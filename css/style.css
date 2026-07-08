@@ -1707,13 +1707,18 @@ input, textarea, select, button { font-family: var(--font); }
     width: 100px;
     height: 100px;
     border-radius: 50%;
-    object-fit: cover;
     border: 3px solid var(--accent);
     box-shadow: 0 0 40px rgba(245,200,66,0.2);
     animation: float 5s ease-in-out infinite;
     margin-bottom: 20px;
     position: relative;
     z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(245,200,66,0.08);
+    font-size: 44px;
+    color: var(--accent);
 }
 
 .landing-hero .lh-badge {

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>طلب عضوية - نقابة المهن التمثيلية</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+<link rel="stylesheet" href="../css/style.css" />
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<style>
+.auth-body { display:flex; align-items:center; justify-content:center; min-height:100vh; padding:20px; }
+.auth-card { background:var(--bg-card); border-radius:var(--radius-xl); padding:32px 24px; width:100%; max-width:460px; box-shadow:var(--shadow-lg); }
+.auth-card h2 { text-align:center; margin-bottom:8px; font-size:22px; }
+.auth-card .sub { text-align:center; color:var(--text-secondary); font-size:14px; margin-bottom:28px; }
+.form-group { margin-bottom:16px; }
+.form-group label { display:block; font-size:13px; color:var(--text-secondary); margin-bottom:6px; }
+.form-group input, .form-group select { width:100%; padding:14px 16px; background:var(--bg-elevated); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text); font-size:15px; outline:none; transition:border-color 0.2s; font-family:var(--font); }
+.form-group input:focus, .form-group select:focus { border-color:var(--accent); }
+.form-group select option { background:#1a1a2e; }
+.btn-submit { width:100%; padding:14px; background:var(--accent-gradient); border:none; border-radius:var(--radius-sm); color:#0a0a14; font-size:16px; font-weight:700; cursor:pointer; transition:opacity 0.2s; }
+.btn-submit:hover { opacity:0.9; }
+.btn-submit:disabled { opacity:0.5; cursor:not-allowed; }
+.auth-footer { text-align:center; margin-top:20px; font-size:14px; color:var(--text-secondary); }
+.auth-footer a { color:var(--accent); font-weight:500; }
+.msg { text-align:center; font-size:13px; margin-top:12px; min-height:20px; }
+.msg.error { color:var(--danger); }
+.msg.success { color:var(--success); }
+.back-link { display:inline-flex; align-items:center; gap:6px; color:var(--text-secondary); font-size:13px; margin-bottom:20px; }
+.back-link i { font-size:12px; }
+</style>
+</head>
+<body class="auth-body">
+  <div class="auth-card">
+    <a href="../index.html" class="back-link"><i class="fas fa-arrow-right"></i> العودة للرئيسية</a>
+    <h2>طلب عضوية</h2>
+    <p class="sub">انضم إلى نقابة المهن التمثيلية وكن جزءاً من الأسرة الفنية</p>
+    <form id="registerForm">
+      <div class="form-group">
+        <label>الاسم الكامل</label>
+        <input type="text" id="fullName" placeholder="الاسم كما في الهوية" required />
+      </div>
+      <div class="form-group">
+        <label>البريد الإلكتروني</label>
+        <input type="email" id="email" placeholder="your@email.com" required />
+      </div>
+      <div class="form-group">
+        <label>رقم الهاتف</label>
+        <input type="tel" id="phone" placeholder="+222 12 34 56 78" dir="ltr" />
+      </div>
+      <div class="form-group">
+        <label>التخصص الفني</label>
+        <select id="profession">
+          <option value="">اختر تخصصك</option>
+          <option value="ممثل">ممثل</option>
+          <option value="مخرج">مخرج</option>
+          <option value="منتج">منتج</option>
+          <option value="كاتب سيناريو">كاتب سيناريو</option>
+          <option value="فني مسرح">فني مسرح</option>
+          <option value="أخرى">أخرى</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>كلمة المرور</label>
+        <input type="password" id="password" placeholder="حدد كلمة مرور قوية" required />
+      </div>
+      <button type="submit" class="btn-submit" id="submitBtn">إرسال الطلب</button>
+    </form>
+    <div id="msg" class="msg"></div>
+    <div class="auth-footer">
+      لديك حساب بالفعل؟ <a href="login.html">تسجيل الدخول</a>
+    </div>
+  </div>
+  <script src="../js/script.js"></script>
+  <script>
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const msg = document.getElementById('msg');
+      const btn = document.getElementById('submitBtn');
+      msg.className = 'msg';
+      msg.textContent = 'جاري إنشاء الحساب...';
+      btn.disabled = true;
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const fullName = document.getElementById('fullName').value;
+      const phone = document.getElementById('phone').value;
+      const profession = document.getElementById('profession').value;
+      const result = await signUp(email, password, fullName, { phone, profession });
+      if (result.error) {
+        msg.className = 'msg error';
+        msg.textContent = result.error;
+        btn.disabled = false;
+      } else {
+        msg.className = 'msg success';
+        msg.textContent = 'تم إرسال الطلب بنجاح! تحقق من بريدك الإلكتروني للتأكيد.';
+        setTimeout(() => window.location.href = 'login.html', 2500);
+      }
+    });
+  </script>
+</body>
+</html>
