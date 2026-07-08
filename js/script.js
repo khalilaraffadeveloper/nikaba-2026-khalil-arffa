@@ -16,10 +16,6 @@ async function signUp(email, password, fullName, metadata) {
     }
   });
   if (authError) return { error: authError.message };
-  const { error: insertError } = await supabase.from('members').insert({
-    full_name: fullName
-  });
-  if (insertError) return { error: insertError.message };
   return { success: true, user: authData.user };
 }
 
@@ -53,9 +49,25 @@ async function getMembers() {
 async function getMyProfile() {
   const user = await getCurrentUser();
   if (!user) return { error: 'Not logged in' };
-  const { data, error } = await supabase.from('members').select('*').eq('id', user.id).maybeSingle();
+  const { data, error } = await supabase.from('members').select('*').eq('user_id', user.id).maybeSingle();
   if (error && error.code !== 'PGRST116') return { error: error.message };
   return { data, metadata: user.user_metadata };
+}
+
+async function updateProfile(fields) {
+  const user = await getCurrentUser();
+  if (!user) return { error: 'Not logged in' };
+  const profile = await getMyProfile();
+  if (!profile.data) return { error: 'Profile not found' };
+  const { data, error } = await supabase.from('members').update(fields).eq('user_id', user.id).select().maybeSingle();
+  if (error) return { error: error.message };
+  return { data };
+}
+
+async function getMemberById(id) {
+  const { data, error } = await supabase.from('members').select('*').eq('id', id).maybeSingle();
+  if (error) return { error: error.message };
+  return { data };
 }
 
 initSupabase();
