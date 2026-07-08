@@ -70,4 +70,24 @@ async function getMemberById(id) {
   return { data };
 }
 
+async function requireAuth() {
+  const user = await getCurrentUser();
+  if (!user) {
+    window.location.href = 'login.html';
+    return null;
+  }
+  return user;
+}
+
+async function requireAdmin() {
+  const user = await requireAuth();
+  if (!user) return null;
+  const { data } = await getMyProfile();
+  if (!data?.is_admin) {
+    window.location.href = 'dashboard.html';
+    return null;
+  }
+  return { user, profile: data };
+}
+
 initSupabase();

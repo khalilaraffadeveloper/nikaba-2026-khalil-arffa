@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>اللوحة الرئيسية - نقابة المهن التمثيلية</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+<link rel="stylesheet" href="../css/style.css" />
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<style>
+.dashboard { max-width: 900px; margin: 0 auto; padding: 20px; }
+.dash-header { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:24px; padding-bottom:16px; border-bottom:1px solid var(--border); }
+.dash-header h1 { font-size:20px; display:flex; align-items:center; gap:8px; }
+.dash-header h1 i { color:var(--accent); }
+.dash-header .user-badge { font-size:13px; color:var(--text-secondary); display:flex; align-items:center; gap:6px; }
+.dash-header .user-badge i { font-size:16px; }
+.btn-logout { padding:8px 18px; background:transparent; border:1px solid var(--danger); color:var(--danger); border-radius:6px; cursor:pointer; font-size:13px; transition:all 0.2s; }
+.btn-logout:hover { background:var(--danger); color:#fff; }
+.card { background:var(--bg-card); border-radius:var(--radius-xl); padding:20px; margin-bottom:16px; box-shadow:var(--shadow-lg); }
+.card h3 { font-size:15px; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+.card h3 i { color:var(--accent); }
+.profile-row { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border); font-size:14px; flex-wrap:wrap; gap:4px; }
+.profile-row:last-child { border-bottom:none; }
+.profile-row .label { color:var(--text-secondary); }
+.profile-row .value { font-weight:500; }
+.status-badge { display:inline-block; padding:2px 10px; border-radius:20px; font-size:12px; font-weight:600; }
+.status-approved { background:rgba(34,197,94,0.15); color:var(--success); }
+.status-pending { background:rgba(245,200,66,0.15); color:var(--accent); }
+.status-rejected { background:rgba(239,68,68,0.15); color:var(--danger); }
+.member-card { padding:14px; border-bottom:1px solid var(--border); font-size:14px; }
+.member-card:last-child { border-bottom:none; }
+.member-card .member-name { font-weight:600; font-size:15px; }
+.member-card .member-meta { display:flex; flex-wrap:wrap; gap:12px; margin-top:4px; color:var(--text-secondary); font-size:13px; }
+.member-actions { display:flex; gap:6px; margin-top:8px; flex-wrap:wrap; }
+.btn-sm { padding:5px 12px; border:none; border-radius:4px; cursor:pointer; font-size:12px; font-weight:600; transition:opacity 0.2s; }
+.btn-sm:hover { opacity:0.8; }
+.btn-approve { background:var(--success); color:#fff; }
+.btn-reject { background:var(--danger); color:#fff; }
+.btn-edit { background:var(--accent); color:#0a0a14; }
+.tabs { display:flex; gap:4px; margin-bottom:16px; }
+.tab { padding:8px 16px; border-radius:6px; cursor:pointer; font-size:13px; background:var(--bg-elevated); border:1px solid var(--border); color:var(--text-secondary); transition:all 0.2s; }
+.tab.active { background:var(--accent); color:#0a0a14; border-color:var(--accent); font-weight:600; }
+.tab:hover:not(.active) { border-color:var(--accent); }
+.empty-state { text-align:center; padding:30px 20px; color:var(--text-secondary); font-size:14px; }
+.empty-state i { font-size:40px; margin-bottom:10px; opacity:0.4; }
+#loading { text-align:center; padding:40px; color:var(--text-secondary); }
+#loading i { font-size:24px; animation:spin 1s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.admin-badge { background:var(--accent); color:#0a0a14; font-size:11px; padding:2px 8px; border-radius:4px; font-weight:700; margin-left:6px; }
+</style>
+</head>
+<body>
+<div class="dashboard" id="app" style="display:none;">
+  <div class="dash-header">
+    <h1><i class="fas fa-id-card"></i> اللوحة الرئيسية</h1>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+      <span class="user-badge"><i class="fas fa-user-circle"></i> <span id="userEmail"></span></span>
+      <button class="btn-logout" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</button>
+    </div>
+  </div>
+
+  <div id="loading"><i class="fas fa-spinner"></i> جاري التحميل...</div>
+
+  <div id="content" style="display:none;">
+    <div class="card">
+      <h3><i class="fas fa-user"></i> بياناتي</h3>
+      <div id="profileInfo"></div>
+    </div>
+
+    <div class="card" id="adminPanel" style="display:none;">
+      <h3><i class="fas fa-users-cog"></i> إدارة الأعضاء</h3>
+      <div class="tabs">
+        <div class="tab active" data-tab="all" onclick="switchTab('all')">الكل</div>
+        <div class="tab" data-tab="pending" onclick="switchTab('pending')">قيد الانتظار</div>
+        <div class="tab" data-tab="approved" onclick="switchTab('approved')">المعتمدون</div>
+      </div>
+      <div id="membersList"></div>
+    </div>
+  </div>
+</div>
+
+<script src="../js/script.js"></script>
+<script>
+let currentUser = null;
+let currentProfile = null;
+let allMembers = [];
+let currentTab = 'all';
+
+async function init() {
+  currentUser = await requireAuth();
+  if (!currentUser) return;
+  document.getElementById('userEmail').textContent = currentUser.email;
+  document.getElementById('app').style.display = 'block';
+  await loadData();
+}
+
+async function loadData() {
+  document.getElementById('loading').style.display = 'block';
+  document.getElementById('content').style.display = 'none';
+
+  const profileRes = await getMyProfile();
+  currentProfile = profileRes.data;
+  const isAdmin = currentProfile?.is_admin === true;
+
+  document.getElementById('profileInfo').innerHTML = renderProfile(currentProfile);
+
+  if (isAdmin) {
+    document.getElementById('adminPanel').style.display = 'block';
+    const membersRes = await getMembers();
+    if (membersRes.data) {
+      allMembers = membersRes.data;
+      renderMembers(currentTab);
+    }
+  }
+
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('content').style.display = 'block';
+}
+
+function renderProfile(profile) {
+  if (!profile) return '<div class="empty-state"><i class="fas fa-user-slash"></i><div>لم يتم إنشاء ملفك بعد</div></div>';
+  const statusClass = profile.membership_status === 'approved' ? 'status-approved' : profile.membership_status === 'pending' ? 'status-pending' : 'status-rejected';
+  const adminBadge = profile.is_admin ? '<span class="admin-badge"><i class="fas fa-crown"></i> آدمن</span>' : '';
+  return `
+    <div class="profile-row"><span class="label">الاسم</span><span class="value">${esc(profile.full_name)} ${adminBadge}</span></div>
+    <div class="profile-row"><span class="label">البريد</span><span class="value">${esc(profile.email)}</span></div>
+    <div class="profile-row"><span class="label">الهاتف</span><span class="value">${esc(profile.phone) || '—'}</span></div>
+    <div class="profile-row"><span class="label">التخصص</span><span class="value">${esc(profile.professional_type) || '—'}</span></div>
+    <div class="profile-row"><span class="label">الحالة</span><span class="value"><span class="status-badge ${statusClass}">${profile.membership_status === 'approved' ? 'معتمد' : profile.membership_status === 'pending' ? 'قيد الانتظار' : 'مرفوض'}</span></span></div>
+    <div class="profile-row"><span class="label">تاريخ الانضمام</span><span class="value">${profile.join_date ? new Date(profile.join_date).toLocaleDateString('ar') : '—'}</span></div>
+    ${profile.bio ? `<div class="profile-row"><span class="label">نبذة</span><span class="value">${esc(profile.bio)}</span></div>` : ''}
+  `;
+}
+
+function renderMembers(tab) {
+  const filtered = tab === 'all' ? allMembers : allMembers.filter(m => m.membership_status === tab);
+  if (filtered.length === 0) {
+    document.getElementById('membersList').innerHTML = '<div class="empty-state"><i class="fas fa-users"></i><div>لا يوجد أعضاء</div></div>';
+    return;
+  }
+  document.getElementById('membersList').innerHTML = filtered.map(m => {
+    const statusClass = m.membership_status === 'approved' ? 'status-approved' : m.membership_status === 'pending' ? 'status-pending' : 'status-rejected';
+    const statusText = m.membership_status === 'approved' ? 'معتمد' : m.membership_status === 'pending' ? 'قيد الانتظار' : 'مرفوض';
+    const actions = m.membership_status === 'pending' ? `
+      <div class="member-actions">
+        <button class="btn-sm btn-approve" onclick="approveMember(${m.id})"><i class="fas fa-check"></i> اعتماد</button>
+        <button class="btn-sm btn-reject" onclick="rejectMember(${m.id})"><i class="fas fa-times"></i> رفض</button>
+      </div>` : '';
+    return `
+      <div class="member-card">
+        <div class="member-name">${esc(m.full_name)} <span class="status-badge ${statusClass}">${statusText}</span></div>
+        <div class="member-meta">
+          <span><i class="fas fa-envelope"></i> ${esc(m.email)}</span>
+          ${m.phone ? `<span><i class="fas fa-phone"></i> ${esc(m.phone)}</span>` : ''}
+          ${m.professional_type ? `<span><i class="fas fa-microphone"></i> ${esc(m.professional_type)}</span>` : ''}
+        </div>
+        ${actions}
+      </div>`;
+  }).join('');
+}
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  renderMembers(tab);
+}
+
+async function approveMember(id) {
+  const res = await updateMemberStatus(id, 'approved');
+  if (res) loadData();
+}
+
+async function rejectMember(id) {
+  const res = await updateMemberStatus(id, 'rejected');
+  if (res) loadData();
+}
+
+async function updateMemberStatus(id, status) {
+  const { data, error } = await supabase.from('members').update({ membership_status: status }).eq('id', id).select();
+  if (error) { alert('خطأ: ' + error.message); return false; }
+  return true;
+}
+
+async function handleLogout() {
+  await signOut();
+  window.location.href = '../index.html';
+}
+
+function esc(s) {
+  if (!s) return '';
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+init();
+</script>
+</body>
+</html>

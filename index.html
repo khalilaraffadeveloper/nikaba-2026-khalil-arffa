@@ -24,9 +24,10 @@
                 منصة فنية مهنية تجمع فناني وممثلي موريتانيا تحت مظلة نقابية موحدة للدفاع عن الحقوق والارتقاء بالمستوى الفني
             </p>
 
-            <div class="lh-buttons">
-                <a href="pages/login.html" class="lh-btn-primary"><i class="fas fa-sign-in-alt"></i> تسجيل الدخول</a>
-                <a href="pages/register.html" class="lh-btn-secondary"><i class="fas fa-user-plus"></i> طلب عضوية</a>
+            <div class="lh-buttons" id="mainButtons">
+                <a href="pages/login.html" class="lh-btn-primary" id="loginBtn"><i class="fas fa-sign-in-alt"></i> تسجيل الدخول</a>
+                <a href="pages/register.html" class="lh-btn-secondary" id="registerBtn"><i class="fas fa-user-plus"></i> طلب عضوية</a>
+                <a href="pages/dashboard.html" class="lh-btn-primary" id="dashboardBtn" style="display:none;"><i class="fas fa-id-card"></i> اللوحة الرئيسية</a>
             </div>
         </div>
     </div>
@@ -102,6 +103,18 @@
         </div>
     </div>
 
+<script>
+const _SUPABASE_URL = 'https://bfdixkdwhccriliwtnch.supabase.co';
+const _SUPABASE_ANON_KEY = 'sb_publishable_Y3FsxqV_4RA96t7MassN4w_NcOJ31--';
+const _supabase = window.supabase.createClient(_SUPABASE_URL, _SUPABASE_ANON_KEY);
+_supabase.auth.getUser().then(({ data }) => {
+  if (data?.user) {
+    document.getElementById('loginBtn').style.display = 'none';
+    document.getElementById('registerBtn').style.display = 'none';
+    document.getElementById('dashboardBtn').style.display = 'inline-flex';
+  }
+});
+</script>
 <script>
 (function() {
     var canvas = document.createElement('canvas');
