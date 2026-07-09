@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>المكتب التنفيذي - نقابة المهن التمثيلية</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/control.css" />
+    <script src="../js/auth.js"></script>
+</head>
+<body class="control-page">
+
+    <div class="control-wrapper">
+
+        <!-- ===== القائمة الجانبية ===== -->
+        <nav class="mekteb-sidebar" id="mektebSidebar">
+            <div class="mekteb-profile" id="mektebProfile">
+                <div class="mekteb-avatar" id="mektebAvatar">
+                    <img src="../images/logoNikabo.png" alt="الشعار" />
+                </div>
+                <h2 class="mekteb-user-name" id="mektebUserName">المكتب التنفيذي</h2>
+            </div>
+
+            <ul class="mekteb-nav-list" id="mektebNavList">
+
+                <!-- الرئيسية -->
+                <li class="mekteb-nav-item" id="navItemDashboard">
+                    <a href="EL_Mekteb1.html" class="mekteb-nav-link active" id="linkDashboard">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span class="mekteb-nav-text">الرئيسية</span>
+                    </a>
+                </li>
+
+                <!-- الأعضاء -->
+                <li class="mekteb-nav-item" id="navItemMembers">
+                    <a href="members.html" class="mekteb-nav-link" id="linkMembers">
+                        <i class="fas fa-users"></i>
+                        <span class="mekteb-nav-text">الأعضاء</span>
+                        <span class="mekteb-badge" id="badgeMembers">0</span>
+                    </a>
+                </li>
+
+                <!-- طلبات العضوية -->
+                <li class="mekteb-nav-item" id="navItemApplications">
+                    <a href="applications.html" class="mekteb-nav-link" id="linkApplications">
+                        <i class="fas fa-file-signature"></i>
+                        <span class="mekteb-nav-text">طلبات العضوية</span>
+                        <span class="mekteb-badge" id="badgeApplications">0</span>
+                    </a>
+                </li>
+
+                <!-- إدارة المحتوى -->
+                <li class="mekteb-nav-item" id="navItemContent">
+                    <a href="content_manage.html" class="mekteb-nav-link" id="linkContent">
+                        <i class="fas fa-edit"></i>
+                        <span class="mekteb-nav-text">إدارة المحتوى</span>
+                    </a>
+                </li>
+
+                <!-- محتوى الموقع -->
+                <li class="mekteb-nav-item" id="navItemSiteContent">
+                    <a href="site_content.html" class="mekteb-nav-link" id="linkSiteContent">
+                        <i class="fas fa-pager"></i>
+                        <span class="mekteb-nav-text">محتوى الموقع</span>
+                    </a>
+                </li>
+
+                <!-- الأخبار -->
+                <li class="mekteb-nav-item" id="navItemNews">
+                    <a href="news_manage.html" class="mekteb-nav-link" id="linkNews">
+                        <i class="fas fa-newspaper"></i>
+                        <span class="mekteb-nav-text">الأخبار</span>
+                    </a>
+                </li>
+
+                <!-- الفعاليات -->
+                <li class="mekteb-nav-item" id="navItemEvents">
+                    <a href="events_manage.html" class="mekteb-nav-link" id="linkEvents">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span class="mekteb-nav-text">الفعاليات</span>
+                    </a>
+                </li>
+
+                <!-- الانتخابات -->
+                <li class="mekteb-nav-item" id="navItemElections">
+                    <a href="elections.html" class="mekteb-nav-link" id="linkElections">
+                        <i class="fas fa-vote-yea"></i>
+                        <span class="mekteb-nav-text">الانتخابات</span>
+                        <span class="mekteb-badge mekteb-badge-active" id="badgeElections">نشط</span>
+                    </a>
+                </li>
+
+                <!-- إنشاء انتخابات -->
+                <li class="mekteb-nav-item" id="navItemElectionCreate">
+                    <a href="election_create.html" class="mekteb-nav-link" id="linkElectionCreate">
+                        <i class="fas fa-plus-circle"></i>
+                        <span class="mekteb-nav-text">إنشاء انتخابات</span>
+                    </a>
+                </li>
+
+                <!-- المرشحون -->
+                <li class="mekteb-nav-item" id="navItemCandidates">
+                    <a href="election_candidates.html" class="mekteb-nav-link" id="linkCandidates">
+                        <i class="fas fa-user-tie"></i>
+                        <span class="mekteb-nav-text">المرشحون</span>
+                    </a>
+                </li>
+
+                <!-- نتائج الانتخابات -->
+                <li class="mekteb-nav-item" id="navItemResults">
+                    <a href="election_results.html" class="mekteb-nav-link" id="linkResults">
+                        <i class="fas fa-chart-bar"></i>
+                        <span class="mekteb-nav-text">نتائج الانتخابات</span>
+                    </a>
+                </li>
+
+                <!-- المعرض -->
+                <li class="mekteb-nav-item" id="navItemGallery">
+                    <a href="gallery_manage.html" class="mekteb-nav-link" id="linkGallery">
+                        <i class="fas fa-images"></i>
+                        <span class="mekteb-nav-text">المعرض</span>
+                    </a>
+                </li>
+
+                <!-- التعليقات -->
+                <li class="mekteb-nav-item" id="navItemComments">
+                    <a href="comments_manage.html" class="mekteb-nav-link" id="linkComments">
+                        <i class="fas fa-comments"></i>
+                        <span class="mekteb-nav-text">التعليقات</span>
+                        <span class="mekteb-badge" id="badgeComments">0</span>
+                    </a>
+                </li>
+
+                <!-- الرسائل -->
+                <li class="mekteb-nav-item" id="navItemMessages">
+                    <a href="messages_manage.html" class="mekteb-nav-link" id="linkMessages">
+                        <i class="fas fa-envelope"></i>
+                        <span class="mekteb-nav-text">الرسائل</span>
+                        <span class="mekteb-badge" id="badgeMessages">0</span>
+                    </a>
+                </li>
+
+                <!-- تذاكر الدعم -->
+                <li class="mekteb-nav-item" id="navItemTickets">
+                    <a href="support_tickets.html" class="mekteb-nav-link" id="linkTickets">
+                        <i class="fas fa-headset"></i>
+                        <span class="mekteb-nav-text">تذاكر الدعم</span>
+                    </a>
+                </li>
+
+                <!-- النظام المالي -->
+                <li class="mekteb-nav-item" id="navItemFinance">
+                    <a href="finance.html" class="mekteb-nav-link" id="linkFinance">
+                        <i class="fas fa-coins"></i>
+                        <span class="mekteb-nav-text">النظام المالي</span>
+                    </a>
+                </li>
+
+                <!-- الأرصدة -->
+                <li class="mekteb-nav-item" id="navItemBalances">
+                    <a href="finance_balances.html" class="mekteb-nav-link" id="linkBalances">
+                        <i class="fas fa-wallet"></i>
+                        <span class="mekteb-nav-text">الأرصدة</span>
+                    </a>
+                </li>
+
+                <!-- المعاملات -->
+                <li class="mekteb-nav-item" id="navItemTransactions">
+                    <a href="finance_transactions.html" class="mekteb-nav-link" id="linkTransactions">
+                        <i class="fas fa-exchange-alt"></i>
+                        <span class="mekteb-nav-text">المعاملات</span>
+                    </a>
+                </li>
+
+                <!-- الخزنة -->
+                <li class="mekteb-nav-item" id="navItemTreasury">
+                    <a href="treasury.html" class="mekteb-nav-link" id="linkTreasury">
+                        <i class="fas fa-landmark"></i>
+                        <span class="mekteb-nav-text">الخزنة</span>
+                    </a>
+                </li>
+
+                <!-- متجر الآفاتار -->
+                <li class="mekteb-nav-item" id="navItemAvatarShop">
+                    <a href="ctrl_avatar_shop.html" class="mekteb-nav-link" id="linkAvatarShop">
+                        <i class="fas fa-smile"></i>
+                        <span class="mekteb-nav-text">متجر الآفاتار</span>
+                    </a>
+                </li>
+
+                <!-- التحليلات -->
+                <li class="mekteb-nav-item" id="navItemAnalytics">
+                    <a href="analytics.html" class="mekteb-nav-link" id="linkAnalytics">
+                        <i class="fas fa-chart-line"></i>
+                        <span class="mekteb-nav-text">التحليلات</span>
+                    </a>
+                </li>
+
+                <!-- الصلاحيات -->
+                <li class="mekteb-nav-item" id="navItemRoles">
+                    <a href="roles.html" class="mekteb-nav-link" id="linkRoles">
+                        <i class="fas fa-user-shield"></i>
+                        <span class="mekteb-nav-text">الصلاحيات</span>
+                    </a>
+                </li>
+
+                <!-- الإعدادات -->
+                <li class="mekteb-nav-item" id="navItemSettings">
+                    <a href="settings.html" class="mekteb-nav-link" id="linkSettings">
+                        <i class="fas fa-cog"></i>
+                        <span class="mekteb-nav-text">الإعدادات</span>
+                    </a>
+                </li>
+
+                <!-- فصل: الموقع العام -->
+                <li class="mekteb-nav-divider" id="navDividerSite">
+                    <span class="mekteb-divider-text">الموقع العام</span>
+                </li>
+
+                <!-- تصفح الموقع -->
+                <li class="mekteb-nav-item" id="navItemBrowse">
+                    <a href="../index.html" class="mekteb-nav-link" id="linkBrowse" target="_blank">
+                        <i class="fas fa-globe"></i>
+                        <span class="mekteb-nav-text">تصفح الموقع</span>
+                    </a>
+                </li>
+
+                <!-- تسجيل خروج -->
+                <li class="mekteb-nav-item mekteb-logout" id="navItemLogout">
+                    <a href="javascript:void(0)" class="mekteb-nav-link" id="linkLogout" onclick="NikabaAuth.logout();window.location.href='ctrl_login.html'">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span class="mekteb-nav-text">تسجيل خروج</span>
+                    </a>
+                </li>
+
+            </ul>
+        </nav>
+
+        <!-- ===== المحتوى الرئيسي ===== -->
+        <main class="mekteb-content" id="mektebContent">
+
+            <!-- شريط العنوان -->
+            <header class="mekteb-header" id="mektebHeader">
+                <h1 class="mekteb-page-title" id="mektebPageTitle">
+                    <i class="fas fa-tachometer-alt"></i> المكتب التنفيذي
+                </h1>
+                <div class="mekteb-header-left" id="mektebHeaderLeft">
+                    <div class="mekteb-notif-bell" id="mektebNotifBell">
+                        <i class="fas fa-bell"></i>
+                        <span class="mekteb-notif-badge hidden" id="mektebNotifBadge">0</span>
+                    </div>
+                    <div class="mekteb-admin-info" id="mektebAdminInfo">
+                        <img src="https://via.placeholder.com/34/1a1a2e/f5c842?text=ن" alt="المشرف" class="mekteb-admin-avatar" id="mektebAdminAvatar" />
+                        <span class="mekteb-admin-greeting" id="mektebAdminGreeting">مرحباً، <strong class="mekteb-admin-name" id="mektebAdminName">النقيب</strong></span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- إحصائيات سريعة -->
+            <section class="mekteb-stats-grid" id="mektebStatsGrid">
+                <div class="mekteb-stat-card mekteb-stat-blue" id="statCardMembers">
+                    <div class="mekteb-stat-icon"><i class="fas fa-users"></i></div>
+                    <div class="mekteb-stat-number" id="statMembers">0</div>
+                    <div class="mekteb-stat-label">إجمالي الأعضاء</div>
+                </div>
+                <div class="mekteb-stat-card mekteb-stat-gold" id="statCardNews">
+                    <div class="mekteb-stat-icon"><i class="fas fa-newspaper"></i></div>
+                    <div class="mekteb-stat-number" id="statNews">0</div>
+                    <div class="mekteb-stat-label">الأخبار</div>
+                </div>
+                <div class="mekteb-stat-card mekteb-stat-purple" id="statCardEvents">
+                    <div class="mekteb-stat-icon"><i class="fas fa-calendar-alt"></i></div>
+                    <div class="mekteb-stat-number" id="statEvents">0</div>
+                    <div class="mekteb-stat-label">الفعاليات</div>
+                </div>
+                <div class="mekteb-stat-card mekteb-stat-green" id="statCardElections">
+                    <div class="mekteb-stat-icon"><i class="fas fa-vote-yea"></i></div>
+                    <div class="mekteb-stat-number" id="statElections">0</div>
+                    <div class="mekteb-stat-label">انتخابات مكتملة</div>
+                </div>
+                <div class="mekteb-stat-card mekteb-stat-red" id="statCardMessages">
+                    <div class="mekteb-stat-icon"><i class="fas fa-envelope"></i></div>
+                    <div class="mekteb-stat-number" id="statMessages">0</div>
+                    <div class="mekteb-stat-label">رسائل غير مقروءة</div>
+                </div>
+                <div class="mekteb-stat-card mekteb-stat-teal" id="statCardComments">
+                    <div class="mekteb-stat-icon"><i class="fas fa-comments"></i></div>
+                    <div class="mekteb-stat-number" id="statComments">0</div>
+                    <div class="mekteb-stat-label">تعليقات pending</div>
+                </div>
+                <div class="mekteb-stat-card mekteb-stat-orange" id="statCardApplications">
+                    <div class="mekteb-stat-icon"><i class="fas fa-file-signature"></i></div>
+                    <div class="mekteb-stat-number" id="statApplications">0</div>
+                    <div class="mekteb-stat-label">طلبات pending</div>
+                </div>
+                <div class="mekteb-stat-card mekteb-stat-pink" id="statCardTreasury">
+                    <div class="mekteb-stat-icon"><i class="fas fa-landmark"></i></div>
+                    <div class="mekteb-stat-number" id="statTreasury">0</div>
+                    <div class="mekteb-stat-label">الرصيد الحالي</div>
+                </div>
+            </section>
+
+            <!-- النشاطات الأخيرة ولوحة سريعة -->
+            <div class="mekteb-panels" id="mektebPanels">
+
+                <!-- النشاطات الأخيرة -->
+                <section class="mekteb-card" id="mektebCardActivity">
+                    <h2 class="mekteb-card-title"><i class="fas fa-history"></i> آخر النشاطات</h2>
+                    <div class="mekteb-timeline" id="mektebTimeline">
+                        <div class="mekteb-timeline-empty"><i class="fas fa-inbox"></i><p>لا توجد نشاطات بعد</p></div>
+                    </div>
+                </section>
+
+                <!-- الانتخابات النشطة -->
+                <section class="mekteb-card" id="mektebCardElection">
+                    <h2 class="mekteb-card-title"><i class="fas fa-vote-yea"></i> الانتخابات الحالية</h2>
+                    <div class="mekteb-election-box" id="mektebElectionBox">
+                        <div class="mekteb-election-icon"><i class="fas fa-vote-yea"></i></div>
+                        <div class="mekteb-election-title" id="mektebElectionTitle">لا توجد انتخابات نشطة</div>
+                        <div class="mekteb-election-meta" id="mektebElectionMeta"></div>
+                        <div class="mekteb-progress-bar" id="mektebProgressBar">
+                            <div class="mekteb-progress-fill" id="mektebProgressFill" style="width: 0%;"></div>
+                        </div>
+                        <div class="mekteb-election-stats" id="mektebElectionStats">
+                            <span id="mektebElectionPercent">0%</span>
+                            <span id="mektebElectionVotes">0 صوت من 0</span>
+                        </div>
+                    </div>
+                    <div class="mekteb-election-actions" id="mektebElectionActions">
+                        <a href="elections.html" class="mekteb-btn-sm mekteb-btn-outline" id="btnViewElections"><i class="fas fa-eye"></i> عرض التفاصيل</a>
+                        <a href="election_candidates.html" class="mekteb-btn-sm mekteb-btn-accent" id="btnViewCandidates"><i class="fas fa-user-tie"></i> المرشحون</a>
+                    </div>
+                </section>
+
+            </div>
+
+            <!-- آخر الأخبار المنشورة -->
+            <section class="mekteb-card" id="mektebCardLatestNews">
+                <h2 class="mekteb-card-title"><i class="fas fa-clock"></i> آخر الأخبار المنشورة</h2>
+                <div class="mekteb-table-wrap" id="mektebTableWrap">
+                    <table class="mekteb-table" id="mektebTable">
+                        <thead>
+                            <tr>
+                                <th>العنوان</th>
+                                <th>التاريخ</th>
+                                <th>المشاهدات</th>
+                                <th>الإعجابات</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="mektebLatestNewsBody">
+                            <tr><td colspan="5" class="mekteb-table-empty">لا توجد أخبار بعد</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+        </main>
+
+    </div>
+
+    <!-- ===== لوحة الإشعارات ===== -->
+    <div class="mekteb-notif-overlay" id="mektebNotifOverlay"></div>
+    <div class="mekteb-notif-panel" id="mektebNotifPanel">
+        <div class="mekteb-notif-panel-header">
+            <h3><i class="fas fa-bell"></i> الإشعارات <span class="mekteb-notif-panel-count" id="mektebNotifPanelCount">0</span></h3>
+            <button class="mekteb-notif-close" id="mektebNotifClose"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="mekteb-notif-panel-actions">
+            <button class="mekteb-notif-action-btn" id="btnMarkAllRead"><i class="fas fa-check-double"></i> قراءة الكل</button>
+            <button class="mekteb-notif-action-btn" id="btnClearAll"><i class="fas fa-trash"></i> مسح الكل</button>
+            <button class="mekteb-notif-action-btn" id="btnViewAllNotifs"><i class="fas fa-external-link-alt"></i> عرض الكل</button>
+        </div>
+        <div class="mekteb-notif-list" id="mektebNotifList">
+            <div class="mekteb-notif-empty"><i class="fas fa-bell"></i><p>لا توجد إشعارات</p></div>
+        </div>
+    </div>
+
+    <script>
+    (async function() {
+        if (!NikabaAuth.checkAuth(true)) return;
+        var user = NikabaAuth.getUser();
+        if (user) {
+            document.querySelector('#mektebAdminName').textContent = user.name || 'النقيب';
+        }
+        try {
+            var r = await NikabaAuth.apiFetch('/api/dashboard/stats');
+            var d = await r.json();
+            if (document.getElementById('statMembers')) document.getElementById('statMembers').textContent = d.members ?? 0;
+            if (document.getElementById('statNews')) document.getElementById('statNews').textContent = d.news ?? 0;
+            if (document.getElementById('statEvents')) document.getElementById('statEvents').textContent = d.events ?? 0;
+            if (document.getElementById('statElections')) document.getElementById('statElections').textContent = d.elections_active ?? 0;
+            if (document.getElementById('statMessages')) document.getElementById('statMessages').textContent = d.tickets_open ?? 0;
+            if (document.getElementById('statComments')) document.getElementById('statComments').textContent = d.comments ?? 0;
+            if (document.getElementById('statApplications')) document.getElementById('statApplications').textContent = d.pending_applications ?? 0;
+            if (document.getElementById('statTreasury')) document.getElementById('statTreasury').textContent = d.treasury_balance ?? 0;
+            if (document.getElementById('badgeApplications')) document.getElementById('badgeApplications').textContent = d.pending_applications ?? 0;
+        } catch(e) { console.warn('Stats load failed', e); }
+    })();
+    </script>
+
+</body>
+</html>
