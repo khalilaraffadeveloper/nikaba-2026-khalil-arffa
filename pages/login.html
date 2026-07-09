@@ -77,7 +77,7 @@
           saveSession(d.access_token, d.refresh_token, d.user);
           msg.className = 'msg success';
           msg.textContent = 'تم تسجيل الدخول بنجاح!';
-          setTimeout(() => window.location.href = 'dashboard.html', 1000);
+          setTimeout(() => window.location.href = 'ashatari.html', 1000);
         } else {
           msg.className = 'msg error';
           msg.textContent = d.msg || d.error_description || 'فشل تسجيل الدخول';

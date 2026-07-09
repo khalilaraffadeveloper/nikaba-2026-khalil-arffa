@@ -20,7 +20,7 @@
             <div class="lh-buttons" id="mainButtons">
                 <a href="pages/login.html" class="lh-btn-primary" id="loginBtn"><i class="fas fa-sign-in-alt"></i> تسجيل الدخول</a>
                 <a href="pages/register.html" class="lh-btn-secondary" id="registerBtn"><i class="fas fa-user-plus"></i> طلب عضوية</a>
-                <a href="pages/dashboard.html" class="lh-btn-primary" id="dashboardBtn" style="display:none;"><i class="fas fa-id-card"></i> اللوحة الرئيسية</a>
+
             </div>
         </div>
     </div>
@@ -90,9 +90,7 @@
 try {
   var token = localStorage.getItem('sb-access-token');
   if (token) {
-    document.getElementById('loginBtn').style.display = 'none';
-    document.getElementById('registerBtn').style.display = 'none';
-    document.getElementById('dashboardBtn').style.display = 'inline-flex';
+    window.location.href = 'pages/ashatari.html';
   }
 } catch(e) {}
 </script>
