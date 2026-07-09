@@ -1,0 +1,514 @@
+/* ============================================
+   EL_Mekteb1.css — المكتب التنفيذي
+   تنسيق خاص بلوحة التحكم
+   ============================================ */
+
+/* ===== الأساسيات ===== */
+body.control-page {
+    max-width: 100%;
+    margin: 0;
+}
+
+/* ===== التخطيط العام ===== */
+.control-wrapper {
+    display: flex;
+    min-height: 100vh;
+    max-width: 100%;
+}
+
+/* ===== القائمة الجانبية ===== */
+.mekteb-sidebar {
+    background: var(--bg-card);
+    width: 60px;
+    min-height: 100vh;
+    padding: 16px 10px;
+    overflow: hidden;
+    transition: width 0.3s ease;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid var(--border);
+    z-index: 100;
+}
+.mekteb-sidebar:hover {
+    width: 260px;
+}
+
+.mekteb-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 2px;
+    margin-bottom: 16px;
+    white-space: nowrap;
+}
+.mekteb-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid var(--accent);
+    flex-shrink: 0;
+}
+.mekteb-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.mekteb-user-name {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+}
+
+.mekteb-nav-list {
+    list-style: none;
+    position: relative;
+    flex: 1;
+}
+.mekteb-nav-list li a {
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    padding: 9px 10px;
+    margin: 3px 0;
+    border-radius: 10px;
+    color: var(--text-secondary);
+    transition: all 0.2s;
+    white-space: nowrap;
+    gap: 20px;
+}
+.mekteb-nav-list li a i {
+    font-size: 22px;
+    width: 22px;
+    text-align: center;
+    flex-shrink: 0;
+    color: var(--text-muted);
+    transition: color 0.2s;
+}
+.mekteb-nav-list li a:hover,
+.mekteb-nav-list li a.active {
+    background: var(--accent-glow);
+    color: var(--accent);
+}
+.mekteb-nav-list li a:hover i,
+.mekteb-nav-list li a.active i {
+    color: var(--accent);
+}
+.mekteb-nav-text {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    font-size: 14px;
+    font-weight: 500;
+}
+.mekteb-sidebar:hover .mekteb-nav-text {
+    opacity: 1;
+}
+.mekteb-badge {
+    background: var(--danger);
+    color: #fff;
+    font-size: 10px;
+    padding: 1px 7px;
+    border-radius: 999px;
+    margin-right: auto;
+    font-weight: 700;
+}
+.mekteb-badge-active {
+    background: var(--success);
+}
+.mekteb-nav-divider {
+    padding: 16px 10px 6px;
+    white-space: nowrap;
+}
+.mekteb-divider-text {
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.mekteb-sidebar:hover .mekteb-divider-text {
+    opacity: 1;
+}
+.mekteb-logout a {
+    color: var(--danger) !important;
+}
+.mekteb-logout a i {
+    color: var(--danger) !important;
+}
+
+/* ===== المحتوى الرئيسي ===== */
+.mekteb-content {
+    flex: 1;
+    padding: 20px 24px;
+    overflow-y: auto;
+    min-height: 100vh;
+}
+
+/* ===== شريط العنوان ===== */
+.mekteb-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+.mekteb-page-title {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+}
+.mekteb-page-title i {
+    color: var(--accent);
+}
+.mekteb-header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+.mekteb-notif-bell {
+    position: relative;
+    cursor: pointer;
+    font-size: 20px;
+    color: var(--text-secondary);
+    transition: color 0.2s;
+}
+.mekteb-notif-bell:hover {
+    color: var(--accent);
+}
+.mekteb-notif-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background: var(--danger);
+    color: #fff;
+    font-size: 9px;
+    padding: 1px 6px;
+    border-radius: 999px;
+    font-weight: 700;
+}
+.mekteb-admin-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.mekteb-admin-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--border);
+}
+.mekteb-admin-greeting {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+/* ===== شبكة الإحصائيات ===== */
+.mekteb-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 14px;
+    margin-bottom: 24px;
+}
+.mekteb-stat-card {
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    padding: 18px 16px;
+    text-align: center;
+    border: 1px solid var(--border);
+    transition: all 0.2s;
+}
+.mekteb-stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow);
+}
+.mekteb-stat-icon {
+    font-size: 28px;
+    margin-bottom: 8px;
+}
+.mekteb-stat-number {
+    font-size: 26px;
+    font-weight: 900;
+    margin-bottom: 4px;
+}
+.mekteb-stat-label {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+.mekteb-stat-blue .mekteb-stat-icon { color: var(--primary); }
+.mekteb-stat-blue .mekteb-stat-number { color: var(--primary); }
+.mekteb-stat-gold .mekteb-stat-icon { color: var(--accent); }
+.mekteb-stat-gold .mekteb-stat-number { color: var(--accent); }
+.mekteb-stat-purple .mekteb-stat-icon { color: var(--purple); }
+.mekteb-stat-purple .mekteb-stat-number { color: var(--purple); }
+.mekteb-stat-green .mekteb-stat-icon { color: var(--success); }
+.mekteb-stat-green .mekteb-stat-number { color: var(--success); }
+.mekteb-stat-red .mekteb-stat-icon { color: var(--danger); }
+.mekteb-stat-red .mekteb-stat-number { color: var(--danger); }
+.mekteb-stat-teal .mekteb-stat-icon { color: var(--teal); }
+.mekteb-stat-teal .mekteb-stat-number { color: var(--teal); }
+.mekteb-stat-orange .mekteb-stat-icon { color: var(--orange); }
+.mekteb-stat-orange .mekteb-stat-number { color: var(--orange); }
+.mekteb-stat-pink .mekteb-stat-icon { color: var(--pink); }
+.mekteb-stat-pink .mekteb-stat-number { color: var(--pink); }
+
+/* ===== اللوحات ===== */
+.mekteb-panels {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+.mekteb-card {
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    padding: 20px;
+    border: 1px solid var(--border);
+}
+.mekteb-card-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.mekteb-card-title i {
+    color: var(--accent);
+}
+
+/* النشاطات */
+.mekteb-timeline-empty {
+    text-align: center;
+    padding: 30px 0;
+    color: var(--text-muted);
+}
+.mekteb-timeline-empty i {
+    font-size: 32px;
+    margin-bottom: 8px;
+    display: block;
+}
+.mekteb-timeline-empty p {
+    font-size: 13px;
+}
+
+/* الانتخابات */
+.mekteb-election-box {
+    text-align: center;
+    padding: 16px 0;
+}
+.mekteb-election-icon {
+    font-size: 36px;
+    color: var(--accent);
+    margin-bottom: 8px;
+}
+.mekteb-election-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+}
+.mekteb-election-meta {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+}
+.mekteb-progress-bar {
+    height: 6px;
+    background: var(--bg-elevated);
+    border-radius: 999px;
+    overflow: hidden;
+    margin-bottom: 4px;
+}
+.mekteb-progress-fill {
+    height: 100%;
+    background: var(--accent-gradient);
+    border-radius: 999px;
+    transition: width 0.6s ease;
+}
+.mekteb-election-stats {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--text-muted);
+}
+.mekteb-election-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+.mekteb-btn-sm {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+.mekteb-btn-outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+}
+.mekteb-btn-outline:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+.mekteb-btn-accent {
+    background: var(--accent);
+    color: #0a0a14;
+}
+.mekteb-btn-accent:hover {
+    background: var(--accent-hover);
+}
+
+/* ===== الجدول ===== */
+.mekteb-table-wrap {
+    overflow-x: auto;
+}
+.mekteb-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+.mekteb-table th {
+    text-align: right;
+    padding: 10px 12px;
+    color: var(--text-muted);
+    font-weight: 600;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+}
+.mekteb-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border-light);
+    color: var(--text-secondary);
+}
+.mekteb-table-empty {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 30px 12px !important;
+}
+
+/* ===== لوحة الإشعارات ===== */
+.mekteb-notif-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 200;
+    display: none;
+}
+.mekteb-notif-panel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 360px;
+    height: 100vh;
+    background: var(--bg-card);
+    border-left: 1px solid var(--border);
+    z-index: 201;
+    padding: 24px 20px;
+    display: none;
+    flex-direction: column;
+    box-shadow: -4px 0 20px rgba(0,0,0,0.3);
+}
+.mekteb-notif-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+.mekteb-notif-panel-header h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.mekteb-notif-panel-header h3 span {
+    background: var(--danger);
+    color: #fff;
+    font-size: 11px;
+    padding: 1px 8px;
+    border-radius: 999px;
+}
+.mekteb-notif-close {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 20px;
+    cursor: pointer;
+}
+.mekteb-notif-close:hover {
+    color: var(--text);
+}
+.mekteb-notif-panel-actions {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+.mekteb-notif-action-btn {
+    flex: 1;
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.mekteb-notif-action-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+.mekteb-notif-list {
+    flex: 1;
+    overflow-y: auto;
+}
+.mekteb-notif-empty {
+    text-align: center;
+    padding: 40px 0;
+    color: var(--text-muted);
+}
+.mekteb-notif-empty i {
+    font-size: 36px;
+    display: block;
+    margin-bottom: 8px;
+}
+.mekteb-notif-empty p {
+    font-size: 13px;
+}
+
+/* ===== متجاوب ===== */
+@media (max-width: 768px) {
+    .mekteb-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .mekteb-panels {
+        grid-template-columns: 1fr;
+    }
+    .mekteb-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .mekteb-header-left {
+        width: 100%;
+        justify-content: space-between;
+    }
+}
