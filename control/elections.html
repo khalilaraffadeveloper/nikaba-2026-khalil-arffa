@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>إدارة الانتخابات - لوحة التحكم</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/control.css" />
+    <script src="../js/supabase.js"></script>
+</head>
+<body class="control-page">
+    <div class="control-wrapper">
+        <div class="menu">
+            <div class="profile">
+                <div class="img-box">
+                    <img src="../images/logoNikabo.png" alt="الشعار" />
+                </div>
+                <h2 id="adminName">النقيب</h2>
+            </div>
+            <ul>
+                <li><a href="dashboard.html"><i class="fas fa-chart-pie"></i><span>الرئيسية</span></a></li>
+                <li><a href="applications.html"><i class="fas fa-file-signature"></i><span>الطلبات</span></a></li>
+                <li><a href="members.html"><i class="fas fa-users"></i><span>الأعضاء</span></a></li>
+                <li><a href="content_manage.html"><i class="fas fa-edit"></i><span>المحتوى</span></a></li>
+                <li><a href="news_manage.html"><i class="fas fa-newspaper"></i><span>الأخبار</span></a></li>
+                <li><a href="events_manage.html"><i class="fas fa-calendar-alt"></i><span>الفعاليات</span></a></li>
+                <li><a href="gallery_manage.html"><i class="fas fa-images"></i><span>المعرض</span></a></li>
+                <li><a href="messages_manage.html"><i class="fas fa-envelope"></i><span>الرسائل</span></a></li>
+                <li><a href="elections.html" class="active"><i class="fas fa-vote-yea"></i><span>الانتخابات</span></a></li>
+                <li><a href="support_tickets.html"><i class="fas fa-headset"></i><span>الدعم</span></a></li>
+                <li><a href="finance.html"><i class="fas fa-coins"></i><span>النظام المالي</span></a></li>
+                <li><a href="treasury.html"><i class="fas fa-landmark"></i><span>الخزنة</span></a></li>
+                <li><a href="settings.html"><i class="fas fa-cog"></i><span>الإعدادات</span></a></li>
+                <li class="logout"><a href="javascript:void(0)" onclick="SB.logout();window.location.href='ctrl_login.html'"><i class="fas fa-sign-out-alt"></i><span>تسجيل خروج</span></a></li>
+            </ul>
+        </div>
+
+        <main class="content">
+            <div class="control-header">
+                <h1><i class="fas fa-vote-yea"></i> إدارة الانتخابات</h1>
+                <div class="header-left">
+                    <div class="admin-info">
+                        <span>مرحباً، <strong id="adminNameHeader">النقيب</strong></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- إحصائيات الانتخابات -->
+            <div class="stats-grid" style="grid-template-columns: repeat(5, 1fr);">
+                <div class="stat-widget gold"><div class="stat-icon"><i class="fas fa-vote-yea"></i></div><div class="stat-number" id="statActive">0</div><div class="stat-label">انتخابات نشطة</div></div>
+                <div class="stat-widget blue"><div class="stat-icon"><i class="fas fa-user-tie"></i></div><div class="stat-number" id="statCandidates">0</div><div class="stat-label">مرشحون</div></div>
+                <div class="stat-widget green"><div class="stat-icon"><i class="fas fa-users"></i></div><div class="stat-number" id="statVoters">0</div><div class="stat-label">الناخبون</div></div>
+                <div class="stat-widget purple"><div class="stat-icon"><i class="fas fa-check-double"></i></div><div class="stat-number" id="statVoted">0</div><div class="stat-label">صوتوا</div></div>
+                <div class="stat-widget red"><div class="stat-icon"><i class="fas fa-hourglass-half"></i></div><div class="stat-number" id="statDaysLeft">0</div><div class="stat-label">يوم متبقي</div></div>
+            </div>
+
+            <!-- شريط الأدوات -->
+            <div class="toolbar">
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <button class="btn-secondary filter-btn active" data-filter="active" style="margin:0; padding: 8px 18px; font-size:12px; background: var(--accent); color:#0a0a14; border-color:var(--accent);">الانتخابات النشطة</button>
+                    <button class="btn-secondary filter-btn" data-filter="past" style="margin:0; padding: 8px 18px; font-size:12px;">الانتخابات السابقة</button>
+                    <button class="btn-secondary filter-btn" data-filter="scheduled" style="margin:0; padding: 8px 18px; font-size:12px;">الانتخابات المجدولة</button>
+                </div>
+                <a href="election_create.html" class="add-btn"><i class="fas fa-plus"></i> دورة انتخابية جديدة</a>
+            </div>
+
+            <!-- قائمة الانتخابات -->
+            <div class="section-card">
+                <h2><i class="fas fa-list"></i> الدورات الانتخابية</h2>
+                <div id="electionsList"></div>
+            </div>
+
+            <!-- أزرار التنقل السريع -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px;">
+                <a href="election_candidates.html" class="stat-widget" style="display: block; text-decoration: none;">
+                    <div class="stat-icon"><i class="fas fa-user-tie"></i></div>
+                    <div class="stat-number" id="navCandidates">0</div>
+                    <div class="stat-label">المرشحون <i class="fas fa-arrow-left" style="font-size: 10px;"></i></div>
+                </a>
+                <a href="election_results.html" class="stat-widget" style="display: block; text-decoration: none;">
+                    <div class="stat-icon"><i class="fas fa-chart-bar"></i></div>
+                    <div class="stat-number">0%</div>
+                    <div class="stat-label">النتائج الأولية <i class="fas fa-arrow-left"></i></div>
+                </a>
+            </div>
+
+            <!-- الجدول الزمني للانتخابات -->
+            <div class="section-card">
+                <h2><i class="fas fa-calendar-alt"></i> الجدول الزمني للدورة الانتخابية</h2>
+                <div class="timeline" id="electionTimeline">
+                    <div class="timeline-item"><div class="tl-date">—</div><div class="tl-title" style="color: var(--success);"><i class="fas fa-check-circle"></i> فتح باب الترشيحات</div><div class="tl-desc">بدء استقبال طلبات الترشح وملفات المرشحين</div></div>
+                    <div class="timeline-item"><div class="tl-date">—</div><div class="tl-title" style="color: var(--success);"><i class="fas fa-check-circle"></i> غلق باب الترشيحات</div><div class="tl-desc">آخر أجل لتقديم ملفات الترشح</div></div>
+                    <div class="timeline-item"><div class="tl-date">—</div><div class="tl-title" style="color: var(--primary);"><i class="fas fa-spinner"></i> دراسة الملفات من طرف اللجنة</div><div class="tl-desc">مراجعة ودراسة طلبات الترشح والبت فيها</div></div>
+                    <div class="timeline-item"><div class="tl-date">—</div><div class="tl-title" style="color: var(--primary);"><i class="fas fa-spinner"></i> إعلان القائمة النهائية للمرشحين</div><div class="tl-desc">نشر أسماء المرشحين المقبولين نهائياً</div></div>
+                    <div class="timeline-item"><div class="tl-date">—</div><div class="tl-title" style="color: var(--accent);"><i class="fas fa-vote-yea"></i> بدء التصويت</div><div class="tl-desc">فتح باب التصويت الإلكتروني للأعضاء</div></div>
+                    <div class="timeline-item"><div class="tl-date">—</div><div class="tl-title" style="color: var(--danger);"><i class="fas fa-hourglass-end"></i> إغلاق التصويت</div><div class="tl-desc">آخر يوم للتصويت عند منتصف الليل</div></div>
+                    <div class="timeline-item"><div class="tl-date">—</div><div class="tl-title" style="color: var(--accent);"><i class="fas fa-trophy"></i> إعلان النتائج النهائية</div><div class="tl-desc">الإعلان الرسمي عن الفائزين</div></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+    SB.requireAuth('ctrl_login.html', true);
+
+    (function() {
+        const member = JSON.parse(localStorage.getItem('member') || sessionStorage.getItem('member') || '{}');
+        if (member.name) {
+            document.getElementById('adminName').textContent = member.name;
+            document.getElementById('adminNameHeader').textContent = member.name;
+        }
+    })();
+
+    let allElections = [];
+
+    async function loadElections() {
+        try {
+            allElections = await SB.api('elections', 'select=*&order=created_at.desc');
+            renderElections('active');
+        } catch(e) { console.warn('Failed to load elections', e); }
+    }
+
+    function renderElections(filter) {
+        const now = new Date();
+        let filtered = [];
+        if (filter === 'active') {
+            filtered = allElections.filter(e => e.status === 'active' || (e.status === 'open' && new Date(e.voting_end) >= now));
+        } else if (filter === 'past') {
+            filtered = allElections.filter(e => e.status === 'completed' || (e.voting_end && new Date(e.voting_end) < now));
+        } else if (filter === 'scheduled') {
+            filtered = allElections.filter(e => e.status === 'scheduled' || e.status === 'pending');
+        } else {
+            filtered = allElections;
+        }
+
+        document.getElementById('statActive').textContent = allElections.filter(e => e.status === 'active' || e.status === 'open').length;
+
+        const list = document.getElementById('electionsList');
+        if (filtered.length === 0) {
+            list.innerHTML = '<p style="color:var(--text-muted); text-align:center; padding:20px;">لا توجد انتخابات حالياً</p>';
+            return;
+        }
+
+        list.innerHTML = filtered.map(e => {
+            const statusClass = (e.status === 'active' || e.status === 'open') ? 'active' : (e.status === 'completed' ? 'closed' : 'pending');
+            const statusText = (e.status === 'active' || e.status === 'open') ? 'نشطة' : (e.status === 'completed' ? 'منتهية' : 'مجدولة');
+            return `<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;padding:14px 0;border-bottom:1px solid var(--border);">
+                <div>
+                    <h3 style="margin-bottom:4px;font-size:15px;">${e.title || 'دورة انتخابية'}</h3>
+                    <p style="font-size:12px;color:var(--text-muted);">${e.description || ''} · ${e.voting_start ? 'يبدأ: ' + new Date(e.voting_start).toLocaleDateString('ar') : ''} ${e.voting_end ? '· ينتهي: ' + new Date(e.voting_end).toLocaleDateString('ar') : ''}</p>
+                </div>
+                <div style="display:flex;gap:8px;align-items:center;">
+                    <span class="status-badge ${statusClass}" style="font-size:12px;padding:4px 12px;">${statusText}</span>
+                    <a href="election_results.html?id=${e.id}" class="btn-secondary" style="margin:0;padding:6px 12px;font-size:12px;"><i class="fas fa-chart-bar"></i> النتائج</a>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.filter-btn').forEach(b => { b.style.background=''; b.style.color=''; b.style.borderColor=''; });
+            btn.style.background = 'var(--accent)';
+            btn.style.color = '#0a0a14';
+            btn.style.borderColor = 'var(--accent)';
+            renderElections(btn.dataset.filter);
+        });
+    });
+
+    loadElections();
+    </script>
+</body>
+</html>

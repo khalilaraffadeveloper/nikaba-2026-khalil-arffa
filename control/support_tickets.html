@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>تذاكر الدعم - لوحة التحكم</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/control.css" />
+    <script src="../js/supabase.js"></script>
+</head>
+<body class="control-page">
+    <div class="control-wrapper">
+        <div class="menu">
+            <div class="profile">
+                <div class="img-box">
+                    <img src="../images/logoNikabo.png" alt="الشعار" />
+                </div>
+                <h2 id="adminName">النقيب</h2>
+            </div>
+            <ul>
+                <li><a href="dashboard.html"><i class="fas fa-chart-pie"></i><span>الرئيسية</span></a></li>
+                <li><a href="applications.html"><i class="fas fa-file-signature"></i><span>الطلبات</span></a></li>
+                <li><a href="members.html"><i class="fas fa-users"></i><span>الأعضاء</span></a></li>
+                <li><a href="content_manage.html"><i class="fas fa-edit"></i><span>المحتوى</span></a></li>
+                <li><a href="news_manage.html"><i class="fas fa-newspaper"></i><span>الأخبار</span></a></li>
+                <li><a href="events_manage.html"><i class="fas fa-calendar-alt"></i><span>الفعاليات</span></a></li>
+                <li><a href="gallery_manage.html"><i class="fas fa-images"></i><span>المعرض</span></a></li>
+                <li><a href="messages_manage.html"><i class="fas fa-envelope"></i><span>الرسائل</span></a></li>
+                <li><a href="elections.html"><i class="fas fa-vote-yea"></i><span>الانتخابات</span></a></li>
+                <li><a href="support_tickets.html" class="active"><i class="fas fa-headset"></i><span>الدعم</span></a></li>
+                <li><a href="finance.html"><i class="fas fa-coins"></i><span>النظام المالي</span></a></li>
+                <li><a href="treasury.html"><i class="fas fa-landmark"></i><span>الخزنة</span></a></li>
+                <li><a href="settings.html"><i class="fas fa-cog"></i><span>الإعدادات</span></a></li>
+                <li class="logout"><a href="javascript:void(0)" onclick="SB.logout();window.location.href='ctrl_login.html'"><i class="fas fa-sign-out-alt"></i><span>تسجيل خروج</span></a></li>
+            </ul>
+        </div>
+
+        <main class="content">
+            <div class="control-header">
+                <h1><i class="fas fa-headset"></i> تذاكر الدعم</h1>
+                <div class="header-left">
+                    <div class="stats-inline" style="display:flex;gap:16px;font-size:12px;">
+                        <span><span style="color:#22c55e;font-weight:700;" id="countOpen">0</span> مفتوحة</span>
+                        <span><span style="color:var(--accent);font-weight:700;" id="countPending">0</span> قيد الانتظار</span>
+                        <span><span style="color:var(--text-muted);font-weight:700;" id="countClosed">0</span> مغلقة</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-bar">
+                <button class="active" data-filter="all">الكل</button>
+                <button data-filter="open">مفتوحة</button>
+                <button data-filter="pending">قيد الانتظار</button>
+                <button data-filter="closed">مغلقة</button>
+                <button data-filter="high">عالية الأولوية</button>
+            </div>
+
+            <div id="ticketList"></div>
+        </main>
+    </div>
+
+    <script>
+    SB.requireAuth('ctrl_login.html', true);
+
+    (function() {
+        const member = JSON.parse(localStorage.getItem('member') || sessionStorage.getItem('member') || '{}');
+        if (member.name) {
+            document.getElementById('adminName').textContent = member.name;
+        }
+    })();
+
+    let allTickets = [];
+    let currentFilter = '';
+
+    function timeAgo(dateStr) {
+        if (!dateStr) return '';
+        const diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 60000);
+        if (diff < 1) return 'منذ دقائق';
+        if (diff < 60) return `منذ ${diff} دقائق`;
+        const hrs = Math.floor(diff / 60);
+        if (hrs < 24) return `منذ ${hrs} ساعات`;
+        const days = Math.floor(hrs / 24);
+        return `منذ ${days} يوم`;
+    }
+
+    async function loadTickets() {
+        try {
+            allTickets = await SB.api('support_tickets', 'select=*&order=created_at.desc');
+            updateCounts();
+            renderTickets();
+        } catch(e) { console.warn('Failed to load tickets', e); }
+    }
+
+    function updateCounts() {
+        const open = allTickets.filter(t => t.status === 'open').length;
+        const pending = allTickets.filter(t => t.status === 'pending').length;
+        const closed = allTickets.filter(t => t.status === 'closed').length;
+        document.getElementById('countOpen').textContent = open;
+        document.getElementById('countPending').textContent = pending;
+        document.getElementById('countClosed').textContent = closed;
+    }
+
+    function renderTickets() {
+        let filtered = allTickets;
+        if (currentFilter === 'open') filtered = allTickets.filter(t => t.status === 'open');
+        else if (currentFilter === 'pending') filtered = allTickets.filter(t => t.status === 'pending');
+        else if (currentFilter === 'closed') filtered = allTickets.filter(t => t.status === 'closed');
+        else if (currentFilter === 'high') filtered = allTickets.filter(t => t.priority === 'high');
+
+        const list = document.getElementById('ticketList');
+        if (filtered.length === 0) {
+            list.innerHTML = '<p style="color:var(--text-muted); text-align:center; padding:20px;">لا توجد تذاكر دعم حالياً</p>';
+            return;
+        }
+
+        list.innerHTML = filtered.map(t => {
+            const initial = (t.subject || 'عضو').charAt(0);
+            const statusClass = t.status === 'open' ? 'open' : (t.status === 'closed' ? 'closed' : 'pending');
+            const statusText = t.status === 'open' ? 'مفتوحة' : (t.status === 'closed' ? 'مغلقة' : 'قيد الانتظار');
+            const priorityClass = t.priority || 'medium';
+
+            return `<div class="section-card" style="padding:14px; cursor:pointer;" onclick="toggleDetail(${t.id})">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <div style="width:8px;height:40px;border-radius:4px;flex-shrink:0;background:${priorityClass === 'high' ? '#ef4444' : (priorityClass === 'low' ? '#3b82f6' : 'var(--accent)')};"></div>
+                    <div style="width:36px;height:36px;border-radius:50%;background:var(--bg-elevated);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--accent);">${initial}</div>
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.subject || ''}</div>
+                        <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">عضو #${t.member_id || '?'} · <span class="status-badge ${statusClass}" style="font-size:11px;padding:2px 8px;">${statusText}</span></div>
+                    </div>
+                    <div style="text-align:left;flex-shrink:0;font-size:12px;color:var(--text-muted);">${timeAgo(t.created_at)}</div>
+                </div>
+                <div class="ticket-detail-content" id="detail-${t.id}" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);">
+                    <div style="font-size:13px;line-height:1.6;color:var(--text-secondary);padding:14px;background:var(--bg-elevated);border-radius:var(--radius-sm);margin-bottom:12px;">${t.message || ''}</div>
+                    ${t.status !== 'closed' ? `<div style="display:flex;gap:8px;">
+                        <button class="btn-primary-sm" onclick="event.stopPropagation();closeTicket(${t.id})"><i class="fas fa-check"></i> إغلاق التذكرة</button>
+                    </div>` : '<p style="font-size:12px;color:var(--text-muted);">التذكرة مغلقة</p>'}
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    function toggleDetail(id) {
+        const el = document.getElementById('detail-' + id);
+        if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
+    }
+
+    async function closeTicket(id) {
+        if (!confirm('هل تريد إغلاق هذه التذكرة؟')) return;
+        try {
+            await SB.api('support_tickets', 'id=eq.' + id, { status: 'closed', resolved_at: new Date().toISOString() }, 'PATCH');
+            loadTickets();
+        } catch(e) { console.warn('Failed to close ticket', e); }
+    }
+
+    document.querySelectorAll('.filter-bar button').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.filter-bar button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentFilter = btn.dataset.filter;
+            renderTickets();
+        });
+    });
+
+    loadTickets();
+    </script>
+</body>
+</html>
