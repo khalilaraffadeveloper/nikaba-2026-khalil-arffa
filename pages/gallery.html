@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>المعرض - نقابة المهن التمثيلية</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+    <header class="site-header">
+        <a href="index.html" class="sh-logo">
+            <img src="../images/logoNikabo.png" alt="الشعار" />
+            <h2>المعرض</h2>
+        </a>
+        <div class="sh-menu">
+            <a href="login.html" class="sh-login"><i class="fas fa-sign-in-alt"></i> دخول</a>
+            <a href="register.html" class="sh-register"><i class="fas fa-user-plus"></i></a>
+        </div>
+    </header>
+
+    <main class="site-main">
+        <div class="section-title fade-up"><i class="fas fa-images"></i> معرض الصور</div>
+        <div id="albumList"></div>
+        <div class="gallery-grid" id="galleryGrid"></div>
+    </main>
+
+    <nav class="site-bottom-nav">
+        <a href="index.html"><i class="fas fa-home"></i><span>الرئيسية</span></a>
+        <a href="news.html"><i class="fas fa-newspaper"></i><span>الأخبار</span></a>
+        <a href="events.html"><i class="fas fa-calendar-alt"></i><span>الفعاليات</span></a>
+        <a href="gallery.html" class="active"><i class="fas fa-images"></i><span>المعرض</span></a>
+        <a href="contact.html"><i class="fas fa-headset"></i><span>اتصل بنا</span></a>
+    </nav>
+
+    <script src="../js/supabase.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            SB.api('GET', '/rest/v1/gallery?select=*&order=created_at.desc').then(function(d) {
+                if (!Array.isArray(d) || d.length === 0) {
+                    document.getElementById('galleryGrid').innerHTML = '<div class="card" style="text-align:center;padding:40px;grid-column:1/-1;"><span style="color:var(--text-muted);">لا توجد صور بعد</span></div>';
+                    return;
+                }
+                var h = '';
+                for (var i = 0; i < d.length; i++) {
+                    h += '<img class="g-img" src="' + d[i].image_path + '" alt="' + SB.esc(d[i].title || '') + '" onclick="window.open(this.src)" />';
+                }
+                document.getElementById('galleryGrid').innerHTML = h;
+            }).catch(function() {});
+        });
+    </script>
+</body>
+</html>

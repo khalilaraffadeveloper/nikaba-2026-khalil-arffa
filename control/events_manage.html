@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>إدارة الفعاليات - لوحة التحكم</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/control.css" />
+    <style>
+        .form-group input, .form-group select, .form-group textarea { width:100%; padding:12px 14px; background:var(--bg-elevated); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text); font-size:14px; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color:var(--accent); outline:none; }
+        .form-group label { font-size:12px; color:var(--text-secondary); display:block; margin-bottom:4px; }
+        .btn-save { padding:10px 24px; background:var(--accent); border:none; border-radius:8px; color:#0a0a14; font-weight:700; cursor:pointer; }
+        .btn-cancel { padding:10px 24px; background:var(--bg-elevated); border:1px solid var(--border); border-radius:8px; color:var(--text-secondary); cursor:pointer; }
+    </style>
+</head>
+<body class="control-page">
+    <div class="control-wrapper">
+        <div class="menu">
+            <div class="profile">
+                <div class="img-box"><img src="../images/logoNikabo.png" alt="الشعار" /></div>
+                <h2 id="adminName">النقيب</h2>
+            </div>
+            <ul>
+                <li><a href="dashboard.html"><i class="fas fa-chart-pie"></i><span>الرئيسية</span></a></li>
+                <li><a href="members.html"><i class="fas fa-users"></i><span>الأعضاء</span></a></li>
+                <li><a href="news_manage.html"><i class="fas fa-newspaper"></i><span>الأخبار</span></a></li>
+                <li><a href="events_manage.html" class="active"><i class="fas fa-calendar-alt"></i><span>الفعاليات</span></a></li>
+                <li class="logout"><a href="javascript:void(0)" onclick="logout()"><i class="fas fa-sign-out-alt"></i><span>تسجيل الخروج</span></a></li>
+            </ul>
+        </div>
+
+        <div class="content">
+            <div class="control-header">
+                <h1>إدارة الفعاليات</h1>
+                <div class="header-left">
+                    <button class="add-btn" onclick="showForm()"><i class="fas fa-plus"></i> إضافة فعالية</button>
+                </div>
+            </div>
+
+            <div class="section-card" id="listSection">
+                <h2>جميع الفعاليات</h2>
+                <div id="eventsList"></div>
+            </div>
+
+            <div class="section-card" id="formSection" style="display:none;">
+                <h2 id="formTitle">إضافة فعالية جديدة</h2>
+                <form id="eventsForm">
+                    <input type="hidden" id="editId" value="" />
+                    <div class="form-group"><label>العنوان</label><input type="text" id="eventTitle" required /></div>
+                    <div class="form-group"><label>الملخص</label><textarea id="eventSummary" rows="2"></textarea></div>
+                    <div class="form-group"><label>الوصف</label><textarea id="eventDescription" rows="6"></textarea></div>
+                    <div class="form-group"><label>رابط الصورة</label><input type="text" id="eventImage" placeholder="https://example.com/image.jpg" /></div>
+                    <div class="form-group"><label>الموقع</label><input type="text" id="eventLocation" placeholder="نواكشوط، موريتانيا" /></div>
+                    <div class="form-group"><label>التاريخ</label><input type="text" id="eventDate" placeholder="2026-01-15" /></div>
+                    <div style="display:flex;gap:8px;">
+                        <button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ</button>
+                        <button type="button" class="btn-cancel" onclick="hideForm()">إلغاء</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="../js/supabase.js"></script>
+    <script>
+        var user;
+        function logout() { SB.clearSession(); window.location.href = 'ctrl_login.html'; }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            user = SB.requireAuth('ctrl_login.html');
+            if (!user) return;
+            SB.api('GET', '/rest/v1/members?select=is_admin,full_name&user_id=eq.' + user.id).then(function(m) {
+                var p = Array.isArray(m) ? m[0] : null;
+                if (!p || !p.is_admin) { alert('غير مصرح'); SB.clearSession(); window.location.href = 'ctrl_login.html'; return; }
+                if (p.full_name) document.getElementById('adminName').textContent = p.full_name;
+            });
+            loadEvents();
+
+            document.getElementById('eventsForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                var id = document.getElementById('editId').value;
+                var data = {
+                    title: document.getElementById('eventTitle').value,
+                    summary: document.getElementById('eventSummary').value,
+                    description: document.getElementById('eventDescription').value,
+                    image_path: document.getElementById('eventImage').value,
+                    location: document.getElementById('eventLocation').value,
+                    event_date: document.getElementById('eventDate').value
+                };
+                if (id) {
+                    SB.api('PATCH', '/rest/v1/events?id=eq.' + id, data).then(function() { hideForm(); loadEvents(); });
+                } else {
+                    SB.api('POST', '/rest/v1/events', data).then(function() { hideForm(); loadEvents(); });
+                }
+            });
+        });
+
+        function loadEvents() {
+            SB.api('GET', '/rest/v1/events?select=*&order=created_at.desc').then(function(d) {
+                if (!Array.isArray(d) || d.length === 0) { document.getElementById('eventsList').innerHTML = '<div class="empty-state"><i class="fas fa-calendar-alt"></i><h3>لا توجد فعاليات</h3></div>'; return; }
+                var h = '<div class="table-wrap"><table><thead><tr><th>العنوان</th><th>الموقع</th><th>التاريخ</th><th>إجراءات</th></tr></thead><tbody>';
+                for (var i = 0; i < d.length; i++) {
+                    h += '<tr><td>' + SB.esc(d[i].title) + '</td><td>' + SB.esc(d[i].location || '') + '</td><td>' + (d[i].event_date || '') + '</td>';
+                    h += '<td><div class="action-btns"><button class="btn-edit" onclick="editEvent(' + d[i].id + ')" title="تعديل"><i class="fas fa-edit"></i></button><button class="btn-delete" onclick="deleteEvent(' + d[i].id + ')" title="حذف"><i class="fas fa-trash"></i></button></div></td></tr>';
+                }
+                h += '</tbody></table></div>';
+                document.getElementById('eventsList').innerHTML = h;
+            });
+        }
+
+        function showForm(data) {
+            document.getElementById('listSection').style.display = 'none';
+            document.getElementById('formSection').style.display = 'block';
+            if (data) {
+                document.getElementById('formTitle').textContent = 'تعديل الفعالية';
+                document.getElementById('editId').value = data.id;
+                document.getElementById('eventTitle').value = data.title || '';
+                document.getElementById('eventSummary').value = data.summary || '';
+                document.getElementById('eventDescription').value = data.description || '';
+                document.getElementById('eventImage').value = data.image_path || '';
+                document.getElementById('eventLocation').value = data.location || '';
+                document.getElementById('eventDate').value = data.event_date || '';
+            }
+        }
+
+        function hideForm() {
+            document.getElementById('listSection').style.display = 'block';
+            document.getElementById('formSection').style.display = 'none';
+            document.getElementById('eventsForm').reset();
+            document.getElementById('editId').value = '';
+            document.getElementById('formTitle').textContent = 'إضافة فعالية جديدة';
+        }
+
+        function editEvent(id) {
+            SB.api('GET', '/rest/v1/events?id=eq.' + id + '&select=*').then(function(d) {
+                var item = Array.isArray(d) ? d[0] : d;
+                if (item) showForm(item);
+            });
+        }
+
+        function deleteEvent(id) {
+            if (confirm('هل أنت متأكد من حذف هذه الفعالية؟')) {
+                SB.api('DELETE', '/rest/v1/events?id=eq.' + id).then(function() { loadEvents(); });
+            }
+        }
+    </script>
+</body>
+</html>

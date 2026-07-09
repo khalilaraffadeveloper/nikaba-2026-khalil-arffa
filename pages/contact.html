@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>اتصل بنا - نقابة المهن التمثيلية</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+    <header class="site-header">
+        <a href="index.html" class="sh-logo">
+            <img src="../images/logoNikabo.png" alt="الشعار" />
+            <h2>اتصل بنا</h2>
+        </a>
+        <div class="sh-menu">
+            <a href="login.html" class="sh-login"><i class="fas fa-sign-in-alt"></i> دخول</a>
+            <a href="register.html" class="sh-register"><i class="fas fa-user-plus"></i></a>
+        </div>
+    </header>
+
+    <main class="site-main">
+        <div class="section-title fade-up"><i class="fas fa-headset"></i> اتصل بنا</div>
+        <div class="card fade-up">
+            <div class="contact-item">
+                <div class="ci-icon"><i class="fas fa-map-marker-alt"></i></div>
+                <div class="ci-info"><div class="ci-label">العنوان</div><div class="ci-value" id="contactAddress">نواكشوط، موريتانيا</div></div>
+            </div>
+            <div class="contact-item">
+                <div class="ci-icon"><i class="fas fa-phone"></i></div>
+                <div class="ci-info"><div class="ci-label">الهاتف</div><div class="ci-value" id="contactPhone">0022236280528</div></div>
+            </div>
+            <div class="contact-item">
+                <div class="ci-icon"><i class="fas fa-envelope"></i></div>
+                <div class="ci-info"><div class="ci-label">البريد الإلكتروني</div><div class="ci-value" id="contactEmail">facebooyy@gmail.com</div></div>
+            </div>
+        </div>
+
+        <div class="card fade-up delay-1">
+            <h3 style="font-size:16px;margin-bottom:12px;display:flex;align-items:center;gap:6px;"><i class="fas fa-paper-plane" style="color:var(--accent);"></i> أرسل لنا رسالة</h3>
+            <form id="contactForm">
+                <div class="form-group"><input type="text" id="contactName" placeholder="اسمك" required /></div>
+                <div class="form-group"><input type="email" id="contactEmailInput" placeholder="بريدك الإلكتروني" required /></div>
+                <div class="form-group"><textarea id="contactMsg" rows="4" placeholder="رسالتك..." required></textarea></div>
+                <button type="submit" class="btn-primary" id="contactSubmit">إرسال <i class="fas fa-arrow-left"></i></button>
+            </form>
+            <div id="contactMsgResult" style="text-align:center;font-size:13px;margin-top:12px;"></div>
+        </div>
+
+        <div class="card fade-up delay-2">
+            <div class="sf-social" style="justify-content:center;">
+                <a href="https://www.facebook.com/share/1KnBzbNcWP/" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
+                <a href="https://wa.me/22236280528" target="_blank"><i class="fab fa-whatsapp"></i></a>
+            </div>
+        </div>
+
+        <a href="index.html" class="view-all"><i class="fas fa-arrow-left"></i> العودة للرئيسية</a>
+    </main>
+
+    <nav class="site-bottom-nav">
+        <a href="index.html"><i class="fas fa-home"></i><span>الرئيسية</span></a>
+        <a href="news.html"><i class="fas fa-newspaper"></i><span>الأخبار</span></a>
+        <a href="events.html"><i class="fas fa-calendar-alt"></i><span>الفعاليات</span></a>
+        <a href="gallery.html"><i class="fas fa-images"></i><span>المعرض</span></a>
+        <a href="contact.html" class="active"><i class="fas fa-headset"></i><span>اتصل بنا</span></a>
+    </nav>
+
+    <script src="../js/supabase.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            SB.api('GET', '/rest/v1/settings?select=*').then(function(d) {
+                if (!Array.isArray(d)) return;
+                for (var i = 0; i < d.length; i++) {
+                    if (d[i].key === 'site_address') document.getElementById('contactAddress').textContent = d[i].value;
+                    if (d[i].key === 'site_phone') document.getElementById('contactPhone').textContent = d[i].value;
+                    if (d[i].key === 'site_email') document.getElementById('contactEmail').textContent = d[i].value;
+                }
+            }).catch(function() {});
+
+            document.getElementById('contactForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                var btn = document.getElementById('contactSubmit');
+                btn.disabled = true;
+                btn.textContent = 'جاري الإرسال...';
+                var data = { name: document.getElementById('contactName').value, email: document.getElementById('contactEmailInput').value, message: document.getElementById('contactMsg').value };
+                SB.api('POST', '/rest/v1/contact_messages', data).then(function() {
+                    document.getElementById('contactMsgResult').innerHTML = '<span style="color:var(--success);">تم إرسال رسالتك بنجاح!</span>';
+                    document.getElementById('contactForm').reset();
+                    btn.disabled = false;
+                    btn.innerHTML = 'إرسال <i class="fas fa-arrow-left"></i>';
+                }).catch(function() {
+                    document.getElementById('contactMsgResult').innerHTML = '<span style="color:var(--danger);">خطأ في الإرسال</span>';
+                    btn.disabled = false;
+                    btn.innerHTML = 'إرسال <i class="fas fa-arrow-left"></i>';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

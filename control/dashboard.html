@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>لوحة التحكم - الرئيسية</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/control.css" />
+</head>
+<body class="control-page">
+    <div class="control-wrapper">
+        <div class="menu">
+            <div class="profile">
+                <div class="img-box"><img src="../images/logoNikabo.png" alt="الشعار" /></div>
+                <h2 id="adminName">النقيب</h2>
+            </div>
+            <ul>
+                <li><a href="dashboard.html" class="active"><i class="fas fa-chart-pie"></i><span>الرئيسية</span></a></li>
+                <li><a href="members.html"><i class="fas fa-users"></i><span>الأعضاء</span></a></li>
+                <li><a href="news_manage.html"><i class="fas fa-newspaper"></i><span>الأخبار</span></a></li>
+                <li><a href="events_manage.html"><i class="fas fa-calendar-alt"></i><span>الفعاليات</span></a></li>
+                <li class="logout"><a href="javascript:void(0)" onclick="logout()"><i class="fas fa-sign-out-alt"></i><span>تسجيل الخروج</span></a></li>
+            </ul>
+        </div>
+
+        <div class="content">
+            <div class="control-header">
+                <h1>الرئيسية</h1>
+                <div class="header-left">
+                    <div class="admin-info"><span id="adminEmail"></span></div>
+                </div>
+            </div>
+
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-widget gold"><div class="stat-icon"><i class="fas fa-users"></i></div><div class="stat-number" id="statMembers">0</div><div class="stat-label">إجمالي الأعضاء</div></div>
+                <div class="stat-widget green"><div class="stat-icon"><i class="fas fa-user-check"></i></div><div class="stat-number" id="statApproved">0</div><div class="stat-label">معتمد</div></div>
+                <div class="stat-widget" style="border-color:rgba(245,158,11,0.3);"><div class="stat-icon" style="color:#f59e0b;"><i class="fas fa-clock"></i></div><div class="stat-number" id="statPending">0</div><div class="stat-label">قيد الانتظار</div></div>
+                <div class="stat-widget red"><div class="stat-icon"><i class="fas fa-newspaper"></i></div><div class="stat-number" id="statNews">0</div><div class="stat-label">الأخبار</div></div>
+                <div class="stat-widget blue"><div class="stat-icon"><i class="fas fa-calendar-alt"></i></div><div class="stat-number" id="statEvents">0</div><div class="stat-label">الفعاليات</div></div>
+                <div class="stat-widget purple"><div class="stat-icon"><i class="fas fa-images"></i></div><div class="stat-number" id="statGallery">0</div><div class="stat-label">صور المعرض</div></div>
+            </div>
+
+            <div class="section-card">
+                <h2>آخر طلبات العضوية</h2>
+                <div id="recentMembers"><div class="empty-state"><i class="fas fa-users"></i><h3>لا توجد طلبات</h3></div></div>
+            </div>
+        </div>
+    </div>
+    <script src="../js/supabase.js"></script>
+    <script>
+        var user;
+        function logout() { SB.clearSession(); window.location.href = 'ctrl_login.html'; }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            user = SB.requireAuth('ctrl_login.html');
+            if (!user) return;
+
+            SB.api('GET', '/rest/v1/members?select=is_admin,full_name&user_id=eq.' + user.id).then(function(members) {
+                var profile = Array.isArray(members) ? members[0] : null;
+                if (!profile || !profile.is_admin) { alert('غير مصرح لك بالدخول'); SB.clearSession(); window.location.href = '../pages/ashatari.html'; return; }
+                if (profile.full_name) document.getElementById('adminName').textContent = profile.full_name;
+            });
+            document.getElementById('adminEmail').textContent = user.email;
+
+            SB.api('GET', '/rest/v1/members?select=id,membership_status').then(function(members) {
+                if (!Array.isArray(members)) return;
+                var total = members.length;
+                var approved = 0, pending = 0;
+                for (var i = 0; i < members.length; i++) {
+                    if (members[i].membership_status === 'approved') approved++;
+                    else if (members[i].membership_status === 'pending' || !members[i].membership_status) pending++;
+                }
+                document.getElementById('statMembers').textContent = total;
+                document.getElementById('statApproved').textContent = approved;
+                document.getElementById('statPending').textContent = pending;
+            });
+
+            SB.api('GET', '/rest/v1/news?select=id').then(function(d) { if (Array.isArray(d)) document.getElementById('statNews').textContent = d.length; });
+            SB.api('GET', '/rest/v1/events?select=id').then(function(d) { if (Array.isArray(d)) document.getElementById('statEvents').textContent = d.length; });
+            SB.api('GET', '/rest/v1/gallery?select=id').then(function(d) { if (Array.isArray(d)) document.getElementById('statGallery').textContent = d.length; });
+
+            SB.api('GET', '/rest/v1/members?select=id,full_name,email,professional_type,membership_status,created_at&order=created_at.desc').then(function(members) {
+                if (!Array.isArray(members) || members.length === 0) return;
+                var recent = members.slice(0, 5);
+                var h = '<div class="table-wrap"><table><thead><tr><th>الاسم</th><th>البريد</th><th>التخصص</th><th>الحالة</th></tr></thead><tbody>';
+                for (var i = 0; i < recent.length; i++) {
+                    var m = recent[i];
+                    var stClass = m.membership_status === 'approved' ? 'approved' : m.membership_status === 'rejected' ? 'rejected' : 'pending';
+                    h += '<tr><td>' + SB.esc(m.full_name) + '</td><td>' + SB.esc(m.email) + '</td><td>' + SB.esc(m.professional_type || '') + '</td><td><span class="status-badge ' + stClass + '">' + (m.membership_status || 'pending') + '</span></td></tr>';
+                }
+                h += '</tbody></table></div>';
+                document.getElementById('recentMembers').innerHTML = h;
+            });
+        });
+    </script>
+</body>
+</html>
