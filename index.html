@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8" />
@@ -12,12 +12,17 @@
     <div class="landing">
         <div class="landing-hero">
             <div class="lh-glow"></div>
+
             <div class="lh-badge"><i class="fas fa-star"></i> نقابة المهن التمثيلية</div>
+
             <img src="images/logoNikabo.png" alt="شعار النقابة" class="lh-logo" />
+
             <h1>نقابة المهن<br>التمثيلية</h1>
+
             <p class="lh-sub">
                 منصة فنية مهنية تجمع فناني وممثلي موريتانيا تحت مظلة نقابية موحدة للدفاع عن الحقوق والارتقاء بالمستوى الفني
             </p>
+
             <div class="lh-buttons">
                 <a href="pages/login.html" class="lh-btn-primary"><i class="fas fa-sign-in-alt"></i> تسجيل الدخول</a>
                 <a href="pages/register.html" class="lh-btn-secondary"><i class="fas fa-user-plus"></i> طلب عضوية</a>
@@ -25,6 +30,7 @@
         </div>
     </div>
 
+    <!-- ===== قسم الاشتراك وطرق الدفع ===== -->
     <div class="landing-section">
         <div class="ls-badge"><i class="fas fa-credit-card"></i> الاشتراك والدفع</div>
         <h2 class="ls-title">كيف تصبح عضواً في النقابة؟</h2>
@@ -60,28 +66,41 @@
             </div>
         </div>
 
-        <div class="ls-payment">
-            <h3>طرق الدفع المقبولة</h3>
-            <p class="ls-acc-num">رقم استلام الرسوم 26067036</p>
-            <div class="ls-pm-list">
-                <span>بنكيلي</span> <span>السداد</span> <span>مصرفي</span>
-                <span>بيم بانك</span> <span>كليك</span>
-                <span>موف موني</span> <span>غزة باي</span>
+        <div class="ls-divider"></div>
+
+        <h2 class="ls-title" style="font-size:18px;"><i class="fas fa-wallet"></i> طرق الدفع المقبولة</h2>
+
+        <div class="ls-payment-info">
+            <div class="lsp-row">
+                <span class="lsp-label"><i class="fas fa-phone"></i> رقم استلام الرسوم</span>
+                <span class="lsp-value" dir="ltr" style="font-family:monospace;font-size:22px;letter-spacing:2px;">26067036</span>
             </div>
-            <p class="ls-cash-note">
-                <i class="fas fa-money-bill-wave"></i>
-                الدفع النقدي: يمكنك الدفع نقداً في مقر النقابة — مكتب الأمين المالي (نواكشوط، موريتانيا)
-            </p>
+        </div>
+
+        <div class="ls-wallets">
+            <div class="lsw-item"><img src="https://img.icons8.com/color/48/000000/mastercard.png" alt="Bankily" /><span>بنكيلي</span></div>
+            <div class="lsw-item"><img src="https://img.icons8.com/color/48/000000/mastercard.png" alt="Essadad" /><span>السداد</span></div>
+            <div class="lsw-item"><img src="https://img.icons8.com/color/48/000000/mastercard.png" alt="Masrefy" /><span>مصرفي</span></div>
+            <div class="lsw-item"><img src="https://img.icons8.com/color/48/000000/bank-cards.png" alt="BIM" /><span>بيم بانك</span></div>
+            <div class="lsw-item"><img src="https://img.icons8.com/color/48/000000/click.png" alt="Click" /><span>كليك</span></div>
+            <div class="lsw-item"><img src="https://img.icons8.com/color/48/000000/money-transfer.png" alt="Move Money" /><span>موف موني</span></div>
+            <div class="lsw-item"><img src="https://img.icons8.com/color/48/000000/money-transfer.png" alt="Gaza Pay" /><span>غزة باي</span></div>
+        </div>
+
+        <div class="ls-cash-note">
+            <i class="fas fa-building-columns"></i>
+            <span><strong>الدفع النقدي:</strong> يمكنك الدفع نقداً في مقر النقابة — مكتب الأمين المالي (نواكشوط، موريتانيا)</span>
         </div>
 
         <div class="ls-cta">
-            <a href="pages/register.html" class="ls-btn-primary"><i class="fas fa-file-signature"></i> ابدأ طلب العضوية الآن</a>
+            <a href="pages/register.html" class="lh-btn-primary" style="display:inline-flex;width:auto;"><i class="fas fa-user-plus"></i> ابدأ طلب العضوية الآن</a>
+        </div>
+
+        <div class="lh-footer-text" style="margin-top:30px;">
+            جميع الحقوق محفوظة &copy; 2026 نقابة المهن التمثيلية
         </div>
     </div>
 
-    <div class="landing-footer">
-        <p>جميع الحقوق محفوظة &copy; 2026 نقابة المهن التمثيلية</p>
-    </div>
-
+<script src="js/landing-particles.js"></script>
 </body>
 </html>
