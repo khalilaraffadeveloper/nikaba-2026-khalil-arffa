@@ -4,26 +4,19 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>نقابة المهن التمثيلية</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <link rel="stylesheet" href="css/style.css" />
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
     <div class="landing">
         <div class="landing-hero">
             <div class="lh-glow"></div>
-
-            <div class="lh-badge"><i class="fas fa-star"></i> نقابة المهن التمثيلية</div>
-
+            <div class="lh-badge">نقابة المهن التمثيلية</div>
             <img src="images/logoNikabo.png" alt="شعار النقابة" class="lh-logo" />
-
             <h1>نقابة المهن<br>التمثيلية</h1>
-
             <p class="lh-sub">
                 منصة فنية مهنية تجمع فناني وممثلي موريتانيا تحت مظلة نقابية موحدة للدفاع عن الحقوق والارتقاء بالمستوى الفني
             </p>
-
             <div class="lh-buttons" id="mainButtons">
                 <a href="pages/login.html" class="lh-btn-primary" id="loginBtn"><i class="fas fa-sign-in-alt"></i> تسجيل الدخول</a>
                 <a href="pages/register.html" class="lh-btn-secondary" id="registerBtn"><i class="fas fa-user-plus"></i> طلب عضوية</a>
@@ -32,11 +25,9 @@
         </div>
     </div>
 
-    <!-- ===== قسم الاشتراك وطرق الدفع ===== -->
     <div class="landing-section">
-        <div class="ls-badge"><i class="fas fa-credit-card"></i> الاشتراك والدفع</div>
+        <div class="ls-badge"> الاشتراك والدفع</div>
         <h2 class="ls-title">كيف تصبح عضواً في النقابة؟</h2>
-
         <div class="ls-steps">
             <div class="ls-step">
                 <div class="lss-num">1</div>
@@ -67,53 +58,43 @@
                 </div>
             </div>
         </div>
-
         <div class="ls-divider"></div>
-
-        <h2 class="ls-title" style="font-size:18px;"><i class="fas fa-wallet"></i> طرق الدفع المقبولة</h2>
-
+        <h2 class="ls-title" style="font-size:18px;"> طرق الدفع المقبولة</h2>
         <div class="ls-payment-info">
             <div class="lsp-row">
-                <span class="lsp-label"><i class="fas fa-phone"></i> رقم استلام الرسوم</span>
+                <span class="lsp-label"> رقم استلام الرسوم</span>
                 <span class="lsp-value" dir="ltr" style="font-family:monospace;font-size:22px;letter-spacing:2px;">26067036</span>
             </div>
         </div>
-
         <div class="ls-wallets">
-            <div class="lsw-item"><img src="https://img.icons8.com/color/48/000000/mastercard.png" alt="Bankily" /><span>بنكيلي</span></div>
-            <div class="lsw-item"><img src="https://img.icons8.com/color/48/000000/mastercard.png" alt="Essadad" /><span>السداد</span></div>
-            <div class="lsw-item"><img src="https://img.icons8.com/color/48/000000/mastercard.png" alt="Masrefy" /><span>مصرفي</span></div>
-            <div class="lsw-item"><img src="https://img.icons8.com/color/48/000000/bank-cards.png" alt="BIM" /><span>بيم بانك</span></div>
-            <div class="lsw-item"><img src="https://img.icons8.com/color/48/000000/click.png" alt="Click" /><span>كليك</span></div>
-            <div class="lsw-item"><img src="https://img.icons8.com/color/48/000000/money-transfer.png" alt="Move Money" /><span>موف موني</span></div>
-            <div class="lsw-item"><img src="https://img.icons8.com/color/48/000000/money-transfer.png" alt="Gaza Pay" /><span>غزة باي</span></div>
+            <div class="lsw-item"><span>بنكيلي</span></div>
+            <div class="lsw-item"><span>السداد</span></div>
+            <div class="lsw-item"><span>مصرفي</span></div>
+            <div class="lsw-item"><span>بيم بانك</span></div>
+            <div class="lsw-item"><span>كليك</span></div>
+            <div class="lsw-item"><span>موف موني</span></div>
+            <div class="lsw-item"><span>غزة باي</span></div>
         </div>
-
         <div class="ls-cash-note">
-            <i class="fas fa-building-columns"></i>
             <span><strong>الدفع النقدي:</strong> يمكنك الدفع نقداً في مقر النقابة — مكتب الأمين المالي (نواكشوط، موريتانيا)</span>
         </div>
-
         <div class="ls-cta">
-            <a href="pages/register.html" class="lh-btn-primary" style="display:inline-flex;width:auto;"><i class="fas fa-user-plus"></i> ابدأ طلب العضوية الآن</a>
+            <a href="pages/register.html" class="lh-btn-primary" style="display:inline-flex;width:auto;"> ابدأ طلب العضوية الآن</a>
         </div>
-
         <div class="lh-footer-text" style="margin-top:30px;">
             جميع الحقوق محفوظة &copy; 2026 نقابة المهن التمثيلية
         </div>
     </div>
 
 <script>
-const _SUPABASE_URL = 'https://bfdixkdwhccriliwtnch.supabase.co';
-const _SUPABASE_ANON_KEY = 'sb_publishable_Y3FsxqV_4RA96t7MassN4w_NcOJ31--';
-const _supabase = window.supabase.createClient(_SUPABASE_URL, _SUPABASE_ANON_KEY);
-_supabase.auth.getUser().then(({ data }) => {
-  if (data?.user) {
+try {
+  var token = localStorage.getItem('sb-access-token');
+  if (token) {
     document.getElementById('loginBtn').style.display = 'none';
     document.getElementById('registerBtn').style.display = 'none';
     document.getElementById('dashboardBtn').style.display = 'inline-flex';
   }
-});
+} catch(e) {}
 </script>
 <script>
 (function() {
@@ -122,18 +103,12 @@ _supabase.auth.getUser().then(({ data }) => {
     canvas.style.cssText = 'position:fixed;inset:0;z-index:0;pointer-events:none;';
     var landing = document.querySelector('.landing');
     if (landing) landing.prepend(canvas);
-
     var ctx = canvas.getContext('2d');
     var particles = [];
     var COUNT = 40;
-
-    function resize() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-    }
+    function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
     window.addEventListener('resize', resize);
     resize();
-
     function Particle() {
         this.reset = function() {
             this.x = Math.random() * canvas.width;
@@ -158,15 +133,10 @@ _supabase.auth.getUser().then(({ data }) => {
             ctx.fill();
         };
     }
-
     for (var i = 0; i < COUNT; i++) particles.push(new Particle());
-
     function animate() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        for (var i = 0; i < particles.length; i++) {
-            particles[i].update();
-            particles[i].draw();
-        }
+        for (var i = 0; i < particles.length; i++) { particles[i].update(); particles[i].draw(); }
         for (var i = 0; i < particles.length; i++) {
             for (var j = i + 1; j < particles.length; j++) {
                 var dx = particles[i].x - particles[j].x;
