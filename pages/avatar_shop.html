@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>متجر الأفاتار - نقابة المهن التمثيلية</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+    <header class="site-header">
+        <a href="ashatari.html" class="sh-logo">
+            <img src="../images/logoNikabo.png" alt="الشعار" />
+            <h2>المتجر</h2>
+        </a>
+        <div class="sh-menu">
+            <a href="login.html" class="sh-login"><i class="fas fa-sign-in-alt"></i></a>
+        </div>
+    </header>
+
+    <main class="site-main">
+        <div class="section-title"><i class="fas fa-store"></i> متجر الأفاتار</div>
+        <p class="section-subtitle">اختر صورتك الرمزية من المتجر</p>
+
+        <div class="av-wallet">
+            <div>
+                <div class="aw-label">الرصيد</div>
+                <div class="aw-amount"><i class="fas fa-coins" style="font-size:18px;margin-left:4px;"></i> 0</div>
+            </div>
+            <a href="javascript:void(0)" class="btn-secondary" style="width:auto;padding:8px 16px;font-size:12px;border-radius:999px;" onclick="alert('قريباً')"><i class="fas fa-plus"></i> شحن</a>
+        </div>
+
+        <div class="avatar-cat-filter" id="avFilter">
+            <a href="javascript:void(0)" class="active" onclick="filterAvatars('')">الكل</a>
+            <a href="javascript:void(0)" onclick="filterAvatars('premium')">مميزة</a>
+            <a href="javascript:void(0)" onclick="filterAvatars('limited')">محدودة</a>
+            <a href="javascript:void(0)" onclick="filterAvatars('new')">جديد</a>
+        </div>
+
+        <div class="avatar-grid" id="avatarGrid">
+            <div class="avatar-item owned">
+                <div class="av-svg"><i class="fas fa-user-circle" style="font-size:56px;color:var(--accent);"></i></div>
+                <div class="av-name">أفاتار ذهبي</div>
+                <div class="av-own"><i class="fas fa-check-circle"></i> مملوكة</div>
+            </div>
+            <div class="avatar-item">
+                <div class="av-svg"><i class="fas fa-user-astronaut" style="font-size:56px;color:var(--text);"></i></div>
+                <div class="av-name">أفاتار فضي</div>
+                <div class="av-price">قريباً</div>
+            </div>
+            <div class="avatar-item">
+                <div class="av-svg"><i class="fas fa-user-ninja" style="font-size:56px;color:var(--text);"></i></div>
+                <div class="av-name">مشترك</div>
+                <div class="av-price">قريباً</div>
+            </div>
+            <div class="avatar-item">
+                <div class="av-svg"><i class="fas fa-user-tie" style="font-size:56px;color:var(--text);"></i></div>
+                <div class="av-name">مشترك</div>
+                <div class="av-price">قريباً</div>
+            </div>
+            <div class="avatar-item">
+                <div class="av-svg"><i class="fas fa-user-secret" style="font-size:56px;color:var(--success);"></i></div>
+                <div class="av-name">أفاتار نادر</div>
+                <div class="av-own"><i class="fas fa-check-circle"></i> مملوكة</div>
+            </div>
+            <div class="avatar-item">
+                <div class="av-svg"><i class="fas fa-user-shield" style="font-size:56px;color:var(--text);"></i></div>
+                <div class="av-name">ناروتو</div>
+                <div class="av-price">قريباً</div>
+            </div>
+        </div>
+
+        <footer class="site-footer">
+            <div class="sf-grid">
+                <div class="sf-col">
+                    <h4><i class="fas fa-building"></i> النقابة</h4>
+                    <p>نقابة المهن التمثيلية — تنظيم مهني يهدف إلى الدفاع عن حقوق الفنانين والممثلين في موريتانيا والارتقاء بالمستوى المهني والفني.</p>
+                    <div class="sf-social">
+                        <a href="https://www.facebook.com/share/1KnBzbNcWP/" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
+                        <a href="https://wa.me/22236280528" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                    </div>
+                </div>
+                <div class="sf-col">
+                    <h4><i class="fas fa-link"></i> روابط سريعة</h4>
+                    <a href="index.html">الرئيسية</a>
+                    <a href="about.html">عن النقابة</a>
+                    <a href="news.html">الأخبار</a>
+                    <a href="events.html">الفعاليات</a>
+                    <a href="gallery.html">المعرض</a>
+                    <a href="contact.html">اتصل بنا</a>
+                </div>
+            </div>
+            <div class="sf-bottom">جميع الحقوق محفوظة &copy; 2026 <span>نقابة المهن التمثيلية</span></div>
+        </footer>
+    </main>
+
+    <nav class="site-bottom-nav">
+        <a href="index.html"><i class="fas fa-home"></i><span>الرئيسية</span></a>
+        <a href="news.html"><i class="fas fa-newspaper"></i><span>الأخبار</span></a>
+        <a href="events.html"><i class="fas fa-calendar-alt"></i><span>الفعاليات</span></a>
+        <a href="gallery.html"><i class="fas fa-images"></i><span>المعرض</span></a>
+        <a href="contact.html"><i class="fas fa-headset"></i><span>اتصل بنا</span></a>
+    </nav>
+
+    <script src="../js/supabase.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            SB.requireAuth('login.html');
+        });
+
+        function filterAvatars(cat) {
+            document.querySelectorAll('#avFilter a').forEach(function(x) { x.classList.remove('active'); });
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>

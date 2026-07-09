@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>إدارة المحتوى - لوحة التحكم</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/control.css" />
+    <script src="../js/supabase.js"></script>
+    <style>
+        .content-tabs { display:flex; gap:8px; margin-bottom:16px; background:var(--bg-elevated); border-radius:var(--radius-sm); padding:16px; }
+        .content-tabs button { flex:1; padding:16px; border-radius:var(--radius-sm); border:none; background:transparent; color:var(--text-secondary); font-size:14px; cursor:pointer; }
+        .content-tabs button.active { background:var(--accent); color:#0a0a14; }
+        .content-tabs button i { margin-left:6px; }
+        .content-panel { display:none; }
+        .content-panel.active { display:block; }
+        .quick-stats-row { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:16px; }
+        .quick-stats-row .qs-item { background:var(--bg-elevated); border:1px solid var(--border); border-radius:var(--radius-sm); padding:16px; text-align:center; }
+        .quick-stats-row .qs-item .qs-num { font-size:14px; font-weight:400; color:var(--accent); }
+        .quick-stats-row .qs-item .qs-label { font-size:14px; color:var(--text-muted); }
+    </style>
+</head>
+<body class="control-page">
+    <div class="control-wrapper">
+        <div class="menu">
+            <div class="profile">
+                <div class="img-box"><img src="../images/logoNikabo.png" alt="الشعار" /></div>
+                <h2>الإدارة</h2>
+            </div>
+            <ul>
+                <li><a href="dashboard.html"><i class="fas fa-chart-pie"></i><span>الرئيسية</span></a></li>
+                <li><a href="members.html"><i class="fas fa-users"></i><span>الأعضاء</span></a></li>
+                <li><a href="content_manage.html" class="active"><i class="fas fa-edit"></i><span>إدارة المحتوى</span></a></li>
+                <li><a href="news_manage.html"><i class="fas fa-newspaper"></i><span>الأخبار</span></a></li>
+                <li><a href="events_manage.html"><i class="fas fa-calendar-alt"></i><span>الفعاليات</span></a></li>
+                <li><a href="messages_manage.html"><i class="fas fa-envelope"></i><span>الرسائل</span></a></li>
+                <li><a href="settings.html"><i class="fas fa-cog"></i><span>الإعدادات</span></a></li>
+                <li class="logout"><a href="javascript:void(0)" onclick="SB.logout();window.location.href='ctrl_login.html'"><i class="fas fa-sign-out-alt"></i><span>تسجيل خروج</span></a></li>
+            </ul>
+        </div>
+
+        <main class="content">
+            <div class="control-header">
+                <h1><i class="fas fa-edit"></i> إدارة المحتوى الموحّدة</h1>
+                <div class="header-left"><span>مرحباً، <strong id="adminName">المشرف</strong></span></div>
+            </div>
+
+            <div class="quick-stats-row">
+                <div class="qs-item"><div class="qs-num" id="qsNews">0</div><div class="qs-label">الأخبار</div></div>
+                <div class="qs-item"><div class="qs-num" id="qsEvents">0</div><div class="qs-label">الفعاليات</div></div>
+                <div class="qs-item"><div class="qs-num" id="qsGallery">0</div><div class="qs-label">صور المعرض</div></div>
+            </div>
+
+            <div class="content-tabs">
+                <button class="active" onclick="switchTab('news')"><i class="fas fa-newspaper"></i> الأخبار</button>
+                <button onclick="switchTab('events')"><i class="fas fa-calendar-alt"></i> الفعاليات</button>
+                <button onclick="switchTab('gallery')"><i class="fas fa-images"></i> المعرض</button>
+            </div>
+
+            <div id="panelNews" class="content-panel active">
+                <div class="table-wrap">
+                    <table><thead><tr><th>العنوان</th><th>التصنيف</th><th>التاريخ</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody id="tblNews"></tbody></table>
+                </div>
+            </div>
+            <div id="panelEvents" class="content-panel">
+                <div class="table-wrap">
+                    <table><thead><tr><th>العنوان</th><th>التاريخ</th><th>المكان</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody id="tblEvents"></tbody></table>
+                </div>
+            </div>
+            <div id="panelGallery" class="content-panel">
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;" id="tblGallery"></div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        SB.requireAuth('ctrl_login.html', true);
+
+        var counts = { news: 0, events: 0, gallery: 0 };
+
+        function switchTab(tab) {
+            document.querySelectorAll('.content-tabs button').forEach(function(b) { b.classList.remove('active'); });
+            event.target.classList.add('active');
+            document.querySelectorAll('.content-panel').forEach(function(p) { p.classList.remove('active'); });
+            document.getElementById('panel' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+        }
+
+        async function loadAll() {
+            try {
+                var news = await SB.api('news', 'select=id,title,category,created_at,status&order=created_at.desc') || [];
+                var events = await SB.api('events', 'select=id,title,event_date,location,status&order=created_at.desc') || [];
+                var gallery = await SB.api('gallery', 'select=id,image_url,caption&order=created_at.desc') || [];
+
+                counts = { news: news.length, events: events.length, gallery: gallery.length };
+                document.getElementById('qsNews').textContent = counts.news;
+                document.getElementById('qsEvents').textContent = counts.events;
+                document.getElementById('qsGallery').textContent = counts.gallery;
+
+                document.getElementById('tblNews').innerHTML = news.map(function(n) {
+                    return '<tr><td>' + (n.title || '') + '</td><td>' + (n.category || '') + '</td><td>' + (n.created_at ? new Date(n.created_at).toLocaleDateString('ar') : '') + '</td><td><span class="status-badge ' + (n.status || 'published') + '">' + (n.status || 'منشور') + '</span></td><td><div class="action-btns"><a href="news_manage.html" class="btn-edit"><i class="fas fa-edit"></i></a></div></td></tr>';
+                }).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);">لا توجد أخبار</td></tr>';
+
+                document.getElementById('tblEvents').innerHTML = events.map(function(e) {
+                    return '<tr><td>' + (e.title || '') + '</td><td>' + (e.event_date ? new Date(e.event_date).toLocaleDateString('ar') : '') + '</td><td>' + (e.location || '') + '</td><td><span class="status-badge ' + (e.status || 'upcoming') + '">' + (e.status || 'قادم') + '</span></td><td><div class="action-btns"><a href="events_manage.html" class="btn-edit"><i class="fas fa-edit"></i></a></div></td></tr>';
+                }).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);">لا توجد فعاليات</td></tr>';
+
+                document.getElementById('tblGallery').innerHTML = gallery.map(function(g) {
+                    return '<div style="aspect-ratio:1;border-radius:8px;overflow:hidden;border:1px solid var(--border);"><img src="' + (g.image_url || '') + '" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display=\'none\'" /></div>';
+                }).join('') || '<div style="text-align:center;padding:20px;color:var(--text-muted);grid-column:1/-1;">لا توجد صور</div>';
+            } catch(e) { console.warn(e); }
+        }
+
+        document.getElementById('adminName').textContent = (JSON.parse(localStorage.getItem('member') || sessionStorage.getItem('member') || '{}')).full_name || 'المشرف';
+        loadAll();
+    </script>
+</body>
+</html>
