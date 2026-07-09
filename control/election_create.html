@@ -162,24 +162,12 @@
     document.getElementById('electionForm').addEventListener('submit', async function(e) {
         e.preventDefault();
 
-        const positionsSelect = document.getElementById('positions');
-        const selectedPositions = Array.from(positionsSelect.selectedOptions).map(o => o.value);
-
         const data = {
             title: document.getElementById('title').value,
             description: document.getElementById('description').value,
-            nominations_start: document.getElementById('nominations_start').value || null,
-            nominations_end: document.getElementById('nominations_end').value || null,
             voting_start: document.getElementById('voting_start').value || null,
             voting_end: document.getElementById('voting_end').value || null,
-            results_date: document.getElementById('results_date').value || null,
-            status: document.getElementById('status').value,
-            positions: selectedPositions,
-            votes_per_member: document.getElementById('votes_per_member').value,
-            min_age: parseInt(document.getElementById('min_age').value) || null,
-            min_membership_years: parseInt(document.getElementById('min_membership_years').value) || null,
-            hide_results: document.getElementById('hide_results').checked,
-            created_at: new Date().toISOString()
+            status: document.getElementById('status').value
         };
 
         try {
