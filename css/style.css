@@ -1,4 +1,5 @@
 /* ===== نقابة المهن التمثيلية — التنسيق العام ===== */
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap');
 
 /* ===== المتغيرات ===== */
 :root {
@@ -27,7 +28,7 @@
 }
 
 body {
-    font-family: system-ui, -apple-system, 'Segoe UI', Tahoma, sans-serif;
+    font-family: 'Tajawal', system-ui, -apple-system, 'Segoe UI', Tahoma, sans-serif;
     background: var(--bg-primary);
     color: var(--text-primary);
     line-height: 1.6;
@@ -91,8 +92,9 @@ a {
 }
 
 h1 {
-    font-size: 36px;
-    font-weight: 800;
+    font-family: 'Tajawal', sans-serif;
+    font-size: 40px;
+    font-weight: 900;
     color: var(--text-primary);
     line-height: 1.2;
     margin-bottom: 16px;
