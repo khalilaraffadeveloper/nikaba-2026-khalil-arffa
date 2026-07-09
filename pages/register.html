@@ -66,48 +66,36 @@
       لديك حساب بالفعل؟ <a href="login.html">تسجيل الدخول</a>
     </div>
   </div>
-<script>
-var SU = 'https://bfdixkdwhccriliwtnch.supabase.co';
-var AK = 'sb_publishable_Y3FsxqV_4RA96t7MassN4w_NcOJ31--';
-document.getElementById('registerForm').addEventListener('submit', function(e) {
-  e.preventDefault();
-  var msg = document.getElementById('msg');
-  var btn = document.getElementById('submitBtn');
-  msg.className = 'msg';
-  msg.textContent = 'جاري إنشاء الحساب...';
-  btn.disabled = true;
-  var email = document.getElementById('email').value;
-  var password = document.getElementById('password').value;
-  var fullName = document.getElementById('fullName').value;
-  var phone = document.getElementById('phone').value;
-  var profession = document.getElementById('profession').value;
-  var userData = { full_name: fullName };
-  if (phone) userData.phone = phone;
-  if (profession) userData.profession = profession;
-  fetch(SU + '/auth/v1/signup', {
-    method: 'POST',
-    headers: { 'apikey': AK, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: email, password: password, data: userData })
-  }).then(function(r) { return r.json(); }).then(function(result) {
-    if (result.error) {
-      msg.className = 'msg error';
-      msg.textContent = result.error_description || result.error.message || result.msg || 'حدث خطأ';
-      btn.disabled = false;
-    } else if (result.id || result.user) {
-      msg.className = 'msg success';
-      msg.textContent = 'تم إرسال الطلب بنجاح! تحقق من بريدك الإلكتروني للتأكيد.';
-      setTimeout(function() { window.location.href = 'login.html'; }, 2500);
-    } else {
-      msg.className = 'msg success';
-      msg.textContent = 'تم إرسال الطلب بنجاح! تحقق من بريدك الإلكتروني للتأكيد.';
-      setTimeout(function() { window.location.href = 'login.html'; }, 2500);
-    }
-  }).catch(function(err) {
-    msg.className = 'msg error';
-    msg.textContent = 'خطأ في الاتصال: ' + err.message;
-    btn.disabled = false;
-  });
-});
-</script>
+  <script src="../js/supabase.js"></script>
+  <script>
+    document.getElementById('registerForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      var msg = document.getElementById('msg');
+      var btn = document.getElementById('submitBtn');
+      msg.className = 'msg';
+      msg.textContent = 'جاري إنشاء الحساب...';
+      btn.disabled = true;
+      var userData = { full_name: document.getElementById('fullName').value };
+      var phone = document.getElementById('phone').value;
+      var profession = document.getElementById('profession').value;
+      if (phone) userData.phone = phone;
+      if (profession) userData.profession = profession;
+      SB.signup(document.getElementById('email').value, document.getElementById('password').value, userData).then(function(result) {
+        if (result.error) {
+          msg.className = 'msg error';
+          msg.textContent = result.error_description || result.error.message || result.msg || 'حدث خطأ';
+          btn.disabled = false;
+        } else {
+          msg.className = 'msg success';
+          msg.textContent = 'تم إرسال الطلب بنجاح! تحقق من بريدك الإلكتروني للتأكيد.';
+          setTimeout(function() { window.location.href = 'login.html'; }, 2500);
+        }
+      }).catch(function(err) {
+        msg.className = 'msg error';
+        msg.textContent = 'خطأ في الاتصال: ' + err.message;
+        btn.disabled = false;
+      });
+    });
+  </script>
 </body>
 </html>

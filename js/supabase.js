@@ -7,16 +7,33 @@ var SB = {
     try { localStorage.setItem('sb-access-token', at); localStorage.setItem('sb-refresh-token', rt); localStorage.setItem('sb-user', JSON.stringify(u)); } catch(e) {}
   },
   clearSession: function() {
-    try { localStorage.removeItem('sb-access-token'); localStorage.removeItem('sb-refresh-token'); localStorage.removeItem('sb-user'); } catch(e) {}
+    try { localStorage.removeItem('sb-access-token'); localStorage.removeItem('sb-refresh-token'); localStorage.removeItem('sb-user'); localStorage.removeItem('member'); } catch(e) {}
   },
-  api: function(method, path, body) {
+  logout: function() { SB.clearSession(); },
+  esc: function(s) { if (!s) return ''; var d = document.createElement('div'); d.textContent = s; return d.innerHTML; },
+  api: function(a, b, c, d) {
+    var METHODS = ['GET','POST','PATCH','DELETE','PUT'];
+    var method, path, body;
+    if (METHODS.indexOf((a||'').toUpperCase()) >= 0) {
+      method = a.toUpperCase(); path = b; body = c;
+    } else {
+      method = d || (c ? 'POST' : 'GET');
+      path = '/rest/v1/' + a;
+      if (b) path += '?' + b;
+      body = c;
+    }
     var token = SB.getToken();
-    var headers = { 'apikey': SB.KEY };
+    var headers = { 'apikey': SB.KEY, 'Prefer': 'return=representation' };
     if (token) headers['Authorization'] = 'Bearer ' + token;
-    if (body) headers['Content-Type'] = 'application/json';
+    if (body && method !== 'GET' && method !== 'DELETE') headers['Content-Type'] = 'application/json';
     var opt = { method: method, headers: headers };
-    if (body) opt.body = JSON.stringify(body);
-    return fetch(SB.URL + path, opt).then(function(r) { return method === 'DELETE' ? r.status : r.json(); });
+    if (body && method !== 'GET' && method !== 'DELETE') opt.body = JSON.stringify(body);
+    return fetch(SB.URL + path, opt).then(function(r) {
+      if (method === 'DELETE') return r.status;
+      var ct = r.headers.get('content-type') || '';
+      if (ct.indexOf('json') >= 0) return r.json();
+      return r.text();
+    });
   },
   login: function(email, password) {
     return fetch(SB.URL + '/auth/v1/token?grant_type=password', {
@@ -32,11 +49,16 @@ var SB = {
       body: JSON.stringify({ email: email, password: password, data: data })
     }).then(function(r) { return r.json(); });
   },
-  requireAuth: function(redirectTo) {
+  requireAuth: function(redirectTo, requireAdmin) {
     var user = SB.getUser();
     var token = SB.getToken();
     if (!user || !token) { SB.clearSession(); window.location.href = redirectTo || 'login.html'; return null; }
+    if (requireAdmin) {
+      SB.api('members', 'select=is_admin&user_id=eq.' + user.id).then(function(members) {
+        var p = Array.isArray(members) ? members[0] : null;
+        if (!p || !p.is_admin) { alert('غير مصرح'); SB.clearSession(); window.location.href = redirectTo || 'login.html'; }
+      });
+    }
     return user;
-  },
-  esc: function(s) { if (!s) return ''; var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+  }
 };
