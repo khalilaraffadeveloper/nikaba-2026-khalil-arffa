@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>إدارة محتوى الموقع - لوحة التحكم</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/control.css" />
+    <style>
+        .sc-section { background:var(--bg-elevated); border:1px solid var(--border); border-radius:var(--radius-sm); padding:16px; margin-bottom:16px; }
+        .sc-section h3 { font-size:14px; font-weight:600; margin-bottom:16px; display:flex; align-items:center; gap:8px; color:var(--accent); }
+        .sc-section h3 i { font-size:14px; }
+        .sc-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+        .sc-grid .form-group { margin-bottom:0; }
+        .sc-actions { display:flex; align-items:center; gap:16px; margin-top:12px; }
+        .sc-actions button { flex:1; }
+        #saveStatus { font-size:14px; font-weight:600; color:#22c55e; }
+    </style>
+    <script src="../js/supabase.js"></script>
+</head>
+<body class="control-page">
+    <div class="control-wrapper">
+        <div class="menu">
+            <div class="profile">
+                <div class="img-box"><img src="../images/logoNikabo.png" alt="الشعار" /></div>
+                <h2>النقيب</h2>
+            </div>
+            <ul>
+                <li><a href="dashboard.html"><i class="fas fa-chart-pie"></i><span>الرئيسية</span></a></li>
+                <li><a href="applications.html"><i class="fas fa-file-signature"></i><span>الطلبات</span></a></li>
+                <li><a href="members.html"><i class="fas fa-users"></i><span>الأعضاء</span></a></li>
+                <li><a href="content_manage.html"><i class="fas fa-edit"></i><span>المحتوى</span></a></li>
+                <li><a href="news_manage.html"><i class="fas fa-newspaper"></i><span>الأخبار</span></a></li>
+                <li><a href="events_manage.html"><i class="fas fa-calendar-alt"></i><span>الفعاليات</span></a></li>
+                <li><a href="gallery_manage.html"><i class="fas fa-images"></i><span>المعرض</span></a></li>
+                <li><a href="messages_manage.html"><i class="fas fa-envelope"></i><span>الرسائل</span></a></li>
+                <li><a href="elections.html"><i class="fas fa-vote-yea"></i><span>الانتخابات</span></a></li>
+                <li><a href="support_tickets.html"><i class="fas fa-headset"></i><span>الدعم</span></a></li>
+                <li><a href="finance.html"><i class="fas fa-coins"></i><span>النظام المالي</span></a></li>
+                <li><a href="treasury.html"><i class="fas fa-landmark"></i><span>الخزنة</span></a></li>
+                <li><a href="settings.html"><i class="fas fa-cog"></i><span>الإعدادات</span></a></li>
+                <li><a href="roles.html"><i class="fas fa-user-shield"></i><span>الصلاحيات</span></a></li>
+                <li><a href="analytics.html"><i class="fas fa-chart-line"></i><span>التحليلات</span></a></li>
+                <li><a href="notifications.html"><i class="fas fa-bell"></i><span>الإشعارات</span></a></li>
+                <li class="logout"><a href="javascript:void(0)" onclick="SB.logout();window.location.href='ctrl_login.html'"><i class="fas fa-sign-out-alt"></i><span>تسجيل خروج</span></a></li>
+            </ul>
+        </div>
+
+        <main class="content">
+            <div class="control-header">
+                <h1><i class="fas fa-globe"></i> محتوى الموقع</h1>
+            </div>
+
+            <div class="sc-section">
+                <h2><i class="fas fa-home"></i> القسم 1: Hero</h2>
+                <div class="sc-grid">
+                    <div class="form-group">
+                        <label>عنوان البطل (hero_title)</label>
+                        <input type="text" id="field_hero_title" class="form-input" />
+                    </div>
+                    <div class="form-group">
+                        <label>نص الزر (hero_btn)</label>
+                        <input type="text" id="field_hero_btn" class="form-input" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>الوصف (hero_subtitle)</label>
+                    <textarea id="field_hero_subtitle" rows="3" class="form-input"></textarea>
+                </div>
+            </div>
+
+            <div class="sc-section">
+                <h2><i class="fas fa-chart-bar"></i> القسم 2: Stats</h2>
+                <div class="sc-grid">
+                    <div class="form-group">
+                        <label>عدد الأعضاء (stat_members)</label>
+                        <input type="number" id="field_stat_members" class="form-input" />
+                    </div>
+                    <div class="form-group">
+                        <label>عدد الفعاليات (stat_events)</label>
+                        <input type="number" id="field_stat_events" class="form-input" />
+                    </div>
+                    <div class="form-group">
+                        <label>عدد الفروع (stat_branches)</label>
+                        <input type="number" id="field_stat_branches" class="form-input" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="sc-section">
+                <h2><i class="fas fa-info-circle"></i> القسم 3: About</h2>
+                <div class="form-group">
+                    <label>النص الرئيسي (about_main)</label>
+                    <textarea id="field_about_main" rows="4" class="form-input"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>التاريخ (about_history)</label>
+                    <textarea id="field_about_history" rows="4" class="form-input"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>الإحصائيات (about_stats)</label>
+                    <input type="text" id="field_about_stats" class="form-input" />
+                </div>
+            </div>
+
+            <div class="sc-section">
+                <h2><i class="fas fa-headset"></i> القسم 4: Contact</h2>
+                <div class="sc-grid">
+                    <div class="form-group">
+                        <label>رقم الهاتف (contact_phone)</label>
+                        <input type="text" id="field_contact_phone" class="form-input" />
+                    </div>
+                    <div class="form-group">
+                        <label>البريد الإلكتروني (contact_email)</label>
+                        <input type="email" id="field_contact_email" class="form-input" />
+                    </div>
+                    <div class="form-group">
+                        <label>العنوان (contact_address)</label>
+                        <input type="text" id="field_contact_address" class="form-input" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="sc-section">
+                <h2><i class="fas fa-building"></i> القسم 5: Footer</h2>
+                <div class="form-group">
+                    <label>نص التذييل (footer_about)</label>
+                    <textarea id="field_footer_about" rows="3" class="form-input"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>حقوق النشر (footer_copyright)</label>
+                    <input type="text" id="field_footer_copyright" class="form-input" />
+                </div>
+            </div>
+
+            <div class="sc-actions">
+                <button class="btn-primary" id="saveBtn"><i class="fas fa-save"></i> حفظ جميع التغييرات</button>
+                <span id="saveStatus"></span>
+            </div>
+        </main>
+    </div>
+
+    <script>
+    var FIELD_MAP = {
+        field_hero_title: 'hero_title', field_hero_subtitle: 'hero_subtitle', field_hero_btn: 'hero_btn',
+        field_stat_members: 'stat_members', field_stat_events: 'stat_events', field_stat_branches: 'stat_branches',
+        field_about_main: 'about_main', field_about_history: 'site_history', field_about_stats: 'about_stats',
+        field_contact_phone: 'site_phone', field_contact_email: 'site_email', field_contact_address: 'site_address',
+        field_footer_about: 'footer_about', field_footer_copyright: 'footer_copyright'
+    };
+    var STORAGE_KEY = 'nikaba_site_content';
+
+    (function() {
+        SB.requireAuth('ctrl_login.html', true);
+
+        var saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+            try {
+                var data = JSON.parse(saved);
+                for (var fid in FIELD_MAP) {
+                    var el = document.getElementById(fid);
+                    var key = FIELD_MAP[fid];
+                    if (el && data[key] !== undefined) el.value = data[key];
+                }
+            } catch(e) { console.warn(e); }
+        }
+    })();
+
+    document.getElementById('saveBtn').addEventListener('click', function() {
+        var btn = this;
+        var status = document.getElementById('saveStatus');
+        btn.disabled = true;
+        status.textContent = 'جاري الحفظ...';
+        status.style.color = 'var(--text-muted)';
+
+        try {
+            var data = {};
+            for (var fid in FIELD_MAP) {
+                var el = document.getElementById(fid);
+                if (el) data[FIELD_MAP[fid]] = el.value;
+            }
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            status.textContent = '✓ تم حفظ جميع التغييرات';
+            status.style.color = '#22c55e';
+        } catch(e) {
+            status.textContent = '✗ فشل الحفظ';
+            status.style.color = '#ef4444';
+        }
+        btn.disabled = false;
+    });
+    </script>
+</body>
+</html>

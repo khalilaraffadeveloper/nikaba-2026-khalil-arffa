@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>التحليلات والإحصائيات - لوحة التحكم</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/control.css" />
+    <style>
+        .analytics-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+        .chart-card { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:16px; }
+        .chart-card h3 { font-size:14px; margin-bottom:16px; display:flex; align-items:center; gap:8px; }
+        .chart-card .chart-area { min-height:120px; background:var(--bg-elevated); border-radius:var(--radius-sm); display:flex; align-items:flex-end; gap:8px; padding:16px; }
+        .chart-card .chart-area .bar { flex:1; border-radius:8px 8px 0 0; min-height:40px; position:relative; }
+        .chart-card .chart-area .bar:hover { opacity:0.5; }
+        .chart-card .chart-area .bar .bar-tooltip { position:absolute; top:-32px; left:50%; transform:translateX(-50%); background:var(--bg-elevated); border:1px solid var(--border); padding:4px 8px; border-radius:8px; font-size:12px; white-space:nowrap; display:none; }
+        .chart-card .chart-area .bar:hover .bar-tooltip { display:block; }
+        .chart-card .chart-labels { display:flex; justify-content:space-between; margin-top:12px; font-size:12px; color:var(--text-muted); }
+        .kpi-row { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:16px; }
+        .kpi-card { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:16px; text-align:center; }
+        .kpi-card .kc-num { font-size:24px; font-weight:700; color:var(--accent); }
+        .kpi-card .kc-label { font-size:13px; color:var(--text-muted); }
+        .kpi-card .kc-change { font-size:12px; font-weight:600; margin-top:8px; }
+        .kpi-card .kc-change.up { color:#22c55e; }
+        .kpi-card .kc-change.down { color:#ef4444; }
+        .data-table-wrap { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:16px; margin-bottom:16px; }
+        .data-table-wrap h3 { font-size:14px; margin-bottom:16px; }
+        .table-mini { width:100%; font-size:13px; border-collapse:collapse; }
+        .table-mini th { text-align:right; padding:8px 12px; color:var(--text-muted); font-weight:600; border-bottom:1px solid var(--border); }
+        .table-mini td { padding:8px 12px; border-bottom:1px solid var(--border); color:var(--text); }
+        .table-mini tr:last-child td { border-bottom:none; }
+        .full-width { grid-column:1/-1; }
+        .stat-value { font-size:32px; font-weight:700; color:var(--accent); text-align:center; padding:20px; }
+        .stat-label-sm { font-size:13px; color:var(--text-muted); text-align:center; }
+    </style>
+    <script src="../js/supabase.js"></script>
+</head>
+<body class="control-page">
+    <div class="control-wrapper">
+        <div class="menu">
+            <div class="profile">
+                <div class="img-box"><img src="../images/logoNikabo.png" alt="الشعار" /></div>
+                <h2>النقيب</h2>
+            </div>
+            <ul>
+                <li><a href="dashboard.html"><i class="fas fa-chart-pie"></i><span>الرئيسية</span></a></li>
+                <li><a href="applications.html"><i class="fas fa-file-signature"></i><span>الطلبات</span></a></li>
+                <li><a href="members.html"><i class="fas fa-users"></i><span>الأعضاء</span></a></li>
+                <li><a href="content_manage.html"><i class="fas fa-edit"></i><span>المحتوى</span></a></li>
+                <li><a href="news_manage.html"><i class="fas fa-newspaper"></i><span>الأخبار</span></a></li>
+                <li><a href="events_manage.html"><i class="fas fa-calendar-alt"></i><span>الفعاليات</span></a></li>
+                <li><a href="gallery_manage.html"><i class="fas fa-images"></i><span>المعرض</span></a></li>
+                <li><a href="messages_manage.html"><i class="fas fa-envelope"></i><span>الرسائل</span></a></li>
+                <li><a href="elections.html"><i class="fas fa-vote-yea"></i><span>الانتخابات</span></a></li>
+                <li><a href="support_tickets.html"><i class="fas fa-headset"></i><span>الدعم</span></a></li>
+                <li><a href="finance.html"><i class="fas fa-coins"></i><span>النظام المالي</span></a></li>
+                <li><a href="treasury.html"><i class="fas fa-landmark"></i><span>الخزنة</span></a></li>
+                <li><a href="settings.html"><i class="fas fa-cog"></i><span>الإعدادات</span></a></li>
+                <li><a href="roles.html"><i class="fas fa-user-shield"></i><span>الصلاحيات</span></a></li>
+                <li><a href="analytics.html" class="active"><i class="fas fa-chart-line"></i><span>التحليلات</span></a></li>
+                <li><a href="notifications.html"><i class="fas fa-bell"></i><span>الإشعارات</span></a></li>
+                <li class="logout"><a href="javascript:void(0)" onclick="SB.logout();window.location.href='ctrl_login.html'"><i class="fas fa-sign-out-alt"></i><span>تسجيل خروج</span></a></li>
+            </ul>
+        </div>
+
+        <main class="content">
+            <div class="control-header">
+                <h1><i class="fas fa-chart-line"></i> التحليلات والإحصائيات</h1>
+            </div>
+
+            <div class="kpi-row" id="kpiRow">
+                <div class="kpi-card"><div class="kc-num" id="kpiMembers">0</div><div class="kc-label">إجمالي الأعضاء</div></div>
+                <div class="kpi-card"><div class="kc-num" id="kpiNews">0</div><div class="kc-label">إجمالي الأخبار</div></div>
+                <div class="kpi-card"><div class="kc-num" id="kpiEvents">0</div><div class="kc-label">إجمالي الفعاليات</div></div>
+                <div class="kpi-card"><div class="kc-num" id="kpiGallery">0</div><div class="kc-label">صور المعرض</div></div>
+            </div>
+
+            <div class="analytics-grid">
+                <div class="chart-card">
+                    <h3><i class="fas fa-users" style="color:var(--accent);"></i> الأعضاء</h3>
+                    <div class="stat-value" id="statMembers">0</div>
+                    <div class="stat-label-sm">إجمالي الأعضاء المسجلين</div>
+                </div>
+                <div class="chart-card">
+                    <h3><i class="fas fa-newspaper" style="color:#3b82f6;"></i> الأخبار</h3>
+                    <div class="stat-value" id="statNews" style="color:#3b82f6;">0</div>
+                    <div class="stat-label-sm">إجمالي الأخبار المنشورة</div>
+                </div>
+                <div class="chart-card">
+                    <h3><i class="fas fa-calendar-alt" style="color:#8b5cf6;"></i> الفعاليات</h3>
+                    <div class="stat-value" id="statEvents" style="color:#8b5cf6;">0</div>
+                    <div class="stat-label-sm">إجمالي الفعاليات</div>
+                </div>
+                <div class="chart-card">
+                    <h3><i class="fas fa-images" style="color:#22c55e;"></i> المعرض</h3>
+                    <div class="stat-value" id="statGallery" style="color:#22c55e;">0</div>
+                    <div class="stat-label-sm">الصور في المعرض</div>
+                </div>
+            </div>
+
+            <div class="data-table-wrap">
+                <h3><i class="fas fa-fire" style="color:var(--accent);"></i> إحصائيات سريعة</h3>
+                <table class="table-mini" id="quickStats">
+                    <tr><th>المؤشر</th><th>القيمة</th></tr>
+                    <tr><td>إجمالي الأخبار المنشورة</td><td id="qsNews">0</td></tr>
+                    <tr><td>إجمالي الفعاليات</td><td id="qsEvents">0</td></tr>
+                    <tr><td>إجمالي الأعضاء</td><td id="qsMembers">0</td></tr>
+                    <tr><td>صور المعرض</td><td id="qsGallery">0</td></tr>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <script src="../js/supabase.js"></script>
+    <script>
+    (async function() {
+        try {
+            var user = SB.requireAuth('ctrl_login.html', true);
+            if (!user) return;
+
+            var [members, news, events, gallery] = await Promise.all([
+                SB.api('GET', '/rest/v1/members?select=id'),
+                SB.api('GET', '/rest/v1/news?select=id'),
+                SB.api('GET', '/rest/v1/events?select=id'),
+                SB.api('GET', '/rest/v1/gallery?select=id')
+            ]);
+
+            var mCount = Array.isArray(members) ? members.length : 0;
+            var nCount = Array.isArray(news) ? news.length : 0;
+            var eCount = Array.isArray(events) ? events.length : 0;
+            var gCount = Array.isArray(gallery) ? gallery.length : 0;
+
+            document.getElementById('kpiMembers').textContent = mCount;
+            document.getElementById('kpiNews').textContent = nCount;
+            document.getElementById('kpiEvents').textContent = eCount;
+            document.getElementById('kpiGallery').textContent = gCount;
+
+            document.getElementById('statMembers').textContent = mCount;
+            document.getElementById('statNews').textContent = nCount;
+            document.getElementById('statEvents').textContent = eCount;
+            document.getElementById('statGallery').textContent = gCount;
+
+            document.getElementById('qsMembers').textContent = mCount;
+            document.getElementById('qsNews').textContent = nCount;
+            document.getElementById('qsEvents').textContent = eCount;
+            document.getElementById('qsGallery').textContent = gCount;
+        } catch(e) { console.warn('Analytics load failed', e); }
+    })();
+    </script>
+</body>
+</html>
