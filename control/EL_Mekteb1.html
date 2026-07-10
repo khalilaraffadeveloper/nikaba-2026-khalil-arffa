@@ -51,6 +51,15 @@
                     </a>
                 </li>
 
+                <!-- طلبات الإنتساب -->
+                <li class="mekteb-nav-item" id="navItemAffiliation">
+                    <a href="affiliation_requests.html" class="mekteb-nav-link" id="linkAffiliation">
+                        <i class="fas fa-handshake"></i>
+                        <span class="mekteb-nav-text">طلبات الإنتساب</span>
+                        <span class="mekteb-badge" id="badgeAffiliation">0</span>
+                    </a>
+                </li>
+
                 <!-- إدارة المحتوى -->
                 <li class="mekteb-nav-item" id="navItemContent">
                     <a href="content_manage.html" class="mekteb-nav-link" id="linkContent">
@@ -134,12 +143,29 @@
                 </li>
 
                 <!-- الرسائل -->
-                <li class="mekteb-nav-item" id="navItemMessages">
-                    <a href="messages_manage.html" class="mekteb-nav-link" id="linkMessages">
+                <li class="mekteb-nav-item mekteb-has-submenu" id="navItemMessages">
+                    <a href="javascript:void(0)" class="mekteb-nav-link mekteb-submenu-toggle" id="linkMessages">
                         <i class="fas fa-envelope"></i>
                         <span class="mekteb-nav-text">الرسائل</span>
                         <span class="mekteb-badge" id="badgeMessages">0</span>
+                        <i class="fas fa-chevron-down mekteb-submenu-arrow"></i>
                     </a>
+                    <ul class="mekteb-submenu" id="messagesSubmenu">
+                        <li class="mekteb-nav-item" id="navItemMessagesAdmin">
+                            <a href="messages_admin.html" class="mekteb-nav-link" id="linkMessagesAdmin">
+                                <i class="fas fa-envelope-open-text"></i>
+                                <span class="mekteb-nav-text">الرسائل الإدارية</span>
+                                <span class="mekteb-badge" id="badgeMessagesAdmin">0</span>
+                            </a>
+                        </li>
+                        <li class="mekteb-nav-item" id="navItemMessagesPersonal">
+                            <a href="messages_personal.html" class="mekteb-nav-link" id="linkMessagesPersonal">
+                                <i class="fas fa-user-envelope"></i>
+                                <span class="mekteb-nav-text">الرسائل الشخصية</span>
+                                <span class="mekteb-badge" id="badgeMessagesPersonal">0</span>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
 
                 <!-- تذاكر الدعم -->
@@ -209,7 +235,7 @@
                 <!-- الإعدادات -->
                 <li class="mekteb-nav-item" id="navItemSettings">
                     <a href="settings.html" class="mekteb-nav-link" id="linkSettings">
-                        <i class="fas fa-cog"></i>
+                        <i class="fas fa-cog mekteb-icon-spin"></i>
                         <span class="mekteb-nav-text">الإعدادات</span>
                     </a>
                 </li>
@@ -379,6 +405,14 @@
     </div>
 
     <script>
+    // toggle submenu
+    document.querySelectorAll('.mekteb-submenu-toggle').forEach(function(el) {
+        el.addEventListener('click', function(e) {
+            e.preventDefault();
+            this.closest('.mekteb-has-submenu').classList.toggle('open');
+        });
+    });
+
     (async function() {
         if (!NikabaAuth.checkAuth(true)) return;
         var user = NikabaAuth.getUser();

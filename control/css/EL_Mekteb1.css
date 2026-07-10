@@ -97,12 +97,11 @@ body.control-page {
     white-space: nowrap;
     gap: 30px;
 }
-.mekteb-nav-list li a i {
+.mekteb-nav-list li a i:first-child {
     font-size: 22px;
     width: 22px;
     text-align: center;
     flex-shrink: 0;
-    color: var(--text-muted);
     transition: color 0.2s;
 }
 .mekteb-nav-list li a:hover,
@@ -110,10 +109,40 @@ body.control-page {
     background: var(--accent-glow);
     color: var(--accent);
 }
-.mekteb-nav-list li a:hover i,
-.mekteb-nav-list li a.active i {
+.mekteb-nav-list li a:hover i:first-child,
+.mekteb-nav-list li a.active i:first-child {
     color: var(--accent);
 }
+
+/* ===== تلوين الأيقونات ===== */
+#navItemDashboard a i:first-child { color: var(--accent); }
+#navItemMembers a i:first-child { color: var(--primary); }
+#navItemApplications a i:first-child { color: var(--teal); }
+#navItemContent a i:first-child { color: var(--orange); }
+#navItemSiteContent a i:first-child { color: var(--purple); }
+#navItemNews a i:first-child { color: var(--success); }
+#navItemEvents a i:first-child { color: var(--pink); }
+#navItemElections a i:first-child { color: var(--accent); }
+#navItemElectionCreate a i:first-child { color: var(--success); }
+#navItemCandidates a i:first-child { color: var(--purple); }
+#navItemResults a i:first-child { color: var(--orange); }
+#navItemGallery a i:first-child { color: var(--pink); }
+#navItemComments a i:first-child { color: var(--teal); }
+#navItemMessages a i:first-child { color: var(--primary); }
+#navItemTickets a i:first-child { color: var(--success); }
+#navItemFinance a i:first-child { color: var(--accent); }
+#navItemBalances a i:first-child { color: var(--teal); }
+#navItemTransactions a i:first-child { color: var(--orange); }
+#navItemTreasury a i:first-child { color: var(--purple); }
+#navItemAvatarShop a i:first-child { color: var(--pink); }
+#navItemAnalytics a i:first-child { color: var(--primary); }
+#navItemRoles a i:first-child { color: var(--orange); }
+#navItemSettings a i:first-child { color: var(--text-muted); }
+#navItemBrowse a i:first-child { color: var(--success); }
+#navItemLogout a i:first-child { color: var(--danger); }
+#navItemAffiliation a i:first-child { color: var(--teal); }
+#navItemMessagesAdmin a i:first-child { color: var(--primary); }
+#navItemMessagesPersonal a i:first-child { color: var(--pink); }
 .mekteb-nav-text {
     opacity: 0;
     transition: opacity 0.3s ease;
@@ -509,6 +538,65 @@ body.control-page {
 }
 .mekteb-notif-empty p {
     font-size: 13px;
+}
+
+/* ===== أيقونة الإعدادات الدوارة ===== */
+@keyframes mekteb-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+.mekteb-icon-spin {
+    animation: mekteb-spin 4s linear infinite;
+}
+#navItemSettings:hover .mekteb-icon-spin {
+    animation-duration: 1s;
+}
+
+/* ===== القوائم الفرعية (submenu) ===== */
+.mekteb-has-submenu {
+    position: relative;
+}
+.mekteb-submenu-toggle {
+    cursor: pointer;
+}
+.mekteb-submenu-arrow {
+    font-size: 10px !important;
+    width: auto !important;
+    margin-right: auto;
+    transition: transform 0.3s ease;
+    color: var(--text-muted) !important;
+}
+.mekteb-sidebar:hover .mekteb-submenu-arrow {
+    display: inline-block;
+}
+.mekteb-has-submenu.open .mekteb-submenu-arrow {
+    transform: rotate(180deg);
+}
+.mekteb-submenu {
+    list-style: none;
+    padding-right: 42px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+.mekteb-has-submenu.open .mekteb-submenu {
+    max-height: 200px;
+}
+.mekteb-submenu .mekteb-nav-item a {
+    padding: 7px 10px;
+    margin: 2px 0;
+    font-size: 13px;
+    gap: 20px;
+}
+.mekteb-submenu .mekteb-nav-item a i:first-child {
+    font-size: 16px;
+    width: 16px;
+}
+.mekteb-sidebar:not(:hover) .mekteb-submenu {
+    display: none;
+}
+.mekteb-sidebar:hover .mekteb-submenu .mekteb-nav-text {
+    opacity: 1;
 }
 
 /* ===== متجاوب ===== */
