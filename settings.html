@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>الإعدادات - نقابة المهن التمثيلية</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <script src="js/supabase-auth.js"></script>
+    <style>
+        .st-page { min-height: 100vh; background: var(--bg); }
+        .st-header {
+            background: var(--bg-card); border-bottom: 1px solid var(--border-light);
+            padding: 14px 16px;
+            display: flex; align-items: center; gap: 12px;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .st-header a { color: var(--text-secondary); font-size: 18px; text-decoration: none; padding: 4px 8px; }
+        .st-header a:hover { color: var(--accent); }
+        .st-header h1 { font-size: 16px; font-weight: 800; color: var(--text); flex: 1; }
+        .st-section { padding: 16px; border-bottom: 1px solid var(--border-light); }
+        .st-section h3 { font-size: 13px; font-weight: 700; color: var(--accent); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+        .st-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 0; border-bottom: 1px solid var(--border-light);
+        }
+        .st-item:last-child { border-bottom: none; }
+        .st-item-label { display: flex; flex-direction: column; }
+        .st-item-label .sti-title { font-size: 14px; font-weight: 600; color: var(--text); }
+        .st-item-label .sti-desc { font-size: 11px; color: var(--text-muted); }
+        .st-toggle {
+            width: 44px; height: 24px;
+            border-radius: 12px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s;
+        }
+        .st-toggle.on { background: var(--accent); border-color: var(--accent); }
+        .st-toggle::after {
+            content: '';
+            position: absolute;
+            top: 2px; right: 2px;
+            width: 18px; height: 18px;
+            border-radius: 50%;
+            background: #fff;
+            transition: all 0.2s;
+        }
+        .st-toggle.on::after { right: 22px; }
+        .st-select {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text);
+            font-size: 13px;
+        }
+        .st-danger {
+            padding: 16px;
+            text-align: center;
+        }
+        .st-danger button {
+            padding: 12px 24px;
+            border-radius: 10px;
+            border: 1px solid rgba(239,68,68,0.2);
+            background: none;
+            color: var(--danger);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .st-danger button:hover { background: rgba(239,68,68,0.1); }
+    </style>
+</head>
+<body>
+    <div class="st-page">
+        <div class="st-header">
+            <a href="general-assembly.html"><i class="fas fa-arrow-right"></i></a>
+            <h1>الإعدادات</h1>
+        </div>
+        <div class="st-section">
+            <h3><i class="fas fa-bell"></i> الإشعارات</h3>
+            <div class="st-item">
+                <div class="st-item-label"><span class="sti-title">إشعارات الأخبار</span><span class="sti-desc">تنبيه عند نشر خبر جديد</span></div>
+                <div class="st-toggle on" data-key="notifNews"></div>
+            </div>
+            <div class="st-item">
+                <div class="st-item-label"><span class="sti-title">إشعارات الفعاليات</span><span class="sti-desc">تنبيه عند إضافة فعالية</span></div>
+                <div class="st-toggle on" data-key="notifEvents"></div>
+            </div>
+            <div class="st-item">
+                <div class="st-item-label"><span class="sti-title">إشعارات الانتخابات</span><span class="sti-desc">تنبيه عند فتح باب الترشح أو التصويت</span></div>
+                <div class="st-toggle on" data-key="notifElections"></div>
+            </div>
+            <div class="st-item">
+                <div class="st-item-label"><span class="sti-title">إشعارات الشات</span><span class="sti-desc">تنبيه عند وصول رسالة جديدة في الشات العام</span></div>
+                <div class="st-toggle" data-key="notifChat"></div>
+            </div>
+        </div>
+        <div class="st-section">
+            <h3><i class="fas fa-globe"></i> اللغة والعرض</h3>
+            <div class="st-item">
+                <div class="st-item-label"><span class="sti-title">اللغة</span><span class="sti-desc">واجهة الموقع</span></div>
+                <select class="st-select" id="stLang">
+                    <option value="ar">العربية</option>
+                    <option value="fr">Français</option>
+                </select>
+            </div>
+            <div class="st-item">
+                <div class="st-item-label"><span class="sti-title">الوضع الداكن</span><span class="sti-desc">إظهار الموقع بالألوان الداكنة</span></div>
+                <div class="st-toggle on" data-key="darkMode"></div>
+            </div>
+        </div>
+        <div class="st-section">
+            <h3><i class="fas fa-info-circle"></i> معلومات الحساب</h3>
+            <div class="st-item">
+                <div class="st-item-label"><span class="sti-title">البريد الإلكتروني</span><span class="sti-desc" id="stEmail">facebooyy@gmail.com</span></div>
+            </div>
+            <div class="st-item">
+                <div class="st-item-label"><span class="sti-title">آخر تسجيل دخول</span><span class="sti-desc" id="stLastLogin">اليوم</span></div>
+            </div>
+        </div>
+        <div class="st-danger">
+            <button id="stDeleteAccount"><i class="fas fa-trash"></i> حذف الحساب</button>
+        </div>
+    </div>
+    <script>
+    (function() {
+        if (!SupabaseAuth.checkAuth(true)) return;
+        var user = SupabaseAuth.getUser();
+        if (user) document.getElementById('stEmail').textContent = user.email;
+
+        document.querySelectorAll('.st-toggle').forEach(function(toggle) {
+            toggle.addEventListener('click', function() {
+                this.classList.toggle('on');
+                var key = this.getAttribute('data-key');
+                var val = this.classList.contains('on');
+                localStorage.setItem(key, val ? '1' : '0');
+            });
+        });
+        document.querySelectorAll('.st-toggle').forEach(function(toggle) {
+            var key = toggle.getAttribute('data-key');
+            var saved = localStorage.getItem(key);
+            if (saved === '0') toggle.classList.remove('on');
+            else toggle.classList.add('on');
+        });
+        document.getElementById('stDeleteAccount').addEventListener('click', function() {
+            if (confirm('هل أنت متأكد؟ سيتم حذف حسابك نهائياً.')) {
+                if (confirm('تأكيد نهائي؟ لا يمكن التراجع عن هذه الخطوة.')) {
+                    alert('سيتم تفعيل خاصية حذف الحساب قريباً.');
+                }
+            }
+        });
+    })();
+    </script>
+</body>
+</html>

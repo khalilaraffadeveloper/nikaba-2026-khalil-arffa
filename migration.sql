@@ -81,6 +81,28 @@ CREATE TRIGGER on_auth_user_created
     FOR EACH ROW
     EXECUTE FUNCTION handle_new_user();
 
--- 4. تحديد صلاحية admin لأول مستخدم يسجل (يدوياً)
+-- 4. جدول رسائل التواصل مع المكتب التنفيذي
+CREATE TABLE IF NOT EXISTS contact_messages (
+    id BIGSERIAL PRIMARY KEY,
+    name TEXT,
+    email TEXT,
+    subject TEXT,
+    department TEXT,
+    message TEXT,
+    status TEXT DEFAULT 'unread' CHECK (status IN ('unread', 'read', 'replied')),
+    created_at TIMESTAMPTZ DEFAULT now()
+);
+
+ALTER TABLE contact_messages ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "contact_insert_anon" ON contact_messages FOR INSERT WITH CHECK (true);
+CREATE POLICY "contact_select_admin" ON contact_messages FOR SELECT USING (
+    auth.uid() IN (SELECT user_id FROM profiles WHERE role IN ('executive', 'admin'))
+);
+CREATE POLICY "contact_update_admin" ON contact_messages FOR UPDATE USING (
+    auth.uid() IN (SELECT user_id FROM profiles WHERE role IN ('executive', 'admin'))
+);
+
+-- 5. تحديد صلاحية admin لأول مستخدم يسجل (يدوياً)
 -- بعد تسجيل أول مستخدم، شغّل هذا الاستعلام:
 -- UPDATE profiles SET role = 'admin' WHERE email = 'admin@example.com';
