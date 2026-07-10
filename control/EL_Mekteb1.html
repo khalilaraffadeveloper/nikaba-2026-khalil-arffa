@@ -51,15 +51,6 @@
                     </a>
                 </li>
 
-                <!-- طلبات العضوية -->
-                <li class="mekteb-nav-item" id="navItemApplications">
-                    <a href="Talabat_intisab.html" class="mekteb-nav-link" id="linkApplications">
-                        <i class="fas fa-file-signature"></i>
-                        <span class="mekteb-nav-text">طلبات العضوية</span>
-                        <span class="mekteb-badge" id="badgeApplications">0</span>
-                    </a>
-                </li>
-
                 <!-- طلبات الإنتساب -->
                 <li class="mekteb-nav-item" id="navItemAffiliation">
                     <a href="Talabat_intisab.html" class="mekteb-nav-link" id="linkAffiliation">
@@ -424,7 +415,7 @@
             var stats = await NikabaAPI.getStats();
             if (document.getElementById('statMembers')) document.getElementById('statMembers').textContent = stats.approved || 0;
             if (document.getElementById('statApplications')) document.getElementById('statApplications').textContent = stats.pending || 0;
-            if (document.getElementById('badgeApplications')) document.getElementById('badgeApplications').textContent = stats.pending || 0;
+            if (document.getElementById('badgeAffiliation')) document.getElementById('badgeAffiliation').textContent = stats.pending || 0;
             if (document.getElementById('badgeAffiliation')) document.getElementById('badgeAffiliation').textContent = stats.pending || 0;
         } catch(e) { console.warn('Stats load failed', e); }
 
