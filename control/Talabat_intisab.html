@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>طلبات الإنتساب - المكتب التنفيذي</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/control.css" />
+    <link rel="stylesheet" href="css/EL_Mekteb1.css" />
+    <script src="../js/auth.js"></script>
+    <style>
+        /* ===== تنسيقات طلبات الإنتساب ===== */
+        .intisab-filters {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+        .intisab-filters button {
+            padding: 6px 16px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+        .intisab-filters button.active {
+            background: var(--accent);
+            color: #000;
+            border-color: var(--accent);
+        }
+        .intisab-filters button .count {
+            font-size: 10px;
+            opacity: 0.7;
+            margin-right: 4px;
+        }
+        .intisab-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all 0.2s;
+        }
+        .intisab-card:hover {
+            border-color: var(--accent);
+        }
+        .intisab-card .intisab-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 8px;
+        }
+        .intisab-card .intisab-name {
+            font-size: 15px;
+            font-weight: 700;
+        }
+        .intisab-card .intisab-email {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .intisab-card .intisab-meta {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .intisab-card .intisab-meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .intisab-card .intisab-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .intisab-badge-pending {
+            background: rgba(245,200,66,.15);
+            color: var(--accent);
+            padding: 2px 10px;
+            border-radius: 10px;
+            font-size: 11px;
+        }
+        .intisab-badge-approved {
+            background: rgba(100,200,100,.15);
+            color: #4caf50;
+            padding: 2px 10px;
+            border-radius: 10px;
+            font-size: 11px;
+        }
+        .intisab-badge-rejected {
+            background: rgba(200,80,80,.15);
+            color: #e74c3c;
+            padding: 2px 10px;
+            border-radius: 10px;
+            font-size: 11px;
+        }
+
+        /* ===== مودال التفاصيل ===== */
+        .intisab-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,.6);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .intisab-modal-overlay.show {
+            display: flex;
+        }
+        .intisab-modal-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 24px;
+        }
+        .intisab-modal-box h3 {
+            margin-bottom: 16px;
+        }
+        .intisab-modal-box .intisab-detail-row {
+            display: flex;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255,255,255,.05);
+            font-size: 13px;
+        }
+        .intisab-modal-box .intisab-detail-row .intisab-label {
+            width: 140px;
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+        .intisab-modal-box .intisab-detail-row .intisab-value {
+            flex: 1;
+        }
+        .intisab-modal-box img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+            margin: 4px 0;
+        }
+        .intisab-modal-box .intisab-form-group {
+            margin-bottom: 12px;
+        }
+        .intisab-modal-box .intisab-form-group label {
+            display: block;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+        .intisab-modal-box .intisab-form-group select,
+        .intisab-modal-box .intisab-form-group textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text-primary);
+            font-size: 13px;
+        }
+        .intisab-modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+        .intisab-btn-approve {
+            background: #4caf50;
+            color: #fff;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .intisab-btn-reject {
+            background: #e74c3c;
+            color: #fff;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .intisab-btn-close {
+            background: var(--bg);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+            padding: 8px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .intisab-empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+        }
+        .intisab-empty-state i {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+        #intisabLoading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body class="control-page">
+
+    <div class="control-wrapper">
+
+        <!-- ===== القائمة الجانبية ===== -->
+        <nav class="mekteb-sidebar" id="mektebSidebar">
+            <div class="mekteb-profile" id="mektebProfile">
+                <div class="mekteb-avatar" id="mektebAvatar">
+                    <img src="../images/logoNikabo.png" alt="الشعار" />
+                </div>
+                <h2 class="mekteb-user-name" id="mektebUserName">المكتب التنفيذي</h2>
+            </div>
+
+            <ul class="mekteb-nav-list" id="mektebNavList">
+
+                <!-- الرئيسية -->
+                <li class="mekteb-nav-item" id="navItemDashboard">
+                    <a href="EL_Mekteb1.html" class="mekteb-nav-link" id="linkDashboard">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span class="mekteb-nav-text">الرئيسية</span>
+                    </a>
+                </li>
+
+                <!-- الأعضاء -->
+                <li class="mekteb-nav-item" id="navItemMembers">
+                    <a href="members.html" class="mekteb-nav-link" id="linkMembers">
+                        <i class="fas fa-users"></i>
+                        <span class="mekteb-nav-text">الأعضاء</span>
+                        <span class="mekteb-badge" id="badgeMembers">0</span>
+                    </a>
+                </li>
+
+                <!-- طلبات العضوية -->
+                <li class="mekteb-nav-item" id="navItemApplications">
+                    <a href="applications.html" class="mekteb-nav-link" id="linkApplications">
+                        <i class="fas fa-file-signature"></i>
+                        <span class="mekteb-nav-text">طلبات العضوية</span>
+                        <span class="mekteb-badge" id="badgeApplications">0</span>
+                    </a>
+                </li>
+
+                <!-- طلبات الإنتساب -->
+                <li class="mekteb-nav-item" id="navItemAffiliation">
+                    <a href="Talabat_intisab.html" class="mekteb-nav-link active" id="linkAffiliation">
+                        <i class="fas fa-handshake"></i>
+                        <span class="mekteb-nav-text">طلبات الإنتساب</span>
+                        <span class="mekteb-badge" id="badgeAffiliation">0</span>
+                    </a>
+                </li>
+
+                <!-- إدارة المحتوى -->
+                <li class="mekteb-nav-item" id="navItemContent">
+                    <a href="content_manage.html" class="mekteb-nav-link" id="linkContent">
+                        <i class="fas fa-edit"></i>
+                        <span class="mekteb-nav-text">إدارة المحتوى</span>
+                    </a>
+                </li>
+
+                <!-- محتوى الموقع -->
+                <li class="mekteb-nav-item" id="navItemSiteContent">
+                    <a href="site_content.html" class="mekteb-nav-link" id="linkSiteContent">
+                        <i class="fas fa-pager"></i>
+                        <span class="mekteb-nav-text">محتوى الموقع</span>
+                    </a>
+                </li>
+
+                <!-- الأخبار -->
+                <li class="mekteb-nav-item" id="navItemNews">
+                    <a href="news_manage.html" class="mekteb-nav-link" id="linkNews">
+                        <i class="fas fa-newspaper"></i>
+                        <span class="mekteb-nav-text">الأخبار</span>
+                    </a>
+                </li>
+
+                <!-- الفعاليات -->
+                <li class="mekteb-nav-item" id="navItemEvents">
+                    <a href="events_manage.html" class="mekteb-nav-link" id="linkEvents">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span class="mekteb-nav-text">الفعاليات</span>
+                    </a>
+                </li>
+
+                <!-- الانتخابات -->
+                <li class="mekteb-nav-item" id="navItemElections">
+                    <a href="elections.html" class="mekteb-nav-link" id="linkElections">
+                        <i class="fas fa-vote-yea"></i>
+                        <span class="mekteb-nav-text">الانتخابات</span>
+                        <span class="mekteb-badge mekteb-badge-active" id="badgeElections">نشط</span>
+                    </a>
+                </li>
+
+                <!-- إنشاء انتخابات -->
+                <li class="mekteb-nav-item" id="navItemElectionCreate">
+                    <a href="election_create.html" class="mekteb-nav-link" id="linkElectionCreate">
+                        <i class="fas fa-plus-circle"></i>
+                        <span class="mekteb-nav-text">إنشاء انتخابات</span>
+                    </a>
+                </li>
+
+                <!-- المرشحون -->
+                <li class="mekteb-nav-item" id="navItemCandidates">
+                    <a href="election_candidates.html" class="mekteb-nav-link" id="linkCandidates">
+                        <i class="fas fa-user-tie"></i>
+                        <span class="mekteb-nav-text">المرشحون</span>
+                    </a>
+                </li>
+
+                <!-- نتائج الانتخابات -->
+                <li class="mekteb-nav-item" id="navItemResults">
+                    <a href="election_results.html" class="mekteb-nav-link" id="linkResults">
+                        <i class="fas fa-chart-bar"></i>
+                        <span class="mekteb-nav-text">نتائج الانتخابات</span>
+                    </a>
+                </li>
+
+                <!-- المعرض -->
+                <li class="mekteb-nav-item" id="navItemGallery">
+                    <a href="gallery_manage.html" class="mekteb-nav-link" id="linkGallery">
+                        <i class="fas fa-images"></i>
+                        <span class="mekteb-nav-text">المعرض</span>
+                    </a>
+                </li>
+
+                <!-- التعليقات -->
+                <li class="mekteb-nav-item" id="navItemComments">
+                    <a href="comments_manage.html" class="mekteb-nav-link" id="linkComments">
+                        <i class="fas fa-comments"></i>
+                        <span class="mekteb-nav-text">التعليقات</span>
+                        <span class="mekteb-badge" id="badgeComments">0</span>
+                    </a>
+                </li>
+
+                <!-- الرسائل -->
+                <li class="mekteb-nav-item mekteb-has-submenu" id="navItemMessages">
+                    <a href="javascript:void(0)" class="mekteb-nav-link mekteb-submenu-toggle" id="linkMessages">
+                        <i class="fas fa-envelope"></i>
+                        <span class="mekteb-nav-text">الرسائل</span>
+                        <span class="mekteb-badge" id="badgeMessages">0</span>
+                        <i class="fas fa-chevron-down mekteb-submenu-arrow"></i>
+                    </a>
+                    <ul class="mekteb-submenu" id="messagesSubmenu">
+                        <li class="mekteb-nav-item" id="navItemMessagesAdmin">
+                            <a href="messages_admin.html" class="mekteb-nav-link" id="linkMessagesAdmin">
+                                <i class="fas fa-envelope-open-text"></i>
+                                <span class="mekteb-nav-text">الرسائل الإدارية</span>
+                                <span class="mekteb-badge" id="badgeMessagesAdmin">0</span>
+                            </a>
+                        </li>
+                        <li class="mekteb-nav-item" id="navItemMessagesPersonal">
+                            <a href="messages_personal.html" class="mekteb-nav-link" id="linkMessagesPersonal">
+                                <i class="fas fa-user-envelope"></i>
+                                <span class="mekteb-nav-text">الرسائل الشخصية</span>
+                                <span class="mekteb-badge" id="badgeMessagesPersonal">0</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <!-- تذاكر الدعم -->
+                <li class="mekteb-nav-item" id="navItemTickets">
+                    <a href="support_tickets.html" class="mekteb-nav-link" id="linkTickets">
+                        <i class="fas fa-headset"></i>
+                        <span class="mekteb-nav-text">تذاكر الدعم</span>
+                    </a>
+                </li>
+
+                <!-- النظام المالي -->
+                <li class="mekteb-nav-item" id="navItemFinance">
+                    <a href="finance.html" class="mekteb-nav-link" id="linkFinance">
+                        <i class="fas fa-coins"></i>
+                        <span class="mekteb-nav-text">النظام المالي</span>
+                    </a>
+                </li>
+
+                <!-- الأرصدة -->
+                <li class="mekteb-nav-item" id="navItemBalances">
+                    <a href="finance_balances.html" class="mekteb-nav-link" id="linkBalances">
+                        <i class="fas fa-wallet"></i>
+                        <span class="mekteb-nav-text">الأرصدة</span>
+                    </a>
+                </li>
+
+                <!-- المعاملات -->
+                <li class="mekteb-nav-item" id="navItemTransactions">
+                    <a href="finance_transactions.html" class="mekteb-nav-link" id="linkTransactions">
+                        <i class="fas fa-exchange-alt"></i>
+                        <span class="mekteb-nav-text">المعاملات</span>
+                    </a>
+                </li>
+
+                <!-- الخزنة -->
+                <li class="mekteb-nav-item" id="navItemTreasury">
+                    <a href="treasury.html" class="mekteb-nav-link" id="linkTreasury">
+                        <i class="fas fa-landmark"></i>
+                        <span class="mekteb-nav-text">الخزنة</span>
+                    </a>
+                </li>
+
+                <!-- متجر الآفاتار -->
+                <li class="mekteb-nav-item" id="navItemAvatarShop">
+                    <a href="ctrl_avatar_shop.html" class="mekteb-nav-link" id="linkAvatarShop">
+                        <i class="fas fa-smile"></i>
+                        <span class="mekteb-nav-text">متجر الآفاتار</span>
+                    </a>
+                </li>
+
+                <!-- التحليلات -->
+                <li class="mekteb-nav-item" id="navItemAnalytics">
+                    <a href="analytics.html" class="mekteb-nav-link" id="linkAnalytics">
+                        <i class="fas fa-chart-line"></i>
+                        <span class="mekteb-nav-text">التحليلات</span>
+                    </a>
+                </li>
+
+                <!-- الصلاحيات -->
+                <li class="mekteb-nav-item" id="navItemRoles">
+                    <a href="roles.html" class="mekteb-nav-link" id="linkRoles">
+                        <i class="fas fa-user-shield"></i>
+                        <span class="mekteb-nav-text">الصلاحيات</span>
+                    </a>
+                </li>
+
+                <!-- الإعدادات -->
+                <li class="mekteb-nav-item" id="navItemSettings">
+                    <a href="settings.html" class="mekteb-nav-link" id="linkSettings">
+                        <i class="fas fa-cog mekteb-icon-spin"></i>
+                        <span class="mekteb-nav-text">الإعدادات</span>
+                    </a>
+                </li>
+
+                <!-- فصل: الموقع العام -->
+                <li class="mekteb-nav-divider" id="navDividerSite">
+                    <span class="mekteb-divider-text">الموقع العام</span>
+                </li>
+
+                <!-- تصفح الموقع -->
+                <li class="mekteb-nav-item" id="navItemBrowse">
+                    <a href="../index.html" class="mekteb-nav-link" id="linkBrowse" target="_blank">
+                        <i class="fas fa-globe"></i>
+                        <span class="mekteb-nav-text">تصفح الموقع</span>
+                    </a>
+                </li>
+
+                <!-- تسجيل خروج -->
+                <li class="mekteb-nav-item mekteb-logout" id="navItemLogout">
+                    <a href="javascript:void(0)" class="mekteb-nav-link" id="linkLogout" onclick="NikabaAuth.logout();window.location.href='ctrl_login.html'">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span class="mekteb-nav-text">تسجيل خروج</span>
+                    </a>
+                </li>
+
+            </ul>
+        </nav>
+
+        <!-- ===== المحتوى الرئيسي ===== -->
+        <main class="mekteb-content" id="mektebContent">
+
+            <!-- شريط العنوان -->
+            <header class="mekteb-header" id="mektebHeader">
+                <h1 class="mekteb-page-title" id="mektebPageTitle">
+                    <i class="fas fa-handshake"></i> طلبات الإنتساب
+                </h1>
+                <div class="mekteb-header-left" id="mektebHeaderLeft">
+                    <div class="mekteb-admin-info" id="mektebAdminInfo">
+                        <img src="https://via.placeholder.com/34/1a1a2e/f5c842?text=ن" alt="المشرف" class="mekteb-admin-avatar" />
+                        <span class="mekteb-admin-greeting">مرحباً، <strong class="mekteb-admin-name" id="mektebAdminName">النقيب</strong></span>
+                    </div>
+                </div>
+            </header>
+
+            <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">إدارة ومراجعة طلبات الإنتساب إلى النقابة</p>
+
+            <!-- فلاتر -->
+            <div class="intisab-filters">
+                <button class="active" data-filter="all" id="filterAll">الكل <span class="count" id="countAll">0</span></button>
+                <button data-filter="pending" id="filterPending">قيد المراجعة <span class="count" id="countPending">0</span></button>
+                <button data-filter="approved" id="filterApproved">مقبول <span class="count" id="countApproved">0</span></button>
+                <button data-filter="rejected" id="filterRejected">مرفوض <span class="count" id="countRejected">0</span></button>
+            </div>
+
+            <!-- قائمة الطلبات -->
+            <div id="intisabList"></div>
+
+        </main>
+
+    </div>
+
+    <!-- ===== مودال التفاصيل ===== -->
+    <div class="intisab-modal-overlay" id="intisabModal">
+        <div class="intisab-modal-box">
+            <h3 id="modalTitle">تفاصيل الطلب</h3>
+            <div id="modalBody"></div>
+            <div class="intisab-modal-actions">
+                <button class="intisab-btn-approve" id="btnApprove"><i class="fas fa-check"></i> قبول</button>
+                <button class="intisab-btn-reject" id="btnReject"><i class="fas fa-times"></i> رفض</button>
+                <button class="intisab-btn-close" id="btnCloseModal">إغلاق</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // toggle submenu
+    document.querySelectorAll('.mekteb-submenu-toggle').forEach(function(el) {
+        el.addEventListener('click', function(e) {
+            e.preventDefault();
+            this.closest('.mekteb-has-submenu').classList.toggle('open');
+        });
+    });
+
+    (function() {
+        var list = document.getElementById('intisabList');
+        var loading = '<div id="intisabLoading"><i class="fas fa-spinner fa-spin" style="font-size:32px;"></i><p style="margin-top:8px;">جاري تحميل الطلبات...</p></div>';
+        list.innerHTML = loading;
+
+        // محاكاة بيانات — سيتم استبدالها بـ API لاحقاً
+        var mockData = [
+            {
+                id: 1,
+                name: 'محمد أحمد',
+                email: 'mohamed@example.com',
+                phone: '12345678',
+                date: '2026-07-01',
+                status: 'pending',
+                specialty: 'تمثيل',
+                notes: ''
+            },
+            {
+                id: 2,
+                name: 'فاطمة محمد',
+                email: 'fatima@example.com',
+                phone: '23456789',
+                date: '2026-06-28',
+                status: 'approved',
+                specialty: 'إخراج',
+                notes: ''
+            },
+            {
+                id: 3,
+                name: 'علي حسن',
+                email: 'ali@example.com',
+                phone: '34567890',
+                date: '2026-06-25',
+                status: 'rejected',
+                specialty: 'سيناريو',
+                notes: ''
+            }
+        ];
+
+        function render(filter) {
+            filter = filter || 'all';
+            var items = filter === 'all' ? mockData : mockData.filter(function(d) { return d.status === filter; });
+            var counts = { all: mockData.length, pending: 0, approved: 0, rejected: 0 };
+            mockData.forEach(function(d) { counts[d.status]++; });
+            document.getElementById('countAll').textContent = counts.all;
+            document.getElementById('countPending').textContent = counts.pending;
+            document.getElementById('countApproved').textContent = counts.approved;
+            document.getElementById('countRejected').textContent = counts.rejected;
+
+            if (items.length === 0) {
+                list.innerHTML = '<div class="intisab-empty-state"><i class="fas fa-inbox"></i><p>لا توجد طلبات</p></div>';
+                return;
+            }
+
+            var html = '';
+            items.forEach(function(d) {
+                var badgeClass = 'intisab-badge-pending';
+                var statusText = 'قيد المراجعة';
+                if (d.status === 'approved') { badgeClass = 'intisab-badge-approved'; statusText = 'مقبول'; }
+                else if (d.status === 'rejected') { badgeClass = 'intisab-badge-rejected'; statusText = 'مرفوض'; }
+
+                html += '<div class="intisab-card" data-id="' + d.id + '">';
+                html += '<div class="intisab-header">';
+                html += '<div><div class="intisab-name">' + d.name + '</div>';
+                html += '<div class="intisab-email">' + d.email + '</div></div>';
+                html += '<span class="' + badgeClass + '">' + statusText + '</span>';
+                html += '</div>';
+                html += '<div class="intisab-meta">';
+                html += '<span><i class="fas fa-phone"></i> ' + d.phone + '</span>';
+                html += '<span><i class="fas fa-calendar"></i> ' + d.date + '</span>';
+                html += '<span><i class="fas fa-star"></i> ' + d.specialty + '</span>';
+                html += '</div>';
+                html += '<div class="intisab-actions">';
+                html += '<button class="intisab-btn-close view-details" data-id="' + d.id + '"><i class="fas fa-eye"></i> عرض التفاصيل</button>';
+                html += '</div>';
+                html += '</div>';
+            });
+            list.innerHTML = html;
+        }
+
+        render('all');
+
+        // فلاتر
+        document.querySelectorAll('.intisab-filters button').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.intisab-filters button').forEach(function(b) { b.classList.remove('active'); });
+                this.classList.add('active');
+                render(this.getAttribute('data-filter'));
+            });
+        });
+
+        // فتح المودال
+        document.addEventListener('click', function(e) {
+            var target = e.target.closest('.view-details');
+            if (!target) return;
+            var id = parseInt(target.getAttribute('data-id'));
+            var item = mockData.find(function(d) { return d.id === id; });
+            if (!item) return;
+            document.getElementById('modalTitle').textContent = 'تفاصيل طلب الإنتساب - ' + item.name;
+            var body = '';
+            body += '<div class="intisab-detail-row"><span class="intisab-label">الاسم</span><span class="intisab-value">' + item.name + '</span></div>';
+            body += '<div class="intisab-detail-row"><span class="intisab-label">البريد</span><span class="intisab-value">' + item.email + '</span></div>';
+            body += '<div class="intisab-detail-row"><span class="intisab-label">الهاتف</span><span class="intisab-value">' + item.phone + '</span></div>';
+            body += '<div class="intisab-detail-row"><span class="intisab-label">التاريخ</span><span class="intisab-value">' + item.date + '</span></div>';
+            body += '<div class="intisab-detail-row"><span class="intisab-label">التخصص</span><span class="intisab-value">' + item.specialty + '</span></div>';
+            document.getElementById('modalBody').innerHTML = body;
+            document.getElementById('intisabModal').classList.add('show');
+        });
+
+        // إغلاق المودال
+        document.getElementById('btnCloseModal').addEventListener('click', function() {
+            document.getElementById('intisabModal').classList.remove('show');
+        });
+        document.getElementById('intisabModal').addEventListener('click', function(e) {
+            if (e.target === this) this.classList.remove('show');
+        });
+    })();
+    </script>
+
+</body>
+</html>
