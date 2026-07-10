@@ -359,9 +359,9 @@
         (async function loadProfile() {
             try {
                 var token = SupabaseAuth.getToken();
-                if (!token || !userId) { console.warn('loadProfile: no token or userId', { token: !!token, userId: userId }); return; }
+                if (!token || !userId) return;
                 var res = await SupabaseAuth.fetch('https://bfdixkdwhccriliwtnch.supabase.co/rest/v1/profiles?email=eq.' + encodeURIComponent(userEmail));
-                if (!res.ok) { console.warn('Profile fetch status:', res.status); var txt = await res.text(); console.warn('Profile fetch body:', txt); return; }
+                if (!res.ok) return;
                 var profiles = await res.json();
                 if (profiles && profiles.length > 0 && profiles[0].role) {
                     userRole = profiles[0].role;

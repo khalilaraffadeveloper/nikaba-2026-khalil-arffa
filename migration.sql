@@ -21,16 +21,23 @@ CREATE TABLE IF NOT EXISTS profiles (
 -- تفعيل Row Level Security
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 
+-- دالة مساعدة لتجنب recursion في RLS
+CREATE OR REPLACE FUNCTION is_admin_or_exec()
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+    RETURN EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role IN ('admin', 'executive'));
+END;
+$$;
+
 -- سياسات RLS لجداول profiles
 CREATE POLICY "profiles_select_own" ON profiles FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "profiles_select_admin" ON profiles FOR SELECT USING (
-    auth.uid() IN (SELECT user_id FROM profiles WHERE role IN ('executive', 'admin'))
-);
+CREATE POLICY "profiles_select_admin" ON profiles FOR SELECT USING (is_admin_or_exec());
 CREATE POLICY "profiles_insert_own" ON profiles FOR INSERT WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "profiles_update_own" ON profiles FOR UPDATE USING (auth.uid() = user_id);
-CREATE POLICY "profiles_update_admin" ON profiles FOR UPDATE USING (
-    auth.uid() IN (SELECT user_id FROM profiles WHERE role IN ('executive', 'admin'))
-);
+CREATE POLICY "profiles_update_admin" ON profiles FOR UPDATE USING (is_admin_or_exec());
 
 -- 2. جدول طلبات الإنتساب
 CREATE TABLE IF NOT EXISTS affiliations (
