@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>الجمعية العامة - نقابة المهن التمثيلية</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <script src="js/supabase-auth.js"></script>
+    <style>
+        .ga-page {
+            min-height: 100vh;
+            background: var(--bg);
+        }
+        /* شريط التنقل العلوي */
+        .ga-nav {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border-light);
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .ga-nav-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .ga-nav-right img {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid var(--accent);
+        }
+        .ga-nav-right .ga-nav-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--accent);
+        }
+        .ga-nav-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .ga-nav-left .ga-user-name {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        .ga-nav-left .ga-user-name strong {
+            color: var(--text);
+        }
+        .ga-nav-left .ga-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: var(--bg-elevated);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 14px;
+            border: 2px solid var(--border);
+        }
+        .ga-nav-left .ga-logout-btn {
+            background: none;
+            border: none;
+            color: var(--danger);
+            font-size: 18px;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        .ga-nav-left .ga-logout-btn:hover {
+            background: rgba(239,68,68,0.1);
+        }
+
+        /* الترحيب */
+        .ga-hero {
+            padding: 40px 20px 30px;
+            text-align: center;
+            position: relative;
+        }
+        .ga-hero::before {
+            content: '';
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(245,200,66,0.04) 0%, transparent 70%);
+            top: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .ga-hero h1 {
+            font-size: 26px;
+            font-weight: 900;
+            color: var(--accent);
+            margin-bottom: 8px;
+            position: relative;
+        }
+        .ga-hero p {
+            font-size: 14px;
+            color: var(--text-muted);
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        .ga-hero .ga-member-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 14px;
+            border-radius: 999px;
+            background: var(--accent-glow);
+            border: 1px solid rgba(245,200,66,0.2);
+            font-size: 12px;
+            color: var(--accent);
+            margin-top: 12px;
+        }
+
+        /* شبكة الخدمات */
+        .ga-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            padding: 0 16px 20px;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+        .ga-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px 16px;
+            text-align: center;
+            transition: all 0.2s;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .ga-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+        .ga-card .ga-card-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+        .ga-card .ga-card-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text);
+        }
+        .ga-card .ga-card-desc {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        /* الألوان */
+        .ga-card:nth-child(1) .ga-card-icon { color: var(--accent); }
+        .ga-card:nth-child(2) .ga-card-icon { color: var(--primary); }
+        .ga-card:nth-child(3) .ga-card-icon { color: var(--success); }
+        .ga-card:nth-child(4) .ga-card-icon { color: var(--purple); }
+        .ga-card:nth-child(5) .ga-card-icon { color: var(--pink); }
+        .ga-card:nth-child(6) .ga-card-icon { color: var(--teal); }
+        .ga-card:nth-child(7) .ga-card-icon { color: var(--orange); }
+        .ga-card:nth-child(8) .ga-card-icon { color: var(--danger); }
+
+        /* الإشعارات */
+        .ga-notif-bar {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            margin: 0 16px 16px;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 480px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .ga-notif-bar .ga-notif-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent-glow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            flex-shrink: 0;
+        }
+        .ga-notif-bar .ga-notif-text {
+            font-size: 13px;
+            color: var(--text-secondary);
+            flex: 1;
+        }
+        .ga-notif-bar .ga-notif-count {
+            background: var(--danger);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 10px;
+            border-radius: 999px;
+        }
+
+        /* الفوتر */
+        .ga-footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-light);
+        }
+
+        @media (min-width: 500px) {
+            .ga-grid {
+                grid-template-columns: repeat(3, 1fr);
+                max-width: 600px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ga-page">
+
+        <!-- شريط التنقل -->
+        <nav class="ga-nav">
+            <div class="ga-nav-right">
+                <img src="images/logoNikabo.png" alt="الشعار" />
+                <span class="ga-nav-title">الجمعية العامة</span>
+            </div>
+            <div class="ga-nav-left">
+                <span class="ga-user-name">مرحباً، <strong id="gaUserName">عضو</strong></span>
+                <div class="ga-avatar" id="gaUserAvatar">ع</div>
+                <button class="ga-logout-btn" id="gaLogoutBtn" title="تسجيل خروج"><i class="fas fa-sign-out-alt"></i></button>
+            </div>
+        </nav>
+
+        <!-- الترحيب -->
+        <div class="ga-hero">
+            <h1>الجمعية العامة</h1>
+            <p>General Assembly — نقابة المهن التمثيلية في موريتانيا</p>
+            <div class="ga-member-badge"><i class="fas fa-user-check"></i> عضو في النقابة</div>
+        </div>
+
+        <!-- شريط الإشعارات -->
+        <div class="ga-notif-bar">
+            <div class="ga-notif-icon"><i class="fas fa-bell"></i></div>
+            <span class="ga-notif-text">لا توجد إشعارات جديدة</span>
+            <span class="ga-notif-count" id="gaNotifCount" style="display:none;">0</span>
+        </div>
+
+        <!-- شبكة الخدمات -->
+        <div class="ga-grid">
+
+            <a href="control/EL_Mekteb1.html" class="ga-card">
+                <div class="ga-card-icon"><i class="fas fa-tachometer-alt"></i></div>
+                <div class="ga-card-title">المكتب التنفيذي</div>
+                <div class="ga-card-desc">Bureau Exécutif</div>
+            </a>
+
+            <a href="news.html" class="ga-card">
+                <div class="ga-card-icon"><i class="fas fa-newspaper"></i></div>
+                <div class="ga-card-title">الأخبار</div>
+                <div class="ga-card-desc">Actualités</div>
+            </a>
+
+            <a href="events.html" class="ga-card">
+                <div class="ga-card-icon"><i class="fas fa-calendar-alt"></i></div>
+                <div class="ga-card-title">الفعاليات</div>
+                <div class="ga-card-desc">Événements</div>
+            </a>
+
+            <a href="members.html" class="ga-card">
+                <div class="ga-card-icon"><i class="fas fa-users"></i></div>
+                <div class="ga-card-title">الأعضاء</div>
+                <div class="ga-card-desc">Membres</div>
+            </a>
+
+            <a href="gallery.html" class="ga-card">
+                <div class="ga-card-icon"><i class="fas fa-images"></i></div>
+                <div class="ga-card-title">المعرض</div>
+                <div class="ga-card-desc">Galerie</div>
+            </a>
+
+            <a href="contact.html" class="ga-card">
+                <div class="ga-card-icon"><i class="fas fa-headset"></i></div>
+                <div class="ga-card-title">اتصل بنا</div>
+                <div class="ga-card-desc">Contact</div>
+            </a>
+
+            <a href="intisab.html" class="ga-card">
+                <div class="ga-card-icon"><i class="fas fa-handshake"></i></div>
+                <div class="ga-card-title">طلب إنتساب</div>
+                <div class="ga-card-desc">Demande d'Adhésion</div>
+            </a>
+
+            <a href="settings.html" class="ga-card">
+                <div class="ga-card-icon"><i class="fas fa-cog"></i></div>
+                <div class="ga-card-title">الإعدادات</div>
+                <div class="ga-card-desc">Paramètres</div>
+            </a>
+
+        </div>
+
+        <div class="ga-footer">
+            جميع الحقوق محفوظة &copy; 2026 — نقابة المهن التمثيلية في موريتانيا
+        </div>
+
+    </div>
+
+    <script>
+    (function() {
+        // التحقق من تسجيل الدخول
+        if (!SupabaseAuth.checkAuth(true)) return;
+
+        var user = SupabaseAuth.getUser();
+        if (user) {
+            var name = user.email ? user.email.split('@')[0] : 'عضو';
+            document.getElementById('gaUserName').textContent = name;
+            document.getElementById('gaUserAvatar').textContent = name.charAt(0).toUpperCase();
+        }
+
+        // تسجيل خروج
+        document.getElementById('gaLogoutBtn').addEventListener('click', function() {
+            if (confirm('تأكيد تسجيل الخروج؟')) {
+                SupabaseAuth.signOut();
+            }
+        });
+    })();
+    </script>
+
+</body>
+</html>

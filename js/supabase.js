@@ -99,7 +99,7 @@
 
         // ===== تحديث حالة طلب =====
         updateAffiliationStatus: async function(id, status) {
-            var token = localStorage.getItem('nikaba_token');
+            var token = window.SupabaseAuth ? SupabaseAuth.getToken() : null;
             var res = await fetch(SUPABASE_URL + '/rest/v1/affiliations?id=eq.' + id, {
                 method: 'PATCH',
                 headers: {

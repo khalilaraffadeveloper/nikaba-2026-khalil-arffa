@@ -1,0 +1,10 @@
+/* control.css — تنسيق أساسي للوحة التحكم */
+body.control-page {
+    max-width: 100%;
+    margin: 0;
+}
+.control-wrapper {
+    display: flex;
+    min-height: 100vh;
+    max-width: 100%;
+}

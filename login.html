@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>تسجيل الدخول - نقابة المهن التمثيلية</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <script src="js/supabase-auth.js"></script>
+    <style>
+        .login-page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px 16px;
+            position: relative;
+            overflow: hidden;
+        }
+        .login-page::before {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(245,200,66,0.06) 0%, transparent 70%);
+            top: -100px;
+            left: -100px;
+            animation: pulse-glow 4s ease-in-out infinite;
+        }
+        .login-page::after {
+            content: '';
+            position: absolute;
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(139,92,246,0.04) 0%, transparent 70%);
+            bottom: -80px;
+            right: -80px;
+        }
+        .login-box {
+            width: 100%;
+            max-width: 380px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 32px 24px;
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.3);
+        }
+        .login-logo {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .login-logo img {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            border: 3px solid var(--accent);
+            margin-bottom: 12px;
+        }
+        .login-logo h1 {
+            font-size: 20px;
+            font-weight: 900;
+            color: var(--accent);
+        }
+        .login-logo p {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+        .login-error {
+            background: rgba(239,68,68,0.1);
+            border: 1px solid rgba(239,68,68,0.2);
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 13px;
+            color: var(--danger);
+            margin-bottom: 16px;
+            display: none;
+        }
+        .login-error.show {
+            display: block;
+        }
+        .login-field {
+            margin-bottom: 16px;
+        }
+        .login-field label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+        .login-field input {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text);
+            font-size: 15px;
+            transition: border-color 0.2s;
+        }
+        .login-field input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        .login-btn {
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            border: none;
+            background: var(--accent-gradient);
+            color: #0a0a14;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 20px rgba(245,200,66,0.25);
+            margin-top: 8px;
+        }
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(245,200,66,0.35);
+        }
+        .login-btn:disabled {
+            opacity: 0.6;
+            transform: none;
+        }
+        .login-links {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .login-links a {
+            display: block;
+            font-size: 13px;
+            color: var(--text-muted);
+            text-decoration: none;
+            margin-bottom: 6px;
+            transition: color 0.2s;
+        }
+        .login-links a:hover {
+            color: var(--accent);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-page">
+        <div class="login-box">
+            <div class="login-logo">
+                <img src="images/logoNikabo.png" alt="الشعار" />
+                <h1>نقابة المهن التمثيلية</h1>
+                <p>تسجيل الدخول إلى حسابك</p>
+            </div>
+
+            <div class="login-error" id="loginError"></div>
+
+            <form id="loginForm">
+                <div class="login-field">
+                    <label>البريد الإلكتروني</label>
+                    <input type="email" id="loginEmail" placeholder="أدخل بريدك الإلكتروني" required autofocus />
+                </div>
+                <div class="login-field">
+                    <label>كلمة المرور</label>
+                    <input type="password" id="loginPassword" placeholder="أدخل كلمة المرور" required />
+                </div>
+                <button type="submit" class="login-btn" id="loginBtn"><i class="fas fa-sign-in-alt"></i> تسجيل الدخول</button>
+            </form>
+
+            <div class="login-links">
+                <a href="intisab.html"><i class="fas fa-user-plus"></i> طلب إنتساب جديد</a>
+                <a href="#"><i class="fas fa-key"></i> نسيت كلمة المرور؟</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    (function() {
+        var form = document.getElementById('loginForm');
+        var btn = document.getElementById('loginBtn');
+        var errorEl = document.getElementById('loginError');
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            errorEl.classList.remove('show');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري تسجيل الدخول...';
+            btn.disabled = true;
+
+            var email = document.getElementById('loginEmail').value.trim();
+            var password = document.getElementById('loginPassword').value;
+
+            try {
+                var result = await SupabaseAuth.signIn(email, password);
+                btn.innerHTML = '<i class="fas fa-check"></i> تم بنجاح';
+                window.location.href = 'general-assembly.html';
+            } catch(err) {
+                errorEl.textContent = err.message;
+                errorEl.classList.add('show');
+                btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> تسجيل الدخول';
+                btn.disabled = false;
+            }
+        });
+    })();
+    </script>
+
+</body>
+</html>

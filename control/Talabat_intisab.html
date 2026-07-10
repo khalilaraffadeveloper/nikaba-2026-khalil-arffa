@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="../css/style.css" />
     <link rel="stylesheet" href="../css/control.css" />
     <link rel="stylesheet" href="css/EL_Mekteb1.css" />
-    <script src="../js/auth.js"></script>
+    <script src="../js/supabase-auth.js"></script>
     <script src="../js/supabase.js"></script>
     <style>
         /* ===== تنسيقات طلبات الإنتساب ===== */
@@ -525,7 +525,7 @@
 
                 <!-- تسجيل خروج -->
                 <li class="mekteb-nav-item mekteb-logout" id="navItemLogout">
-                    <a href="javascript:void(0)" class="mekteb-nav-link" id="linkLogout" onclick="NikabaAuth.logout();window.location.href='ctrl_login.html'">
+                    <a href="javascript:void(0)" class="mekteb-nav-link" id="linkLogout" onclick="SupabaseAuth.signOut()">
                         <i class="fas fa-sign-out-alt"></i>
                         <span class="mekteb-nav-text">تسجيل خروج</span>
                     </a>
