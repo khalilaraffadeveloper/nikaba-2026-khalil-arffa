@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="../css/control.css" />
     <link rel="stylesheet" href="css/EL_Mekteb1.css" />
     <script src="../js/auth.js"></script>
+    <script src="../js/supabase.js"></script>
     <style>
         /* ===== تنسيقات طلبات الإنتساب ===== */
         .intisab-filters {
@@ -593,73 +594,23 @@
 
     (function() {
         var list = document.getElementById('intisabList');
-        var loading = '<div id="intisabLoading"><i class="fas fa-spinner fa-spin" style="font-size:32px;"></i><p style="margin-top:8px;">جاري تحميل الطلبات...</p></div>';
-        list.innerHTML = loading;
-
-        // محاكاة بيانات — سيتم استبدالها بـ API لاحقاً
-        var mockData = [
-            {
-                id: 1,
-                name: 'محمد أحمد',
-                email: 'mohamed@example.com',
-                national_id: '1234567890',
-                phone: '12345678',
-                whatsapp: '12345678',
-                personal_photo: 'https://via.placeholder.com/300x300/1a1a2e/f5c842?text=صورة+شخصية',
-                id_card_image: 'https://via.placeholder.com/400x250/14141f/f5c842?text=بطاقة+التعريف+الوطنية',
-                payment_receipt_image: 'https://via.placeholder.com/400x300/14141f/f5c842?text=وصل+دفع+رسوم+الإشتراك',
-                payment_number: '26067036',
-                payment_date: '2026-07-01',
-                date: '2026-07-01',
-                status: 'pending',
-                specialty: 'تمثيل',
-                notes: ''
-            },
-            {
-                id: 2,
-                name: 'فاطمة محمد',
-                email: 'fatima@example.com',
-                national_id: '2345678901',
-                phone: '23456789',
-                whatsapp: '98765432',
-                personal_photo: 'https://via.placeholder.com/300x300/1a1a2e/f5c842?text=صورة+شخصية',
-                id_card_image: 'https://via.placeholder.com/400x250/14141f/f5c842?text=بطاقة+التعريف+الوطنية',
-                payment_receipt_image: 'https://via.placeholder.com/400x300/14141f/f5c842?text=وصل+دفع+رسوم+الإشتراك',
-                payment_number: '26445577',
-                payment_date: '2026-06-28',
-                date: '2026-06-28',
-                status: 'approved',
-                specialty: 'إخراج',
-                notes: ''
-            },
-            {
-                id: 3,
-                name: 'علي حسن',
-                email: 'ali@example.com',
-                national_id: '3456789012',
-                phone: '34567890',
-                whatsapp: '11223344',
-                personal_photo: 'https://via.placeholder.com/300x300/1a1a2e/f5c842?text=صورة+شخصية',
-                id_card_image: 'https://via.placeholder.com/400x250/14141f/f5c842?text=بطاقة+التعريف+الوطنية',
-                payment_receipt_image: 'https://via.placeholder.com/400x300/14141f/f5c842?text=وصل+دفع+رسوم+الإشتراك',
-                payment_number: '25001122',
-                payment_date: '2026-06-25',
-                date: '2026-06-25',
-                status: 'rejected',
-                specialty: 'سيناريو',
-                notes: ''
-            }
-        ];
+        var currentFilter = 'all';
+        var allData = [];
 
         function render(filter) {
-            filter = filter || 'all';
-            var items = filter === 'all' ? mockData : mockData.filter(function(d) { return d.status === filter; });
-            var counts = { all: mockData.length, pending: 0, approved: 0, rejected: 0 };
-            mockData.forEach(function(d) { counts[d.status]++; });
+            filter = filter || currentFilter;
+            currentFilter = filter;
+            var items = filter === 'all' ? allData : allData.filter(function(d) { return d.status === filter; });
+            var counts = { all: allData.length, pending: 0, approved: 0, rejected: 0 };
+            allData.forEach(function(d) { counts[d.status]++; });
             document.getElementById('countAll').textContent = counts.all;
             document.getElementById('countPending').textContent = counts.pending;
             document.getElementById('countApproved').textContent = counts.approved;
             document.getElementById('countRejected').textContent = counts.rejected;
+
+            // تحديث badge في القائمة الجانبية
+            var badge = document.getElementById('badgeAffiliation');
+            if (badge) badge.textContent = counts.pending;
 
             if (items.length === 0) {
                 list.innerHTML = '<div class="intisab-empty-state"><i class="fas fa-inbox"></i><p>لا توجد طلبات</p></div>';
@@ -676,13 +627,13 @@
                 html += '<div class="intisab-card" data-id="' + d.id + '">';
                 html += '<div class="intisab-header">';
                 html += '<div><div class="intisab-name">' + d.name + '</div>';
-                html += '<div class="intisab-email">بطاقة: ' + d.national_id + '</div></div>';
+                html += '<div class="intisab-email">بطاقة: ' + (d.national_id || '—') + '</div></div>';
                 html += '<span class="' + badgeClass + '">' + statusText + '</span>';
                 html += '</div>';
                 html += '<div class="intisab-meta">';
                 html += '<span><i class="fas fa-phone"></i> ' + d.phone + '</span>';
                 html += '<span><i class="fab fa-whatsapp"></i> ' + d.whatsapp + '</span>';
-                html += '<span><i class="fas fa-calendar"></i> ' + d.date + '</span>';
+                html += '<span><i class="fas fa-calendar"></i> ' + (d.payment_date || d.created_at || '') + '</span>';
                 html += '</div>';
                 html += '<div class="intisab-actions">';
                 html += '<button class="intisab-btn-close view-details" data-id="' + d.id + '"><i class="fas fa-eye"></i> عرض شكلية الإنتساب</button>';
@@ -692,7 +643,21 @@
             list.innerHTML = html;
         }
 
-        render('all');
+        // جلب البيانات من Supabase
+        async function loadData() {
+            list.innerHTML = '<div id="intisabLoading"><i class="fas fa-spinner fa-spin" style="font-size:32px;"></i><p style="margin-top:8px;">جاري تحميل الطلبات...</p></div>';
+            try {
+                var data = await NikabaAPI.getAffiliations();
+                allData = data || [];
+            } catch(e) {
+                allData = [];
+                list.innerHTML = '<div class="intisab-empty-state"><i class="fas fa-exclamation-triangle"></i><p>فشل تحميل البيانات</p></div>';
+                return;
+            }
+            render(currentFilter);
+        }
+
+        loadData();
 
         // فلاتر
         document.querySelectorAll('.intisab-filters button').forEach(function(btn) {
@@ -708,7 +673,7 @@
             var target = e.target.closest('.view-details');
             if (!target) return;
             var id = parseInt(target.getAttribute('data-id'));
-            var item = mockData.find(function(d) { return d.id === id; });
+            var item = allData.find(function(d) { return d.id === id; });
             if (!item) return;
             var badge = document.getElementById('modalStatusBadge');
             var badgeClass = 'intisab-badge-pending';
@@ -726,7 +691,7 @@
             body += '<div class="intisab-section-title"><i class="fas fa-user"></i> المعلومات الشخصية</div>';
             body += '<div class="intisab-grid">';
             body += '<div class="intisab-field full"><div class="intisab-field-label">الإسم</div><div class="intisab-field-value rtl">' + item.name + '</div></div>';
-            body += '<div class="intisab-field"><div class="intisab-field-label">رقم بطاقة التعريف</div><div class="intisab-field-value">' + item.national_id + '</div></div>';
+            body += '<div class="intisab-field"><div class="intisab-field-label">رقم بطاقة التعريف</div><div class="intisab-field-value">' + (item.national_id || '—') + '</div></div>';
             body += '<div class="intisab-field"><div class="intisab-field-label">الإيميل</div><div class="intisab-field-value rtl">' + (item.email || '—') + '</div></div>';
             body += '</div></div>';
 
@@ -743,20 +708,40 @@
             body += '<div class="intisab-section-title"><i class="fas fa-credit-card"></i> معلومات الدفع</div>';
             body += '<div class="intisab-grid">';
             body += '<div class="intisab-field"><div class="intisab-field-label">الرقم الذي تم منه الدفع</div><div class="intisab-field-value">' + item.payment_number + '</div></div>';
-            body += '<div class="intisab-field"><div class="intisab-field-label">تاريخ عملية الدفع</div><div class="intisab-field-value">' + item.payment_date + '</div></div>';
+            body += '<div class="intisab-field"><div class="intisab-field-label">تاريخ عملية الدفع</div><div class="intisab-field-value">' + (item.payment_date || '—') + '</div></div>';
             body += '</div></div>';
 
             // قسم المستندات
             body += '<div class="intisab-section">';
             body += '<div class="intisab-section-title"><i class="fas fa-file-image"></i> المستندات المرفوعة</div>';
             body += '<div class="intisab-images">';
-            body += '<div class="intisab-image-card"><img src="' + (item.personal_photo || 'https://via.placeholder.com/300x300/14141f/666?text=لا+توجد') + '" alt="صورة شخصية" /><div class="intisab-image-label"><i class="fas fa-user"></i> صورة شخصية</div></div>';
-            body += '<div class="intisab-image-card"><img src="' + (item.id_card_image || 'https://via.placeholder.com/300x300/14141f/666?text=لا+توجد') + '" alt="بطاقة تعريف" /><div class="intisab-image-label"><i class="fas fa-id-card"></i> بطاقة التعريف</div></div>';
-            body += '<div class="intisab-image-card"><img src="' + (item.payment_receipt_image || 'https://via.placeholder.com/300x300/14141f/666?text=لا+توجد') + '" alt="وصل دفع" /><div class="intisab-image-label"><i class="fas fa-receipt"></i> وصل دفع الرسوم</div></div>';
+            body += '<div class="intisab-image-card"><img src="' + (item.personal_photo_url || 'https://via.placeholder.com/300x300/14141f/666?text=لا+توجد') + '" alt="صورة شخصية" /><div class="intisab-image-label"><i class="fas fa-user"></i> صورة شخصية</div></div>';
+            body += '<div class="intisab-image-card"><img src="' + (item.id_card_image_url || 'https://via.placeholder.com/300x300/14141f/666?text=لا+توجد') + '" alt="بطاقة تعريف" /><div class="intisab-image-label"><i class="fas fa-id-card"></i> بطاقة التعريف</div></div>';
+            body += '<div class="intisab-image-card"><img src="' + (item.payment_receipt_url || 'https://via.placeholder.com/300x300/14141f/666?text=لا+توجد') + '" alt="وصل دفع" /><div class="intisab-image-label"><i class="fas fa-receipt"></i> وصل دفع الرسوم</div></div>';
             body += '</div></div>';
 
             document.getElementById('modalBody').innerHTML = body;
             document.getElementById('intisabModal').classList.add('show');
+
+            // ربط أزرار القبول/الرفض
+            document.getElementById('btnApprove').onclick = async function() {
+                if (!confirm('تأكيد قبول طلب الإنتساب من ' + item.name + '?')) return;
+                try {
+                    await NikabaAPI.updateAffiliationStatus(id, 'approved');
+                    item.status = 'approved';
+                    loadData();
+                    document.getElementById('intisabModal').classList.remove('show');
+                } catch(e) { alert('خطأ: ' + e.message); }
+            };
+            document.getElementById('btnReject').onclick = async function() {
+                if (!confirm('تأكيد رفض طلب الإنتساب من ' + item.name + '?')) return;
+                try {
+                    await NikabaAPI.updateAffiliationStatus(id, 'rejected');
+                    item.status = 'rejected';
+                    loadData();
+                    document.getElementById('intisabModal').classList.remove('show');
+                } catch(e) { alert('خطأ: ' + e.message); }
+            };
         });
 
         // إغلاق المودال

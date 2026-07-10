@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="../css/control.css" />
     <link rel="stylesheet" href="css/EL_Mekteb1.css" />
     <script src="../js/auth.js"></script>
+    <script src="../js/supabase.js"></script>
 </head>
 <body class="control-page">
 
@@ -420,17 +421,11 @@
             document.querySelector('#mektebAdminName').textContent = user.name || 'النقيب';
         }
         try {
-            var r = await NikabaAuth.apiFetch('/api/dashboard/stats');
-            var d = await r.json();
-            if (document.getElementById('statMembers')) document.getElementById('statMembers').textContent = d.members ?? 0;
-            if (document.getElementById('statNews')) document.getElementById('statNews').textContent = d.news ?? 0;
-            if (document.getElementById('statEvents')) document.getElementById('statEvents').textContent = d.events ?? 0;
-            if (document.getElementById('statElections')) document.getElementById('statElections').textContent = d.elections_active ?? 0;
-            if (document.getElementById('statMessages')) document.getElementById('statMessages').textContent = d.tickets_open ?? 0;
-            if (document.getElementById('statComments')) document.getElementById('statComments').textContent = d.comments ?? 0;
-            if (document.getElementById('statApplications')) document.getElementById('statApplications').textContent = d.pending_applications ?? 0;
-            if (document.getElementById('statTreasury')) document.getElementById('statTreasury').textContent = d.treasury_balance ?? 0;
-            if (document.getElementById('badgeApplications')) document.getElementById('badgeApplications').textContent = d.pending_applications ?? 0;
+            var stats = await NikabaAPI.getStats();
+            if (document.getElementById('statMembers')) document.getElementById('statMembers').textContent = stats.total || 0;
+            if (document.getElementById('statApplications')) document.getElementById('statApplications').textContent = stats.pending || 0;
+            if (document.getElementById('badgeApplications')) document.getElementById('badgeApplications').textContent = stats.pending || 0;
+            if (document.getElementById('badgeAffiliation')) document.getElementById('badgeAffiliation').textContent = stats.pending || 0;
         } catch(e) { console.warn('Stats load failed', e); }
     })();
     </script>

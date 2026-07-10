@@ -6,6 +6,7 @@
     <title>طلب إنتساب - نقابة المهن التمثيلية</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <link rel="stylesheet" href="css/style.css" />
+    <script src="js/supabase.js"></script>
     <style>
         .intisab-page {
             max-width: 520px;
@@ -313,28 +314,23 @@
             });
         });
 
-        form.addEventListener('submit', function(e) {
+        form.addEventListener('submit', async function(e) {
             e.preventDefault();
             document.getElementById('intisabPaymentDate').value = getCombinedDate();
             var btn = document.getElementById('intisabSubmitBtn');
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
             btn.disabled = true;
 
-            var formData = new FormData(form);
-            fetch('/api/affiliation/apply', { method: 'POST', body: formData })
-                .then(function(r) {
-                    if (!r.ok) return r.json().then(function(d) { throw new Error(d.error || d.title || 'فشل تقديم الطلب'); });
-                    return r.json();
-                })
-                .then(function(data) {
-                    btn.innerHTML = '<i class="fas fa-check-circle"></i> تم الإرسال بنجاح';
-                    window.location.href = 'intisab-done.html?id=' + (data.id || '');
-                })
-                .catch(function(err) {
-                    btn.innerHTML = '<i class="fas fa-paper-plane"></i> إرسال طلب الإنتساب';
-                    btn.disabled = false;
-                    alert('خطأ: ' + err.message);
-                });
+            try {
+                var formData = new FormData(form);
+                var result = await NikabaAPI.submitAffiliation(formData);
+                btn.innerHTML = '<i class="fas fa-check-circle"></i> تم الإرسال بنجاح';
+                window.location.href = 'intisab-done.html?id=' + (result[0]?.id || '');
+            } catch(err) {
+                btn.innerHTML = '<i class="fas fa-paper-plane"></i> إرسال طلب الإنتساب';
+                btn.disabled = false;
+                alert('خطأ: ' + err.message);
+            }
         });
     })();
     </script>
