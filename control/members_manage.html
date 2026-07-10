@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>إدارة الأعضاء - المكتب التنفيذي</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/control.css" />
+    <link rel="stylesheet" href="css/EL_Mekteb1.css" />
+    <script src="../js/supabase-auth.js"></script>
+    <style>
+        .mb-toolbar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+        .mb-toolbar input { padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 13px; min-width: 200px; flex: 1; }
+        .mb-toolbar select { padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 13px; }
+        .mb-toolbar .mb-count { font-size: 13px; color: var(--text-muted); }
+        .mb-table { width: 100%; border-collapse: collapse; }
+        .mb-table th { text-align: right; font-size: 11px; color: var(--text-muted); padding: 10px 8px; border-bottom: 1px solid var(--border); }
+        .mb-table td { padding: 10px 8px; font-size: 13px; color: var(--text); border-bottom: 1px solid var(--border-light); }
+        .mb-table .role-badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+        .role-badge.admin { background: rgba(245,200,66,0.15); color: var(--accent); }
+        .role-badge.executive { background: rgba(99,102,241,0.15); color: #818cf8; }
+        .role-badge.member { background: rgba(34,197,94,0.15); color: #22c55e; }
+        .mb-table td.actions { display: flex; gap: 6px; }
+        .mb-table td.actions button { background: none; border: none; cursor: pointer; font-size: 13px; padding: 4px 8px; border-radius: 6px; }
+        .mb-table td.actions .edit-btn { color: var(--primary); }
+        .mb-table td.actions .edit-btn:hover { background: rgba(59,130,246,0.1); }
+        .mb-empty { text-align: center; padding: 40px; color: var(--text-muted); }
+        @media(max-width:768px) {
+            .mb-table { font-size: 12px; }
+            .mb-table th, .mb-table td { padding: 6px 4px; }
+            .mb-toolbar input { min-width: 120px; }
+        }
+    </style>
+</head>
+<body class="control-page">
+    <div class="control-wrapper">
+        <nav class="mekteb-sidebar">
+            <div class="mekteb-profile"><div class="mekteb-avatar"><img src="../images/logoNikabo.png" /></div><h2 class="mekteb-user-name">المكتب التنفيذي</h2></div>
+            <ul class="mekteb-nav-list">
+                <li class="mekteb-nav-item"><a href="EL_Mekteb1.html" class="mekteb-nav-link"><i class="fas fa-tachometer-alt"></i><span class="mekteb-nav-text">الرئيسية</span></a></li>
+                <li class="mekteb-nav-item"><a href="members_manage.html" class="mekteb-nav-link active"><i class="fas fa-users"></i><span class="mekteb-nav-text">الأعضاء</span></a></li>
+                <li class="mekteb-nav-item"><a href="Talabat_intisab.html" class="mekteb-nav-link"><i class="fas fa-handshake"></i><span class="mekteb-nav-text">طلبات الإنتساب</span></a></li>
+                <li class="mekteb-nav-item"><a href="news_manage.html" class="mekteb-nav-link"><i class="fas fa-newspaper"></i><span class="mekteb-nav-text">الأخبار</span></a></li>
+                <li class="mekteb-nav-item"><a href="events_manage.html" class="mekteb-nav-link"><i class="fas fa-calendar-alt"></i><span class="mekteb-nav-text">الفعاليات</span></a></li>
+                <li class="mekteb-nav-item"><a href="messages_manage.html" class="mekteb-nav-link"><i class="fas fa-envelope"></i><span class="mekteb-nav-text">الرسائل</span></a></li>
+                <li class="mekteb-nav-divider"><span class="mekteb-divider-text">الموقع العام</span></li>
+                <li class="mekteb-nav-item"><a href="../index.html" class="mekteb-nav-link" target="_blank"><i class="fas fa-globe"></i><span class="mekteb-nav-text">تصفح الموقع</span></a></li>
+                <li class="mekteb-nav-item mekteb-logout"><a href="javascript:void(0)" class="mekteb-nav-link" onclick="SupabaseAuth.signOut()"><i class="fas fa-sign-out-alt"></i><span class="mekteb-nav-text">تسجيل خروج</span></a></li>
+            </ul>
+        </nav>
+        <main class="mekteb-content">
+            <header class="mekteb-header"><h1 class="mekteb-page-title"><i class="fas fa-users"></i> إدارة الأعضاء</h1></header>
+            <div class="mb-toolbar">
+                <input type="text" id="mbSearch" placeholder="بحث بالاسم أو البريد..." />
+                <select id="mbRoleFilter"><option value="">كل الأدوار</option><option value="admin">آدمن</option><option value="executive">مكتب تنفيذي</option><option value="member">عضو</option></select>
+                <span class="mb-count" id="mbCount">0 عضو</span>
+            </div>
+            <div id="mbWrap"><div class="mb-empty" id="mbLoading"><i class="fas fa-spinner fa-spin" style="font-size:32px;"></i><p style="margin-top:8px;">جاري تحميل الأعضاء...</p></div></div>
+        </main>
+    </div>
+    <div class="modal-overlay" id="mbRoleModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:500;align-items:center;justify-content:center;">
+        <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:16px;max-width:400px;width:92%;padding:20px;">
+            <h3 style="margin-bottom:14px;">تعديل صلاحية العضو</h3>
+            <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px;" id="mbRoleUserName"></p>
+            <select id="mbRoleSelect" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:13px;margin-bottom:14px;">
+                <option value="member">عضو</option>
+                <option value="executive">مكتب تنفيذي</option>
+                <option value="admin">آدمن</option>
+            </select>
+            <div style="display:flex;gap:10px;justify-content:flex-end;">
+                <button id="mbRoleCancel" style="padding:10px 20px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text-secondary);cursor:pointer;">إلغاء</button>
+                <button id="mbRoleSave" style="padding:10px 20px;border-radius:10px;border:none;background:var(--accent);color:#0a0a14;font-weight:700;cursor:pointer;">حفظ</button>
+            </div>
+        </div>
+    </div>
+    <script>
+    (function() {
+        if (!SupabaseAuth.checkAuth(true)) return;
+        var allMembers = [];
+        var editingUserId = null;
+        var api = 'https://bfdixkdwhccriliwtnch.supabase.co';
+        var key = 'sb_publishable_Y3FsxqV_4RA96t7MassN4w_NcOJ31--';
+        function h() { return { 'apikey': key, 'Authorization': 'Bearer ' + (SupabaseAuth.getToken() || key), 'Content-Type': 'application/json' }; }
+        async function load() {
+            try {
+                var r = await fetch(api + '/rest/v1/profiles?order=created_at.desc', { headers: h() });
+                allMembers = r.ok ? (await r.json() || []) : [];
+            } catch(e) { allMembers = []; }
+            render();
+        }
+        function render() {
+            var q = document.getElementById('mbSearch').value.trim().toLowerCase();
+            var roleF = document.getElementById('mbRoleFilter').value;
+            var filtered = allMembers.filter(function(m) {
+                if (roleF && m.role !== roleF) return false;
+                if (q && (m.name||'').toLowerCase().indexOf(q) === -1 && (m.email||'').toLowerCase().indexOf(q) === -1) return false;
+                return true;
+            });
+            document.getElementById('mbCount').textContent = filtered.length + ' عضو';
+            var wrap = document.getElementById('mbWrap');
+            if (!filtered.length) { wrap.innerHTML = '<div class="mb-empty"><i class="fas fa-users" style="font-size:32px;opacity:0.4;"></i><p style="margin-top:8px;">لا يوجد أعضاء</p></div>'; return; }
+            var html = '<table class="mb-table"><thead><tr><th>الاسم</th><th>البريد</th><th>الهاتف</th><th>الدور</th><th>تاريخ التسجيل</th><th></th></tr></thead><tbody>';
+            filtered.forEach(function(m) {
+                var roleClass = m.role === 'admin' ? 'admin' : m.role === 'executive' ? 'executive' : 'member';
+                var roleLabel = m.role === 'admin' ? 'آدمن' : m.role === 'executive' ? 'مكتب تنفيذي' : 'عضو';
+                var date = m.created_at ? m.created_at.slice(0,10) : '-';
+                html += '<tr><td>' + (m.name || '-') + '</td><td style="direction:ltr;text-align:right;">' + (m.email || '-') + '</td><td>' + (m.phone || '-') + '</td><td><span class="role-badge ' + roleClass + '">' + roleLabel + '</span></td><td>' + date + '</td><td class="actions"><button class="edit-btn" data-uid="' + m.user_id + '" data-name="' + (m.name||'').replace(/"/g,'&quot;') + '" data-role="' + (m.role||'member') + '"><i class="fas fa-user-shield"></i></button></td></tr>';
+            });
+            html += '</tbody></table>';
+            wrap.innerHTML = html;
+        }
+        document.getElementById('mbSearch').addEventListener('input', render);
+        document.getElementById('mbRoleFilter').addEventListener('change', render);
+        document.getElementById('mbWrap').addEventListener('click', function(e) {
+            var btn = e.target.closest('.edit-btn');
+            if (!btn) return;
+            editingUserId = btn.getAttribute('data-uid');
+            document.getElementById('mbRoleUserName').textContent = 'تعديل صلاحية: ' + btn.getAttribute('data-name');
+            document.getElementById('mbRoleSelect').value = btn.getAttribute('data-role');
+            document.getElementById('mbRoleModal').style.display = 'flex';
+        });
+        document.getElementById('mbRoleCancel').addEventListener('click', function() { document.getElementById('mbRoleModal').style.display = 'none'; });
+        document.getElementById('mbRoleSave').addEventListener('click', async function() {
+            if (!editingUserId) return;
+            var newRole = document.getElementById('mbRoleSelect').value;
+            var r = await fetch(api + '/rest/v1/profiles?user_id=eq.' + editingUserId, { method: 'PATCH', headers: h(), body: JSON.stringify({ role: newRole }) });
+            if (r.ok) { document.getElementById('mbRoleModal').style.display = 'none'; load(); } else { alert('فشل تحديث الصلاحية'); }
+        });
+        load();
+    })();
+    </script>
+</body>
+</html>

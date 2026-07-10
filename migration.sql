@@ -159,6 +159,33 @@ CREATE POLICY "events_delete_admin" ON events FOR DELETE USING (
     auth.uid() IN (SELECT user_id FROM profiles WHERE role IN ('executive', 'admin'))
 );
 
--- 7. تحديد صلاحية admin لأول مستخدم يسجل (يدوياً)
+-- 7. جدول الانتخابات
+CREATE TABLE IF NOT EXISTS elections (
+    id BIGSERIAL PRIMARY KEY,
+    title TEXT NOT NULL,
+    description TEXT,
+    position TEXT,
+    candidates JSONB DEFAULT '[]'::jsonb,
+    start_date TEXT,
+    end_date TEXT,
+    status TEXT DEFAULT 'upcoming' CHECK (status IN ('upcoming', 'active', 'completed')),
+    created_at TIMESTAMPTZ DEFAULT now(),
+    updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+ALTER TABLE elections ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "elections_select_all" ON elections FOR SELECT USING (true);
+CREATE POLICY "elections_insert_admin" ON elections FOR INSERT WITH CHECK (
+    auth.uid() IN (SELECT user_id FROM profiles WHERE role IN ('executive', 'admin'))
+);
+CREATE POLICY "elections_update_admin" ON elections FOR UPDATE USING (
+    auth.uid() IN (SELECT user_id FROM profiles WHERE role IN ('executive', 'admin'))
+);
+CREATE POLICY "elections_delete_admin" ON elections FOR DELETE USING (
+    auth.uid() IN (SELECT user_id FROM profiles WHERE role IN ('executive', 'admin'))
+);
+
+-- 8. تحديد صلاحية admin لأول مستخدم يسجل (يدوياً)
 -- بعد تسجيل أول مستخدم، شغّل هذا الاستعلام:
 -- UPDATE profiles SET role = 'admin' WHERE email = 'admin@example.com';

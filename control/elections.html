@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>إدارة الانتخابات - المكتب التنفيذي</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/control.css" />
+    <link rel="stylesheet" href="css/EL_Mekteb1.css" />
+    <script src="../js/supabase-auth.js"></script>
+    <style>
+        .el-toolbar { display: flex; gap: 10px; margin-bottom: 16px; }
+        .el-toolbar button { padding: 10px 20px; border-radius: 10px; border: none; font-size: 13px; font-weight: 700; cursor: pointer; background: var(--accent); color: #0a0a14; }
+        .el-grid { display: grid; gap: 12px; }
+        .el-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+        .el-card .el-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .el-card .el-title { font-size: 15px; font-weight: 700; }
+        .el-card .el-status { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 700; }
+        .el-status.upcoming { background: rgba(59,130,246,0.15); color: #60a5fa; }
+        .el-status.active { background: rgba(34,197,94,0.15); color: #22c55e; }
+        .el-status.completed { background: rgba(107,114,128,0.15); color: #9ca3af; }
+        .el-card .el-meta { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
+        .el-card .el-desc { font-size: 13px; color: var(--text-secondary); margin-bottom: 10px; }
+        .el-card .el-actions { display: flex; gap: 6px; }
+        .el-card .el-actions button { background: none; border: none; cursor: pointer; font-size: 12px; padding: 5px 12px; border-radius: 8px; font-weight: 600; }
+        .el-card .el-actions .el-activate { background: var(--accent); color: #0a0a14; }
+        .el-card .el-actions .el-end { background: rgba(239,68,68,0.15); color: #ef4444; }
+        .el-card .el-actions .el-del { background: rgba(239,68,68,0.1); color: #f87171; }
+        .el-card .el-actions .el-edit { background: rgba(59,130,246,0.1); color: #60a5fa; }
+        .el-card .el-actions .el-cands { background: rgba(168,85,247,0.1); color: #a855f7; }
+        .el-empty { text-align: center; padding: 40px; color: var(--text-muted); }
+        .el-cand-list { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-light); }
+        .el-cand-list .cand-item { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; font-size: 12px; color: var(--text-secondary); }
+        .el-cand-list .cand-item .cand-votes { color: var(--accent); font-weight: 700; }
+    </style>
+</head>
+<body class="control-page">
+    <div class="control-wrapper">
+        <nav class="mekteb-sidebar">
+            <div class="mekteb-profile"><div class="mekteb-avatar"><img src="../images/logoNikabo.png" /></div><h2 class="mekteb-user-name">المكتب التنفيذي</h2></div>
+            <ul class="mekteb-nav-list">
+                <li class="mekteb-nav-item"><a href="EL_Mekteb1.html" class="mekteb-nav-link"><i class="fas fa-tachometer-alt"></i><span class="mekteb-nav-text">الرئيسية</span></a></li>
+                <li class="mekteb-nav-item"><a href="members_manage.html" class="mekteb-nav-link"><i class="fas fa-users"></i><span class="mekteb-nav-text">الأعضاء</span></a></li>
+                <li class="mekteb-nav-item"><a href="Talabat_intisab.html" class="mekteb-nav-link"><i class="fas fa-handshake"></i><span class="mekteb-nav-text">طلبات الإنتساب</span></a></li>
+                <li class="mekteb-nav-item"><a href="news_manage.html" class="mekteb-nav-link"><i class="fas fa-newspaper"></i><span class="mekteb-nav-text">الأخبار</span></a></li>
+                <li class="mekteb-nav-item"><a href="events_manage.html" class="mekteb-nav-link"><i class="fas fa-calendar-alt"></i><span class="mekteb-nav-text">الفعاليات</span></a></li>
+                <li class="mekteb-nav-item"><a href="elections.html" class="mekteb-nav-link active"><i class="fas fa-vote-yea"></i><span class="mekteb-nav-text">الانتخابات</span></a></li>
+                <li class="mekteb-nav-item"><a href="messages_manage.html" class="mekteb-nav-link"><i class="fas fa-envelope"></i><span class="mekteb-nav-text">الرسائل</span></a></li>
+                <li class="mekteb-nav-divider"><span class="mekteb-divider-text">الموقع العام</span></li>
+                <li class="mekteb-nav-item"><a href="../index.html" class="mekteb-nav-link" target="_blank"><i class="fas fa-globe"></i><span class="mekteb-nav-text">تصفح الموقع</span></a></li>
+                <li class="mekteb-nav-item mekteb-logout"><a href="javascript:void(0)" class="mekteb-nav-link" onclick="SupabaseAuth.signOut()"><i class="fas fa-sign-out-alt"></i><span class="mekteb-nav-text">تسجيل خروج</span></a></li>
+            </ul>
+        </nav>
+        <main class="mekteb-content">
+            <header class="mekteb-header"><h1 class="mekteb-page-title"><i class="fas fa-vote-yea"></i> إدارة الانتخابات</h1></header>
+            <div class="el-toolbar"><button id="btnAddElection"><i class="fas fa-plus"></i> إنشاء انتخابات جديدة</button></div>
+            <div class="el-grid" id="elGrid"><div class="el-empty" id="elLoading"><i class="fas fa-spinner fa-spin" style="font-size:32px;"></i><p style="margin-top:8px;">جاري التحميل...</p></div></div>
+        </main>
+    </div>
+    <div class="modal-overlay" id="elModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:500;align-items:center;justify-content:center;">
+        <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:16px;max-width:500px;width:92%;padding:20px;max-height:90vh;overflow-y:auto;">
+            <h3 style="margin-bottom:14px;" id="elModalTitle">إنشاء انتخابات</h3>
+            <div class="contact-field"><label>عنوان الانتخابات</label><input type="text" id="elTitle" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);" /></div>
+            <div class="contact-field"><label>الوصف</label><textarea id="elDesc" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);height:60px;"></textarea></div>
+            <div class="contact-field"><label>المنصب (مثال: نقيب، أمين عام)</label><input type="text" id="elPosition" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);" /></div>
+            <div style="display:flex;gap:10px;"><div class="contact-field" style="flex:1;"><label>تاريخ البدء</label><input type="date" id="elStart" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);" /></div><div class="contact-field" style="flex:1;"><label>تاريخ الانتهاء</label><input type="date" id="elEnd" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);" /></div></div>
+            <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px;">
+                <button id="elModalCancel" style="padding:10px 20px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text-secondary);cursor:pointer;">إلغاء</button>
+                <button id="elModalSave" style="padding:10px 20px;border-radius:10px;border:none;background:var(--accent);color:#0a0a14;font-weight:700;cursor:pointer;">حفظ</button>
+            </div>
+        </div>
+    </div>
+    <script>
+    (function() {
+        if (!SupabaseAuth.checkAuth(true)) return;
+        var allElections = [];
+        var editingId = null;
+        var api = 'https://bfdixkdwhccriliwtnch.supabase.co';
+        var key = 'sb_publishable_Y3FsxqV_4RA96t7MassN4w_NcOJ31--';
+        function h() { return { 'apikey': key, 'Authorization': 'Bearer ' + (SupabaseAuth.getToken() || key), 'Content-Type': 'application/json' }; }
+        async function load() {
+            try { var r = await fetch(api + '/rest/v1/elections?order=created_at.desc', { headers: h() }); allElections = r.ok ? (await r.json() || []) : []; } catch(e) { allElections = []; }
+            render();
+        }
+        function render() {
+            var grid = document.getElementById('elGrid');
+            if (!allElections.length) { grid.innerHTML = '<div class="el-empty"><i class="fas fa-vote-yea" style="font-size:32px;opacity:0.4;"></i><p style="margin-top:8px;">لا توجد انتخابات بعد</p></div>'; return; }
+            var html = '';
+            allElections.forEach(function(e) {
+                var status = e.status || 'upcoming';
+                var statusLabel = status === 'upcoming' ? 'قادمة' : status === 'active' ? 'نشطة' : 'منتهية';
+                var candCount = e.candidates ? e.candidates.length : 0;
+                var totalVotes = e.candidates ? e.candidates.reduce(function(s, c) { return s + (c.votes || 0); }, 0) : 0;
+                html += '<div class="el-card"><div class="el-top"><span class="el-title">' + e.title + '</span><span class="el-status ' + status + '">' + statusLabel + '</span></div><div class="el-meta">' + (e.position ? 'المنصب: ' + e.position : '') + (e.start_date ? ' | من ' + e.start_date : '') + (e.end_date ? ' إلى ' + e.end_date : '') + '</div><div class="el-desc">' + (e.description || '') + '</div><div class="el-meta">' + candCount + ' مرشح' + (candCount !== 1 ? 'ون' : '') + (totalVotes > 0 ? ' | ' + totalVotes + ' صوت' : '') + '</div>';
+                if (e.candidates && e.candidates.length) {
+                    html += '<div class="el-cand-list">';
+                    e.candidates.forEach(function(c) {
+                        html += '<div class="cand-item"><span>' + c.name + '</span><span class="cand-votes">' + (c.votes || 0) + ' صوت</span></div>';
+                    });
+                    html += '</div>';
+                }
+                html += '<div class="el-actions">';
+                html += '<button class="el-edit" data-id="' + e.id + '" data-title="' + (e.title||'').replace(/"/g,'&quot;') + '" data-desc="' + (e.description||'').replace(/"/g,'&quot;') + '" data-pos="' + (e.position||'').replace(/"/g,'&quot;') + '" data-start="' + (e.start_date||'') + '" data-end="' + (e.end_date||'') + '"><i class="fas fa-edit"></i> تعديل</button>';
+                if (status === 'upcoming') html += '<button class="el-activate" data-id="' + e.id + '"><i class="fas fa-play"></i> تفعيل</button>';
+                if (status === 'active') html += '<button class="el-end" data-id="' + e.id + '"><i class="fas fa-stop"></i> إنهاء</button>';
+                html += '<button class="el-cands" data-id="' + e.id + '" data-title="' + (e.title||'').replace(/"/g,'&quot;') + '"><i class="fas fa-user-tie"></i> المرشحون</button>';
+                html += '<button class="el-del" data-id="' + e.id + '"><i class="fas fa-trash"></i> حذف</button>';
+                html += '</div></div>';
+            });
+            grid.innerHTML = html;
+        }
+        function openModal(title, data) {
+            editingId = data ? data.id : null;
+            document.getElementById('elModalTitle').textContent = title;
+            document.getElementById('elTitle').value = data ? data.title : '';
+            document.getElementById('elDesc').value = data ? (data.description || '') : '';
+            document.getElementById('elPosition').value = data ? (data.position || '') : '';
+            document.getElementById('elStart').value = data ? (data.start_date || '') : '';
+            document.getElementById('elEnd').value = data ? (data.end_date || '') : '';
+            document.getElementById('elModal').style.display = 'flex';
+        }
+        document.getElementById('btnAddElection').addEventListener('click', function() { openModal('إنشاء انتخابات جديدة', null); });
+        document.getElementById('elModalCancel').addEventListener('click', function() { document.getElementById('elModal').style.display = 'none'; });
+        document.getElementById('elModalSave').addEventListener('click', async function() {
+            var title = document.getElementById('elTitle').value.trim();
+            if (!title) { alert('العنوان مطلوب'); return; }
+            var body = JSON.stringify({
+                title: title,
+                description: document.getElementById('elDesc').value.trim(),
+                position: document.getElementById('elPosition').value.trim(),
+                start_date: document.getElementById('elStart').value,
+                end_date: document.getElementById('elEnd').value
+            });
+            var r;
+            if (editingId) { r = await fetch(api + '/rest/v1/elections?id=eq.' + editingId, { method: 'PATCH', headers: h(), body: body }); }
+            else { r = await fetch(api + '/rest/v1/elections', { method: 'POST', headers: Object.assign(h(), { 'Prefer': 'return=representation' }), body: body }); }
+            if (r.ok) { document.getElementById('elModal').style.display = 'none'; load(); } else { alert('فشل الحفظ'); }
+        });
+        document.getElementById('elGrid').addEventListener('click', function(e) {
+            var target = e.target.closest('button');
+            if (!target) return;
+            var id = parseInt(target.getAttribute('data-id'));
+            if (target.classList.contains('el-edit')) {
+                openModal('تعديل الانتخابات', { id: id, title: target.getAttribute('data-title'), description: target.getAttribute('data-desc'), position: target.getAttribute('data-pos'), start_date: target.getAttribute('data-start'), end_date: target.getAttribute('data-end') });
+            }
+            if (target.classList.contains('el-activate')) {
+                if (confirm('تفعيل هذه الانتخابات؟')) fetch(api + '/rest/v1/elections?id=eq.' + id, { method: 'PATCH', headers: h(), body: JSON.stringify({ status: 'active' }) }).then(function(r) { if (r.ok) load(); });
+            }
+            if (target.classList.contains('el-end')) {
+                if (confirm('إنهاء هذه الانتخابات؟')) fetch(api + '/rest/v1/elections?id=eq.' + id, { method: 'PATCH', headers: h(), body: JSON.stringify({ status: 'completed' }) }).then(function(r) { if (r.ok) load(); });
+            }
+            if (target.classList.contains('el-del')) {
+                if (confirm('حذف هذه الانتخابات؟')) fetch(api + '/rest/v1/elections?id=eq.' + id, { method: 'DELETE', headers: h() }).then(function(r) { if (r.ok) load(); });
+            }
+            if (target.classList.contains('el-cands')) {
+                var elTitle = target.getAttribute('data-title');
+                var name = prompt('إضافة مرشح للانتخابات: "' + elTitle + '"\nأدخل اسم المرشح:');
+                if (name && name.trim()) {
+                    (async function() {
+                        var rr = await fetch(api + '/rest/v1/elections?id=eq.' + id + '&select=candidates', { headers: h() });
+                        var existing = rr.ok ? (await rr.json()) : [];
+                        var cands = (existing.length && existing[0].candidates) ? existing[0].candidates : [];
+                        cands.push({ name: name.trim(), votes: 0 });
+                        var r2 = await fetch(api + '/rest/v1/elections?id=eq.' + id, { method: 'PATCH', headers: h(), body: JSON.stringify({ candidates: cands }) });
+                        if (r2.ok) load();
+                    })();
+                }
+            }
+        });
+        load();
+    })();
+    </script>
+</body>
+</html>

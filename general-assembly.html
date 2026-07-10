@@ -538,6 +538,30 @@
             document.getElementById('gaEventsList').innerHTML = html;
         })();
 
+        // ===== انتخابات من Supabase =====
+        (async function loadElections() {
+            try {
+                var res = await fetch(api + '/rest/v1/elections?order=created_at.desc&limit=5', { headers: h() });
+                if (!res.ok) return;
+                var elections = await res.json() || [];
+                var active = elections.filter(function(e) { return e.status === 'active'; });
+                var el = active.length ? active[0] : (elections.length ? elections[0] : null);
+                if (!el) return;
+                document.getElementById('gaElecTitle').textContent = el.title || 'انتخابات';
+                document.getElementById('gaElecStatus').textContent = el.description || (el.status === 'active' ? 'التصويت مفتوح الآن' : el.status === 'completed' ? 'انتهت' : 'قادمة');
+                var totalVotes = el.candidates ? el.candidates.reduce(function(s, c) { return s + (c.votes || 0); }, 0) : 0;
+                document.getElementById('gaElecVotes').textContent = totalVotes + ' مشارك';
+                if (el.candidates && el.candidates.length) {
+                    var candHtml = '<div style="margin-top:10px;text-align:right;">';
+                    el.candidates.forEach(function(c) {
+                        candHtml += '<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.05);"><span>' + c.name + '</span><span style="color:var(--accent);font-weight:700;">' + (c.votes || 0) + ' صوت</span></div>';
+                    });
+                    candHtml += '</div>';
+                    document.getElementById('gaElectionCard').insertAdjacentHTML('beforeend', candHtml);
+                }
+            } catch(e) {}
+        })();
+
         // ===== الشات مع localStorage =====
         var chatMessages = document.getElementById('gaChatMessages');
         var chatInput = document.getElementById('gaChatInput');
