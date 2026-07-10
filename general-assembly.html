@@ -360,12 +360,11 @@
             try {
                 var token = SupabaseAuth.getToken();
                 if (!token || !userId) { console.warn('loadProfile: no token or userId', { token: !!token, userId: userId }); return; }
-                var res = await fetch('https://bfdixkdwhccriliwtnch.supabase.co/rest/v1/profiles?user_id=eq.' + userId + '&select=role', {
+                var res = await fetch('https://bfdixkdwhccriliwtnch.supabase.co/rest/v1/profiles?user_id=eq.' + encodeURIComponent(userId), {
                     headers: { 'apikey': 'sb_publishable_Y3FsxqV_4RA96t7MassN4w_NcOJ31--', 'Authorization': 'Bearer ' + token }
                 });
                 if (!res.ok) { console.warn('Profile fetch status:', res.status); var txt = await res.text(); console.warn('Profile fetch body:', txt); return; }
                 var profiles = await res.json();
-                console.log('loadProfile result:', JSON.stringify(profiles));
                 if (profiles && profiles.length > 0 && profiles[0].role) {
                     userRole = profiles[0].role;
                     var roleEl = document.getElementById('gaDrawerRole');
