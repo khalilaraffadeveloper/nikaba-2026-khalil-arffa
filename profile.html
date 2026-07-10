@@ -158,6 +158,7 @@
         if (!SupabaseAuth.checkAuth(true)) return;
         var user = SupabaseAuth.getUser();
         var userEmail = user ? user.email : '';
+        var userId = user ? user.id : '';
         var userName = userEmail ? userEmail.split('@')[0] : 'عضو';
         document.getElementById('prName').textContent = userName;
         document.getElementById('prEmail').textContent = userEmail;
@@ -168,25 +169,27 @@
         (async function() {
             try {
                 var token = SupabaseAuth.getToken();
-                var res = await fetch('https://bfdixkdwhccriliwtnch.supabase.co/rest/v1/profiles?email=eq.' + encodeURIComponent(userEmail) + '&select=*', {
+                var res = await fetch('https://bfdixkdwhccriliwtnch.supabase.co/rest/v1/profiles?user_id=eq.' + userId + '&select=*', {
                     headers: { 'apikey': 'sb_publishable_Y3FsxqV_4RA96t7MassN4w_NcOJ31--', 'Authorization': 'Bearer ' + token }
                 });
-                if (!res.ok) return;
+                if (!res.ok) { console.warn('Profile fetch failed', res.status); return; }
                 var profiles = await res.json();
                 if (profiles && profiles.length > 0) {
                     var p = profiles[0];
                     if (p.phone) document.getElementById('prFieldPhone').textContent = p.phone;
                     if (p.national_id) document.getElementById('prFieldId').textContent = p.national_id;
                     if (p.whatsapp) document.getElementById('prFieldWhatsapp').textContent = p.whatsapp;
+                    if (p.name) { document.getElementById('prName').textContent = p.name; document.getElementById('prFieldName').textContent = p.name; }
                     if (p.created_at) document.getElementById('prFieldCreated').textContent = new Date(p.created_at).toLocaleDateString('ar-MR');
                     if (p.role) {
                         var roleEl = document.getElementById('prRole');
                         if (p.role === 'admin') { roleEl.textContent = '🛡️ آدمن'; roleEl.className = 'pr-role pr-role-admin'; }
                         else if (p.role === 'executive') { roleEl.textContent = '⚡ مكتب تنفيذي'; roleEl.className = 'pr-role pr-role-executive'; }
+                        else { roleEl.textContent = '✔️ عضو'; roleEl.className = 'pr-role pr-role-member'; }
                         if (p.role === 'admin' || p.role === 'executive') document.getElementById('prSecretBtn').classList.add('show');
                     }
                 }
-            } catch(e) {}
+            } catch(e) { console.warn('Profile load error', e); }
         })();
 
         document.getElementById('prEditBtn').addEventListener('click', function() {
