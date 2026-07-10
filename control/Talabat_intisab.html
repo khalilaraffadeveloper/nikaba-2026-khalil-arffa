@@ -730,7 +730,21 @@
                 var btn = document.getElementById('btnApprove');
                 btn.disabled = true;
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري...';
+                var createdAccount = null;
                 try {
+                    if (item.email) {
+                        try {
+                            createdAccount = await NikabaAPI.createMemberFromAffiliation({
+                                email: item.email,
+                                name: item.name,
+                                phone: item.phone,
+                                whatsapp: item.whatsapp,
+                                national_id: item.national_id
+                            });
+                        } catch(accErr) {
+                            alert('تنبيه: تم قبول الطلب ولكن فشل إنشاء الحساب\n' + accErr.message + '\nيمكنك إنشاء الحساب يدوياً من "تسجيل عضو"');
+                        }
+                    }
                     await NikabaAPI.updateAffiliationStatus(id, 'approved');
                     try {
                         await NikabaAPI.createWelcomeNews(item.name, item.phone, item.payment_date);
@@ -740,6 +754,13 @@
                     item.status = 'approved';
                     loadData();
                     document.getElementById('intisabModal').classList.remove('show');
+                    if (createdAccount) {
+                        alert('✅ تم قبول العضو وإنشاء حسابه بنجاح\n\nالبريد: ' + createdAccount.email + '\nكلمة السر: ' + createdAccount.password + '\n\nيرجى تسليم كلمة السر للعضو الجديد');
+                    } else if (item.email) {
+                        alert('✅ تم قبول الطلب بنجاح');
+                    } else {
+                        alert('✅ تم قبول الطلب بنجاح\nملاحظة: لم يتم إنشاء حساب لأن البريد الإلكتروني غير موجود.\nيمكنك إنشاء الحساب من "تسجيل عضو"');
+                    }
                 } catch(e) { alert('خطأ: ' + e.message); }
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fas fa-check"></i> قبول';

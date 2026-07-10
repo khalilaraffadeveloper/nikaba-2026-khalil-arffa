@@ -151,6 +151,44 @@
             return await res.json();
         },
 
+        // ===== إنشاء حساب عضو من طلب إنتساب =====
+        createMemberFromAffiliation: async function(data) {
+            var token = window.SupabaseAuth ? SupabaseAuth.getToken() : null;
+            if (!token) throw new Error('يجب تسجيل الدخول أولاً');
+            var password = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-2).toUpperCase() + '1!';
+            var signRes = await fetch(SUPABASE_URL + '/auth/v1/signup', {
+                method: 'POST',
+                headers: { 'apikey': SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: data.email, password: password })
+            });
+            var signData = await signRes.json();
+            if (!signRes.ok) throw new Error(signData.msg || signData.error_description || signData.error || 'فشل إنشاء الحساب');
+            var newUserId = (signData.user && signData.user.id) || signData.id || '';
+            if (!newUserId) throw new Error('لم يتم الحصول على معرف المستخدم');
+            await new Promise(function(r) { setTimeout(r, 2000); });
+            var profileRes = await fetch(SUPABASE_URL + '/rest/v1/profiles?user_id=eq.' + encodeURIComponent(newUserId), {
+                headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + token }
+            });
+            if (profileRes.ok) {
+                var existing = await profileRes.json();
+                var profileId = (existing && existing.length > 0) ? existing[0].id : null;
+                if (profileId) {
+                    await fetch(SUPABASE_URL + '/rest/v1/profiles?id=eq.' + profileId, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + token },
+                        body: JSON.stringify({ name: data.name, phone: data.phone, whatsapp: data.whatsapp, national_id: data.national_id, role: 'member' })
+                    });
+                } else {
+                    await fetch(SUPABASE_URL + '/rest/v1/profiles', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + token, 'Prefer': 'return=minimal' },
+                        body: JSON.stringify({ user_id: newUserId, email: data.email, name: data.name, phone: data.phone, whatsapp: data.whatsapp, national_id: data.national_id, role: 'member' })
+                    });
+                }
+            }
+            return { userId: newUserId, email: data.email, password: password };
+        },
+
         // ===== إحصائيات سريعة للوحة التحكم =====
         getStats: async function() {
             var all = await this.getAffiliations();
