@@ -25,11 +25,17 @@
             return data;
         },
 
+        // ===== مسار جذر الموقع =====
+        rootPath: function() {
+            var parts = window.location.pathname.split('/').filter(Boolean);
+            return parts.length > 0 && parts[0].indexOf('.html') < 0 ? '/' + parts[0] + '/' : '/';
+        },
+
         // ===== تسجيل خروج =====
-        signOut: function(redirect) {
+        signOut: function() {
             localStorage.removeItem(this.TOKEN_KEY);
             localStorage.removeItem(this.USER_KEY);
-            window.location.href = redirect || 'login.html';
+            window.location.href = this.rootPath();
         },
 
         // ===== حفظ الجلسة =====
@@ -54,7 +60,7 @@
         checkAuth: function(redirect) {
             var token = this.getToken();
             if (!token) {
-                if (redirect) window.location.href = 'login.html';
+                if (redirect) window.location.href = this.rootPath() + 'index.html';
                 return false;
             }
             return true;
@@ -64,7 +70,7 @@
         requireRole: async function(redirect) {
             if (!this.checkAuth(redirect)) return false;
             var token = this.getToken();
-            if (!token) { if (redirect) window.location.href = redirect || 'login.html'; return false; }
+            if (!token) { window.location.href = this.rootPath() + 'index.html'; return false; }
             try {
                 var user = this.getUser();
                 if (!user || !user.id) return false;
@@ -76,12 +82,12 @@
                 if (!profiles || !profiles.length) return false;
                 var role = profiles[0].role;
                 if (role !== 'admin' && role !== 'executive') {
-                    if (redirect) window.location.href = redirect;
+                    window.location.href = this.rootPath() + 'index.html';
                     return false;
                 }
                 return role;
             } catch(e) {
-                if (redirect) window.location.href = redirect;
+                window.location.href = this.rootPath() + 'index.html';
                 return false;
             }
         },
