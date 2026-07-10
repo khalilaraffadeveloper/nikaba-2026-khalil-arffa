@@ -82,6 +82,7 @@
                     <a href="news_manage.html" class="mekteb-nav-link" id="linkNews">
                         <i class="fas fa-newspaper"></i>
                         <span class="mekteb-nav-text">الأخبار</span>
+                        <span class="mekteb-badge" id="badgeNews">0</span>
                     </a>
                 </li>
 
@@ -90,6 +91,7 @@
                     <a href="events_manage.html" class="mekteb-nav-link" id="linkEvents">
                         <i class="fas fa-calendar-alt"></i>
                         <span class="mekteb-nav-text">الفعاليات</span>
+                        <span class="mekteb-badge" id="badgeEventsCount">0</span>
                     </a>
                 </li>
 
@@ -144,29 +146,12 @@
                 </li>
 
                 <!-- الرسائل -->
-                <li class="mekteb-nav-item mekteb-has-submenu" id="navItemMessages">
-                    <a href="javascript:void(0)" class="mekteb-nav-link mekteb-submenu-toggle" id="linkMessages">
+                <li class="mekteb-nav-item" id="navItemMessages">
+                    <a href="messages_manage.html" class="mekteb-nav-link" id="linkMessages">
                         <i class="fas fa-envelope"></i>
                         <span class="mekteb-nav-text">الرسائل</span>
                         <span class="mekteb-badge" id="badgeMessages">0</span>
-                        <i class="fas fa-chevron-down mekteb-submenu-arrow"></i>
                     </a>
-                    <ul class="mekteb-submenu" id="messagesSubmenu">
-                        <li class="mekteb-nav-item" id="navItemMessagesAdmin">
-                            <a href="messages_admin.html" class="mekteb-nav-link" id="linkMessagesAdmin">
-                                <i class="fas fa-envelope-open-text"></i>
-                                <span class="mekteb-nav-text">الرسائل الإدارية</span>
-                                <span class="mekteb-badge" id="badgeMessagesAdmin">0</span>
-                            </a>
-                        </li>
-                        <li class="mekteb-nav-item" id="navItemMessagesPersonal">
-                            <a href="messages_personal.html" class="mekteb-nav-link" id="linkMessagesPersonal">
-                                <i class="fas fa-user-envelope"></i>
-                                <span class="mekteb-nav-text">الرسائل الشخصية</span>
-                                <span class="mekteb-badge" id="badgeMessagesPersonal">0</span>
-                            </a>
-                        </li>
-                    </ul>
                 </li>
 
                 <!-- تذاكر الدعم -->
@@ -420,13 +405,64 @@
         if (user) {
             document.querySelector('#mektebAdminName').textContent = user.email ? user.email.split('@')[0] : 'النقيب';
         }
+        var api = 'https://bfdixkdwhccriliwtnch.supabase.co';
+        var key = 'sb_publishable_Y3FsxqV_4RA96t7MassN4w_NcOJ31--';
+        var token = SupabaseAuth.getToken() || key;
+        function h() { return { 'apikey': key, 'Authorization': 'Bearer ' + token }; }
+
         try {
+            // إحصائيات طلبات الإنتساب
             var stats = await NikabaAPI.getStats();
-            if (document.getElementById('statMembers')) document.getElementById('statMembers').textContent = stats.total || 0;
+            if (document.getElementById('statMembers')) document.getElementById('statMembers').textContent = stats.approved || 0;
             if (document.getElementById('statApplications')) document.getElementById('statApplications').textContent = stats.pending || 0;
             if (document.getElementById('badgeApplications')) document.getElementById('badgeApplications').textContent = stats.pending || 0;
             if (document.getElementById('badgeAffiliation')) document.getElementById('badgeAffiliation').textContent = stats.pending || 0;
         } catch(e) { console.warn('Stats load failed', e); }
+
+        // الأخبار
+        try {
+            var newsRes = await fetch(api + '/rest/v1/news?select=count', { headers: h() });
+            if (newsRes.ok) {
+                var newsCount = await newsRes.json();
+                if (document.getElementById('statNews')) document.getElementById('statNews').textContent = Array.isArray(newsCount) ? newsCount.length : (newsCount.count || 0);
+            }
+        } catch(e) {}
+
+        // الفعاليات
+        try {
+            var evtRes = await fetch(api + '/rest/v1/events?select=count', { headers: h() });
+            if (evtRes.ok) {
+                var evtCount = await evtRes.json();
+                if (document.getElementById('statEvents')) document.getElementById('statEvents').textContent = Array.isArray(evtCount) ? evtCount.length : (evtCount.count || 0);
+            }
+        } catch(e) {}
+
+        // الرسائل
+        try {
+            var msgRes = await fetch(api + '/rest/v1/contact_messages?status=eq.unread&select=count', { headers: h() });
+            if (msgRes.ok) {
+                var msgData = await msgRes.json();
+                var unreadCount = Array.isArray(msgData) ? msgData.length : (msgData.count || 0);
+                if (document.getElementById('statMessages')) document.getElementById('statMessages').textContent = unreadCount;
+                if (document.getElementById('badgeMessages')) document.getElementById('badgeMessages').textContent = unreadCount;
+                if (document.getElementById('badgeComments')) document.getElementById('badgeComments').textContent = unreadCount;
+                if (unreadCount > 0 && document.getElementById('mektebNotifBadge')) {
+                    document.getElementById('mektebNotifBadge').classList.remove('hidden');
+                    document.getElementById('mektebNotifBadge').textContent = unreadCount;
+                }
+            }
+        } catch(e) {}
+
+        // أعضاء
+        try {
+            var memRes = await fetch(api + '/rest/v1/profiles?select=count', { headers: h() });
+            if (memRes.ok) {
+                var memData = await memRes.json();
+                var memCount = Array.isArray(memData) ? memData.length : (memData.count || 0);
+                if (document.getElementById('statMembers')) document.getElementById('statMembers').textContent = memCount;
+                if (document.getElementById('badgeMembers')) document.getElementById('badgeMembers').textContent = memCount;
+            }
+        } catch(e) {}
     })();
     </script>
 

@@ -470,40 +470,72 @@
             this.innerHTML = '<i class="fas fa-paper-plane"></i> إرسال';
         });
 
-        // ===== أخبار =====
+        // ===== أخبار من Supabase مع fallback =====
+        var api = 'https://bfdixkdwhccriliwtnch.supabase.co';
+        var key = 'sb_publishable_Y3FsxqV_4RA96t7MassN4w_NcOJ31--';
+        var token = SupabaseAuth.getToken() || key;
+        function h() { return { 'apikey': key, 'Authorization': 'Bearer ' + token }; }
+
         var sampleNews = [
             { date: '2026-07-10', title: 'افتتاح باب الترشح لانتخابات النقابة', excerpt: 'أعلنت اللجنة المشرفة على الانتخابات فتح باب الترشح للمناصب النقابية ابتداءً من 15 يوليو.', full: 'أعلنت اللجنة المشرفة على الانتخابات النقابية فتح باب الترشح للمناصب النقابية (النقيب، الأمين العام، الأمين المالي، أعضاء المكتب التنفيذي) ابتداءً من 15 يوليو 2026. على الراغبين في الترشح تقديم ملفاتهم قبل 30 يوليو.' },
             { date: '2026-07-08', title: 'ورشة عمل حول حقوق الفنانين', excerpt: 'ينظم المكتب التنفيذي ورشة عمل يوم 20 يوليو بالتعاون مع منظمة اليونسكو.', full: 'ينظم المكتب التنفيذي للنقابة بالتعاون مع منظمة اليونسكو ورشة عمل حول حقوق الفنانين الملكية الفكرية. ستقام الورشة يوم 20 يوليو 2026 في مقر النقابة بنواكشوط.' },
             { date: '2026-07-05', title: 'استقبال طلبات الإنتساب', excerpt: 'لا يزال باب الإنتساب مفتوحاً لجميع الفنانين والممثلين في موريتانيا.', full: 'باب الإنتساب إلى النقابة لا يزال مفتوحاً لجميع الفنانين والممثلين والعارضين والعاملين في المجال الفني بموريتانيا. قدّم طلبك الآن عبر استمارة الإنتساب.' },
             { date: '2026-07-01', title: 'اجتماع الجمعية العامة السنوي', excerpt: 'دعوة لجميع الأعضاء لحضور اجتماع الجمعية العامة السنوي المقرر عقده في أغسطس.', full: 'دعوة لجميع أعضاء الجمعية العامة لحضور الاجتماع السنوي المقرر عقده في شهر أغسطس 2026. سيتم إرسال الدعوات الرسمية عبر البريد الإلكتروني.' }
         ];
-        var newsHtml = '';
-        sampleNews.forEach(function(n, i) {
-            newsHtml += '<div class="ga-news-card" data-news="' + i + '"><div class="ga-news-date">' + n.date + '</div><div class="ga-news-title">' + n.title + '</div><div class="ga-news-excerpt">' + n.excerpt + '</div></div>';
-        });
-        document.getElementById('gaNewsList').innerHTML = newsHtml;
-        document.querySelectorAll('.ga-news-card').forEach(function(card) {
-            card.addEventListener('click', function() {
-                var i = parseInt(this.getAttribute('data-news'));
-                var n = sampleNews[i];
-                if (!n) return;
-                document.getElementById('modalNewsDetailBody').innerHTML = '<div class="nd-date">' + n.date + '</div><div class="nd-title">' + n.title + '</div><div class="nd-content">' + n.full + '</div>';
-                openModal('modalNewsDetail');
-            });
-        });
-        document.getElementById('tickerElections').textContent = sampleNews[0].title;
 
-        // ===== فعاليات =====
+        (async function loadNews() {
+            var newsData = [];
+            try {
+                var res = await fetch(api + '/rest/v1/news?order=created_at.desc&limit=20', { headers: h() });
+                if (res.ok) { newsData = await res.json() || []; }
+            } catch(e) {}
+            var items = newsData.length ? newsData : sampleNews;
+            var html = '';
+            items.forEach(function(n, i) {
+                var date = n.created_at ? new Date(n.created_at).toLocaleDateString('ar-MR') : (n.date || '');
+                var title = n.title || '';
+                var excerpt = n.excerpt || '';
+                html += '<div class="ga-news-card" data-news="' + i + '"><div class="ga-news-date">' + date + '</div><div class="ga-news-title">' + title + '</div><div class="ga-news-excerpt">' + excerpt + '</div></div>';
+            });
+            document.getElementById('gaNewsList').innerHTML = html;
+            document.querySelectorAll('.ga-news-card').forEach(function(card) {
+                card.addEventListener('click', function() {
+                    var i = parseInt(this.getAttribute('data-news'));
+                    var n = items[i];
+                    if (!n) return;
+                    var full = n.content || n.full || n.excerpt || 'لا يوجد محتوى إضافي';
+                    var date = n.created_at ? new Date(n.created_at).toLocaleDateString('ar-MR') : (n.date || '');
+                    document.getElementById('modalNewsDetailBody').innerHTML = '<div class="nd-date">' + date + '</div><div class="nd-title">' + n.title + '</div><div class="nd-content">' + full + '</div>';
+                    openModal('modalNewsDetail');
+                });
+            });
+            if (items.length > 0) document.getElementById('tickerElections').textContent = items[0].title;
+        })();
+
+        // ===== فعاليات من Supabase مع fallback =====
         var sampleEvents = [
-            { day: '20', month: 'يوليو', title: 'ورشة حقوق الفنانين', desc: 'بالتعاون مع اليونسكو', full: 'ورشة عمل حول حقوق الفنانين والملكية الفكرية بالتعاون مع منظمة اليونسكو. مقر النقابة، نواكشوط.' },
-            { day: '15', month: 'يوليو', title: 'افتتاح باب الترشح', desc: 'الانتخابات النقابية', full: 'افتتاح باب الترشح لانتخابات النقابة. آخر موعد لتقديم الملفات: 30 يوليو.' },
-            { day: '05', month: 'أغسطس', title: 'الجمعية العامة السنوي', desc: 'قاعة الاجتماعات الكبرى', full: 'الاجتماع السنوي للجمعية العامة لمناقشة التقرير الأدبي والمالي وانتخاب المكتب التنفيذي.' }
+            { day: '20', month: 'يوليو', title: 'ورشة حقوق الفنانين', desc: 'بالتعاون مع اليونسكو' },
+            { day: '15', month: 'يوليو', title: 'افتتاح باب الترشح', desc: 'الانتخابات النقابية' },
+            { day: '05', month: 'أغسطس', title: 'الجمعية العامة السنوي', desc: 'قاعة الاجتماعات الكبرى' }
         ];
-        var eventsHtml = '';
-        sampleEvents.forEach(function(e) {
-            eventsHtml += '<div class="ga-event-item"><div class="ga-event-date-box"><span class="eday">' + e.day + '</span><span class="emonth">' + e.month + '</span></div><div class="ga-event-info"><div class="ga-event-title">' + e.title + '</div><div class="ga-event-desc">' + e.desc + '</div></div></div>';
-        });
-        document.getElementById('gaEventsList').innerHTML = eventsHtml;
+
+        (async function loadEvents() {
+            var evtData = [];
+            try {
+                var res = await fetch(api + '/rest/v1/events?order=created_at.desc&limit=20', { headers: h() });
+                if (res.ok) { evtData = await res.json() || []; }
+            } catch(e) {}
+            var items = evtData.length ? evtData : sampleEvents;
+            var html = '';
+            items.forEach(function(e) {
+                var day = e.day || '?';
+                var month = e.month || '';
+                var title = e.title || '';
+                var desc = e.description || e.desc || '';
+                html += '<div class="ga-event-item"><div class="ga-event-date-box"><span class="eday">' + day + '</span><span class="emonth">' + month + '</span></div><div class="ga-event-info"><div class="ga-event-title">' + title + '</div><div class="ga-event-desc">' + desc + '</div></div></div>';
+            });
+            document.getElementById('gaEventsList').innerHTML = html;
+        })();
 
         // ===== الشات مع localStorage =====
         var chatMessages = document.getElementById('gaChatMessages');

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>الرسائل - المكتب التنفيذي</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/control.css" />
+    <link rel="stylesheet" href="css/EL_Mekteb1.css" />
+    <script src="../js/supabase-auth.js"></script>
+    <style>
+        .msg-filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+        .msg-filters button { padding: 6px 16px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg-card); color: var(--text-secondary); cursor: pointer; font-size: 12px; }
+        .msg-filters button.active { background: var(--accent); color: #000; border-color: var(--accent); }
+        .msg-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; }
+        .msg-card:hover { border-color: var(--accent); }
+        .msg-card.unread { border-right: 3px solid var(--accent); }
+        .msg-subject { font-size: 14px; font-weight: 700; color: var(--text); }
+        .msg-meta { font-size: 11px; color: var(--text-muted); margin: 4px 0; display: flex; gap: 12px; }
+        .msg-preview { font-size: 12px; color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .msg-badge { font-size: 10px; padding: 2px 8px; border-radius: 6px; background: var(--bg-elevated); color: var(--text-muted); }
+    </style>
+</head>
+<body class="control-page">
+    <div class="control-wrapper">
+        <nav class="mekteb-sidebar"><?php /* sidebar same as Talabat_intisab */ ?>
+            <div class="mekteb-profile"><div class="mekteb-avatar"><img src="../images/logoNikabo.png" /></div><h2 class="mekteb-user-name">المكتب التنفيذي</h2></div>
+            <ul class="mekteb-nav-list">
+                <li class="mekteb-nav-item"><a href="EL_Mekteb1.html" class="mekteb-nav-link"><i class="fas fa-tachometer-alt"></i><span class="mekteb-nav-text">الرئيسية</span></a></li>
+                <li class="mekteb-nav-item"><a href="Talabat_intisab.html" class="mekteb-nav-link"><i class="fas fa-handshake"></i><span class="mekteb-nav-text">طلبات الإنتساب</span></a></li>
+                <li class="mekteb-nav-item"><a href="news_manage.html" class="mekteb-nav-link"><i class="fas fa-newspaper"></i><span class="mekteb-nav-text">الأخبار</span></a></li>
+                <li class="mekteb-nav-item"><a href="events_manage.html" class="mekteb-nav-link"><i class="fas fa-calendar-alt"></i><span class="mekteb-nav-text">الفعاليات</span></a></li>
+                <li class="mekteb-nav-item"><a href="messages_manage.html" class="mekteb-nav-link active"><i class="fas fa-envelope"></i><span class="mekteb-nav-text">الرسائل</span></a></li>
+                <li class="mekteb-nav-divider"><span class="mekteb-divider-text">الموقع العام</span></li>
+                <li class="mekteb-nav-item"><a href="../index.html" class="mekteb-nav-link" target="_blank"><i class="fas fa-globe"></i><span class="mekteb-nav-text">تصفح الموقع</span></a></li>
+                <li class="mekteb-nav-item mekteb-logout"><a href="javascript:void(0)" class="mekteb-nav-link" onclick="SupabaseAuth.signOut()"><i class="fas fa-sign-out-alt"></i><span class="mekteb-nav-text">تسجيل خروج</span></a></li>
+            </ul>
+        </nav>
+        <main class="mekteb-content">
+            <header class="mekteb-header"><h1 class="mekteb-page-title"><i class="fas fa-envelope"></i> رسائل التواصل</h1></header>
+            <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">الرسائل الواردة من الأعضاء عبر نموذج التواصل</p>
+            <div class="msg-filters">
+                <button class="active" data-filter="all">الكل <span id="countAll">0</span></button>
+                <button data-filter="unread">غير مقروءة <span id="countUnread">0</span></button>
+                <button data-filter="read">مقروءة <span id="countRead">0</span></button>
+                <button data-filter="replied">تم الرد <span id="countReplied">0</span></button>
+            </div>
+            <div id="msgList"><div style="text-align:center;padding:40px;color:var(--text-muted);"><i class="fas fa-spinner fa-spin" style="font-size:32px;"></i><p style="margin-top:8px;">جاري تحميل الرسائل...</p></div></div>
+        </main>
+    </div>
+    <script>
+    (function() {
+        if (!SupabaseAuth.checkAuth(true)) return;
+        var allMessages = [];
+        var currentFilter = 'all';
+        function render(filter) {
+            filter = filter || currentFilter; currentFilter = filter;
+            var items = filter === 'all' ? allMessages : allMessages.filter(function(m) { return m.status === filter; });
+            var counts = { all: allMessages.length, unread: 0, read: 0, replied: 0 };
+            allMessages.forEach(function(m) { if (counts[m.status] !== undefined) counts[m.status]++; });
+            document.getElementById('countAll').textContent = counts.all;
+            document.getElementById('countUnread').textContent = counts.unread;
+            document.getElementById('countRead').textContent = counts.read;
+            document.getElementById('countReplied').textContent = counts.replied;
+            if (!items.length) { document.getElementById('msgList').innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);"><i class="fas fa-inbox"></i><p>لا توجد رسائل</p></div>'; return; }
+            var html = '';
+            items.forEach(function(m) {
+                var deptNames = { general: 'عام', membership: 'عضوية', finance: 'مالي', legal: 'قانوني', complaint: 'شكوى' };
+                html += '<div class="msg-card' + (m.status === 'unread' ? ' unread' : '') + '" data-id="' + m.id + '">';
+                html += '<div class="msg-subject">' + m.subject + ' <span class="msg-badge">' + (deptNames[m.department] || m.department) + '</span></div>';
+                html += '<div class="msg-meta"><span>' + m.name + '</span><span>' + m.email + '</span><span>' + new Date(m.created_at).toLocaleDateString('ar-MR') + '</span></div>';
+                html += '<div class="msg-preview">' + (m.message ? m.message.substring(0, 100) : '') + '...</div></div>';
+            });
+            document.getElementById('msgList').innerHTML = html;
+        }
+        document.querySelectorAll('.msg-filters button').forEach(function(b) {
+            b.addEventListener('click', function() { document.querySelectorAll('.msg-filters button').forEach(function(x) { x.classList.remove('active'); }); this.classList.add('active'); render(this.getAttribute('data-filter')); });
+        });
+        document.getElementById('msgList').addEventListener('click', function(e) {
+            var card = e.target.closest('.msg-card');
+            if (!card) return;
+            var id = parseInt(card.getAttribute('data-id'));
+            var msg = allMessages.find(function(m) { return m.id === id; });
+            if (!msg) return;
+            var deptNames = { general: 'عام', membership: 'عضوية', finance: 'مالي', legal: 'قانوني', complaint: 'شكوى' };
+            alert('من: ' + msg.name + ' (' + msg.email + ')\nالقسم: ' + (deptNames[msg.department] || msg.department) + '\nالموضوع: ' + msg.subject + '\n\n' + msg.message + '\n\n---\n' + new Date(msg.created_at).toLocaleString('ar-MR'));
+            if (msg.status === 'unread') {
+                fetch('https://bfdixkdwhccriliwtnch.supabase.co/rest/v1/contact_messages?id=eq.' + id, { method: 'PATCH', headers: { 'Content-Type': 'application/json', 'apikey': 'sb_publishable_Y3FsxqV_4RA96t7MassN4w_NcOJ31--', 'Authorization': 'Bearer ' + SupabaseAuth.getToken() }, body: JSON.stringify({ status: 'read' }) }).catch(function(){});
+                msg.status = 'read';
+                render(currentFilter);
+            }
+        });
+        (async function load() {
+            try {
+                var token = SupabaseAuth.getToken();
+                var res = await fetch('https://bfdixkdwhccriliwtnch.supabase.co/rest/v1/contact_messages?order=created_at.desc', { headers: { 'apikey': 'sb_publishable_Y3FsxqV_4RA96t7MassN4w_NcOJ31--', 'Authorization': 'Bearer ' + token } });
+                if (res.ok) { allMessages = await res.json() || []; }
+            } catch(e) {}
+            render('all');
+        })();
+    })();
+    </script>
+</body>
+</html>

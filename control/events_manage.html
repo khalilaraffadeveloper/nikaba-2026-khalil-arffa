@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>إدارة الفعاليات - المكتب التنفيذي</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/control.css" />
+    <link rel="stylesheet" href="css/EL_Mekteb1.css" />
+    <script src="../js/supabase-auth.js"></script>
+    <style>
+        .evt-toolbar { display: flex; gap: 10px; margin-bottom: 16px; }
+        .evt-toolbar button { padding: 10px 20px; border-radius: 10px; border: none; font-size: 13px; font-weight: 700; cursor: pointer; background: var(--accent); color: #0a0a14; }
+        .evt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .evt-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; position: relative; }
+        .evt-card .evt-date { font-size: 11px; color: var(--text-muted); }
+        .evt-card .evt-title { font-size: 14px; font-weight: 700; margin: 4px 0; }
+        .evt-card .evt-actions { display: flex; gap: 6px; margin-top: 8px; }
+        .evt-card .evt-actions button { background: none; border: none; cursor: pointer; font-size: 13px; padding: 4px 8px; border-radius: 6px; }
+        .evt-card .evt-actions .ed { color: var(--primary); }
+        .evt-card .evt-actions .dl { color: var(--danger); }
+        .evt-empty { text-align: center; padding: 40px; color: var(--text-muted); grid-column: 1/-1; }
+    </style>
+</head>
+<body class="control-page">
+    <div class="control-wrapper">
+        <nav class="mekteb-sidebar">
+            <div class="mekteb-profile"><div class="mekteb-avatar"><img src="../images/logoNikabo.png" /></div><h2 class="mekteb-user-name">المكتب التنفيذي</h2></div>
+            <ul class="mekteb-nav-list">
+                <li class="mekteb-nav-item"><a href="EL_Mekteb1.html" class="mekteb-nav-link"><i class="fas fa-tachometer-alt"></i><span class="mekteb-nav-text">الرئيسية</span></a></li>
+                <li class="mekteb-nav-item"><a href="Talabat_intisab.html" class="mekteb-nav-link"><i class="fas fa-handshake"></i><span class="mekteb-nav-text">طلبات الإنتساب</span></a></li>
+                <li class="mekteb-nav-item"><a href="news_manage.html" class="mekteb-nav-link"><i class="fas fa-newspaper"></i><span class="mekteb-nav-text">الأخبار</span></a></li>
+                <li class="mekteb-nav-item"><a href="events_manage.html" class="mekteb-nav-link active"><i class="fas fa-calendar-alt"></i><span class="mekteb-nav-text">الفعاليات</span></a></li>
+                <li class="mekteb-nav-item"><a href="messages_manage.html" class="mekteb-nav-link"><i class="fas fa-envelope"></i><span class="mekteb-nav-text">الرسائل</span></a></li>
+                <li class="mekteb-nav-divider"><span class="mekteb-divider-text">الموقع العام</span></li>
+                <li class="mekteb-nav-item"><a href="../index.html" class="mekteb-nav-link" target="_blank"><i class="fas fa-globe"></i><span class="mekteb-nav-text">تصفح الموقع</span></a></li>
+                <li class="mekteb-nav-item mekteb-logout"><a href="javascript:void(0)" class="mekteb-nav-link" onclick="SupabaseAuth.signOut()"><i class="fas fa-sign-out-alt"></i><span class="mekteb-nav-text">تسجيل خروج</span></a></li>
+            </ul>
+        </nav>
+        <main class="mekteb-content">
+            <header class="mekteb-header"><h1 class="mekteb-page-title"><i class="fas fa-calendar-alt"></i> إدارة الفعاليات</h1></header>
+            <div class="evt-toolbar"><button id="btnAddEvent"><i class="fas fa-plus"></i> إضافة فعالية</button></div>
+            <div class="evt-grid" id="evtGrid"><div class="evt-empty" id="evtLoading"><i class="fas fa-spinner fa-spin" style="font-size:32px;"></i><p style="margin-top:8px;">جاري التحميل...</p></div></div>
+        </main>
+    </div>
+    <div class="modal-overlay" id="evtModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:500;align-items:center;justify-content:center;">
+        <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:16px;max-width:480px;width:92%;padding:20px;">
+            <h3 style="margin-bottom:14px;" id="evtModalTitle">إضافة فعالية</h3>
+            <div class="contact-field"><label>عنوان الفعالية</label><input type="text" id="evtTitle" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);" /></div>
+            <div style="display:flex;gap:10px;"><div class="contact-field" style="flex:1;"><label>اليوم</label><input type="text" id="evtDay" placeholder="20" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);" /></div><div class="contact-field" style="flex:2;"><label>الشهر</label><input type="text" id="evtMonth" placeholder="يوليو" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);" /></div></div>
+            <div class="contact-field"><label>الوصف</label><textarea id="evtDesc" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);height:60px;"></textarea></div>
+            <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px;">
+                <button id="evtModalCancel" style="padding:10px 20px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text-secondary);cursor:pointer;">إلغاء</button>
+                <button id="evtModalSave" style="padding:10px 20px;border-radius:10px;border:none;background:var(--accent);color:#0a0a14;font-weight:700;cursor:pointer;">حفظ</button>
+            </div>
+        </div>
+    </div>
+    <script>
+    (function() {
+        if (!SupabaseAuth.checkAuth(true)) return;
+        var allEvents = [];
+        var editingId = null;
+        var api = 'https://bfdixkdwhccriliwtnch.supabase.co';
+        var key = 'sb_publishable_Y3FsxqV_4RA96t7MassN4w_NcOJ31--';
+        function h() { return { 'apikey': key, 'Authorization': 'Bearer ' + (SupabaseAuth.getToken() || key), 'Content-Type': 'application/json' }; }
+        async function load() {
+            try { var r = await fetch(api + '/rest/v1/events?order=created_at.desc', { headers: h() }); allEvents = r.ok ? (await r.json() || []) : []; } catch(e) { allEvents = []; }
+            render();
+        }
+        function render() {
+            var grid = document.getElementById('evtGrid');
+            if (!allEvents.length) { grid.innerHTML = '<div class="evt-empty"><i class="fas fa-calendar-alt"></i><p>لا توجد فعاليات</p></div>'; return; }
+            var html = '';
+            allEvents.forEach(function(e) {
+                html += '<div class="evt-card"><div class="evt-date">' + (e.day || '?') + ' ' + (e.month || '') + '</div><div class="evt-title">' + e.title + '</div><div class="evt-actions"><button class="ed" data-id="' + e.id + '" data-title="' + (e.title||'').replace(/"/g,'&quot;') + '" data-day="' + (e.day||'') + '" data-month="' + (e.month||'') + '" data-desc="' + (e.description||'').replace(/"/g,'&quot;') + '"><i class="fas fa-edit"></i></button><button class="dl" data-id="' + e.id + '"><i class="fas fa-trash"></i></button></div></div>';
+            });
+            grid.innerHTML = html;
+        }
+        function openModal(title, data) {
+            editingId = data ? data.id : null;
+            document.getElementById('evtModalTitle').textContent = title;
+            document.getElementById('evtTitle').value = data ? data.title : '';
+            document.getElementById('evtDay').value = data ? (data.day || '') : '';
+            document.getElementById('evtMonth').value = data ? (data.month || '') : '';
+            document.getElementById('evtDesc').value = data ? (data.description || '') : '';
+            document.getElementById('evtModal').style.display = 'flex';
+        }
+        document.getElementById('btnAddEvent').addEventListener('click', function() { openModal('إضافة فعالية', null); });
+        document.getElementById('evtModalCancel').addEventListener('click', function() { document.getElementById('evtModal').style.display = 'none'; });
+        document.getElementById('evtModalSave').addEventListener('click', async function() {
+            var title = document.getElementById('evtTitle').value.trim();
+            if (!title) { alert('العنوان مطلوب'); return; }
+            var body = JSON.stringify({ title: title, day: document.getElementById('evtDay').value.trim(), month: document.getElementById('evtMonth').value.trim(), description: document.getElementById('evtDesc').value.trim() });
+            var r;
+            if (editingId) { r = await fetch(api + '/rest/v1/events?id=eq.' + editingId, { method: 'PATCH', headers: h(), body: body }); }
+            else { r = await fetch(api + '/rest/v1/events', { method: 'POST', headers: Object.assign(h(), { 'Prefer': 'return=representation' }), body: body }); }
+            if (r.ok) { document.getElementById('evtModal').style.display = 'none'; load(); } else { alert('فشل الحفظ'); }
+        });
+        document.getElementById('evtGrid').addEventListener('click', function(e) {
+            var ed = e.target.closest('.ed');
+            var dl = e.target.closest('.dl');
+            if (ed) {
+                var d = { id: parseInt(ed.getAttribute('data-id')), title: ed.getAttribute('data-title'), day: ed.getAttribute('data-day'), month: ed.getAttribute('data-month'), description: ed.getAttribute('data-desc') };
+                openModal('تعديل الفعالية', d);
+            }
+            if (dl) {
+                if (confirm('تأكيد الحذف؟')) fetch(api + '/rest/v1/events?id=eq.' + parseInt(dl.getAttribute('data-id')), { method: 'DELETE', headers: h() }).then(function(r) { if (r.ok) load(); });
+            }
+        });
+        load();
+    })();
+    </script>
+</body>
+</html>

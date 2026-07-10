@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>إدارة الأخبار - المكتب التنفيذي</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/control.css" />
+    <link rel="stylesheet" href="css/EL_Mekteb1.css" />
+    <script src="../js/supabase-auth.js"></script>
+    <style>
+        .news-toolbar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+        .news-toolbar button { padding: 10px 20px; border-radius: 10px; border: none; font-size: 13px; font-weight: 700; cursor: pointer; }
+        .news-btn-add { background: var(--accent); color: #0a0a14; }
+        .news-btn-add:hover { background: var(--accent-hover); }
+        .news-table { width: 100%; border-collapse: collapse; }
+        .news-table th { text-align: right; font-size: 11px; color: var(--text-muted); padding: 10px 8px; border-bottom: 1px solid var(--border); }
+        .news-table td { padding: 10px 8px; font-size: 13px; color: var(--text); border-bottom: 1px solid var(--border-light); }
+        .news-table td.actions { display: flex; gap: 6px; }
+        .news-table td.actions button { background: none; border: none; cursor: pointer; font-size: 14px; padding: 4px; border-radius: 6px; }
+        .news-table td.actions .edit-btn { color: var(--primary); }
+        .news-table td.actions .del-btn { color: var(--danger); }
+        .news-table td.actions .edit-btn:hover { background: rgba(59,130,246,0.1); }
+        .news-table td.actions .del-btn:hover { background: rgba(239,68,68,0.1); }
+        .news-empty { text-align: center; padding: 40px; color: var(--text-muted); }
+    </style>
+</head>
+<body class="control-page">
+    <div class="control-wrapper">
+        <nav class="mekteb-sidebar">
+            <div class="mekteb-profile"><div class="mekteb-avatar"><img src="../images/logoNikabo.png" /></div><h2 class="mekteb-user-name">المكتب التنفيذي</h2></div>
+            <ul class="mekteb-nav-list">
+                <li class="mekteb-nav-item"><a href="EL_Mekteb1.html" class="mekteb-nav-link"><i class="fas fa-tachometer-alt"></i><span class="mekteb-nav-text">الرئيسية</span></a></li>
+                <li class="mekteb-nav-item"><a href="Talabat_intisab.html" class="mekteb-nav-link"><i class="fas fa-handshake"></i><span class="mekteb-nav-text">طلبات الإنتساب</span></a></li>
+                <li class="mekteb-nav-item"><a href="news_manage.html" class="mekteb-nav-link active"><i class="fas fa-newspaper"></i><span class="mekteb-nav-text">الأخبار</span></a></li>
+                <li class="mekteb-nav-item"><a href="events_manage.html" class="mekteb-nav-link"><i class="fas fa-calendar-alt"></i><span class="mekteb-nav-text">الفعاليات</span></a></li>
+                <li class="mekteb-nav-item"><a href="messages_manage.html" class="mekteb-nav-link"><i class="fas fa-envelope"></i><span class="mekteb-nav-text">الرسائل</span></a></li>
+                <li class="mekteb-nav-divider"><span class="mekteb-divider-text">الموقع العام</span></li>
+                <li class="mekteb-nav-item"><a href="../index.html" class="mekteb-nav-link" target="_blank"><i class="fas fa-globe"></i><span class="mekteb-nav-text">تصفح الموقع</span></a></li>
+                <li class="mekteb-nav-item mekteb-logout"><a href="javascript:void(0)" class="mekteb-nav-link" onclick="SupabaseAuth.signOut()"><i class="fas fa-sign-out-alt"></i><span class="mekteb-nav-text">تسجيل خروج</span></a></li>
+            </ul>
+        </nav>
+        <main class="mekteb-content">
+            <header class="mekteb-header"><h1 class="mekteb-page-title"><i class="fas fa-newspaper"></i> إدارة الأخبار</h1></header>
+            <div class="news-toolbar">
+                <button class="news-btn-add" id="btnAddNews"><i class="fas fa-plus"></i> إضافة خبر جديد</button>
+            </div>
+            <div id="newsTableWrap">
+                <div class="news-empty" id="newsLoading"><i class="fas fa-spinner fa-spin" style="font-size:32px;"></i><p style="margin-top:8px;">جاري تحميل الأخبار...</p></div>
+            </div>
+        </main>
+    </div>
+    <div class="modal-overlay" id="newsModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:500;align-items:center;justify-content:center;">
+        <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:16px;max-width:500px;width:92%;max-height:85vh;overflow-y:auto;padding:20px;">
+            <h3 style="margin-bottom:14px;" id="newsModalTitle">إضافة خبر جديد</h3>
+            <div class="contact-field" style="margin-bottom:12px;"><label>العنوان</label><input type="text" id="newsTitle" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);" /></div>
+            <div class="contact-field" style="margin-bottom:12px;"><label>نبذة مختصرة</label><input type="text" id="newsExcerpt" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);" /></div>
+            <div class="contact-field" style="margin-bottom:12px;"><label>المحتوى الكامل</label><textarea id="newsContent" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);height:100px;"></textarea></div>
+            <div style="display:flex;gap:10px;justify-content:flex-end;">
+                <button class="intisab-btn-close" id="newsModalCancel" style="padding:10px 20px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text-secondary);cursor:pointer;">إلغاء</button>
+                <button class="intisab-btn-approve" id="newsModalSave" style="padding:10px 20px;border-radius:10px;border:none;background:var(--accent);color:#0a0a14;font-weight:700;cursor:pointer;">حفظ</button>
+            </div>
+        </div>
+    </div>
+    <script>
+    (function() {
+        if (!SupabaseAuth.checkAuth(true)) return;
+        var allNews = [];
+        var editingId = null;
+        var api = 'https://bfdixkdwhccriliwtnch.supabase.co';
+        var key = 'sb_publishable_Y3FsxqV_4RA96t7MassN4w_NcOJ31--';
+        function headers() { return { 'apikey': key, 'Authorization': 'Bearer ' + (SupabaseAuth.getToken() || key), 'Content-Type': 'application/json' }; }
+        async function loadNews() {
+            try {
+                var res = await fetch(api + '/rest/v1/news?order=created_at.desc', { headers: headers() });
+                allNews = res.ok ? (await res.json() || []) : [];
+            } catch(e) { allNews = []; }
+            render();
+        }
+        function render() {
+            var wrap = document.getElementById('newsTableWrap');
+            if (!allNews.length) { wrap.innerHTML = '<div class="news-empty"><i class="fas fa-newspaper"></i><p>لا توجد أخبار بعد</p></div>'; return; }
+            var html = '<table class="news-table"><thead><tr><th>العنوان</th><th>التاريخ</th><th>المشاهدات</th><th></th></tr></thead><tbody>';
+            allNews.forEach(function(n) {
+                html += '<tr><td>' + n.title + '</td><td style="font-size:11px;color:var(--text-muted);">' + new Date(n.created_at).toLocaleDateString('ar-MR') + '</td><td>' + (n.views || 0) + '</td>';
+                html += '<td class="actions"><button class="edit-btn" data-id="' + n.id + '" data-title="' + n.title.replace(/"/g,'&quot;') + '" data-excerpt="' + (n.excerpt||'').replace(/"/g,'&quot;') + '" data-content="' + (n.content||'').replace(/"/g,'&quot;') + '"><i class="fas fa-edit"></i></button>';
+                html += '<button class="del-btn" data-id="' + n.id + '"><i class="fas fa-trash"></i></button></td></tr>';
+            });
+            html += '</tbody></table>';
+            wrap.innerHTML = html;
+        }
+        function openModal(title, data) {
+            editingId = data ? data.id : null;
+            document.getElementById('newsModalTitle').textContent = title;
+            document.getElementById('newsTitle').value = data ? data.title : '';
+            document.getElementById('newsExcerpt').value = data ? (data.excerpt || '') : '';
+            document.getElementById('newsContent').value = data ? (data.content || '') : '';
+            document.getElementById('newsModal').style.display = 'flex';
+        }
+        document.getElementById('btnAddNews').addEventListener('click', function() { openModal('إضافة خبر جديد', null); });
+        document.getElementById('newsModalCancel').addEventListener('click', function() { document.getElementById('newsModal').style.display = 'none'; });
+        document.getElementById('newsModalSave').addEventListener('click', async function() {
+            var title = document.getElementById('newsTitle').value.trim();
+            var excerpt = document.getElementById('newsExcerpt').value.trim();
+            var content = document.getElementById('newsContent').value.trim();
+            if (!title) { alert('العنوان مطلوب'); return; }
+            var body = JSON.stringify({ title: title, excerpt: excerpt, content: content, author: (SupabaseAuth.getUser() ? SupabaseAuth.getUser().email : 'admin') });
+            var res;
+            if (editingId) {
+                res = await fetch(api + '/rest/v1/news?id=eq.' + editingId, { method: 'PATCH', headers: headers(), body: body });
+            } else {
+                res = await fetch(api + '/rest/v1/news', { method: 'POST', headers: Object.assign(headers(), { 'Prefer': 'return=representation' }), body: body });
+            }
+            if (res.ok) { document.getElementById('newsModal').style.display = 'none'; loadNews(); }
+            else { alert('فشل الحفظ'); }
+        });
+        document.getElementById('newsTableWrap').addEventListener('click', function(e) {
+            var editBtn = e.target.closest('.edit-btn');
+            var delBtn = e.target.closest('.del-btn');
+            if (editBtn) {
+                var data = { id: parseInt(editBtn.getAttribute('data-id')), title: editBtn.getAttribute('data-title'), excerpt: editBtn.getAttribute('data-excerpt'), content: editBtn.getAttribute('data-content') };
+                openModal('تعديل الخبر', data);
+            }
+            if (delBtn) {
+                var id = parseInt(delBtn.getAttribute('data-id'));
+                if (confirm('تأكيد حذف الخبر؟')) {
+                    fetch(api + '/rest/v1/news?id=eq.' + id, { method: 'DELETE', headers: headers() }).then(function(r) { if (r.ok) loadNews(); });
+                }
+            }
+        });
+        loadNews();
+    })();
+    </script>
+</body>
+</html>

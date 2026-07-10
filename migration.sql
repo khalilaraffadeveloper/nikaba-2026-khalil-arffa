@@ -103,6 +103,62 @@ CREATE POLICY "contact_update_admin" ON contact_messages FOR UPDATE USING (
     auth.uid() IN (SELECT user_id FROM profiles WHERE role IN ('executive', 'admin'))
 );
 
--- 5. تحديد صلاحية admin لأول مستخدم يسجل (يدوياً)
+-- 5. جدول الأخبار
+CREATE TABLE IF NOT EXISTS news (
+    id BIGSERIAL PRIMARY KEY,
+    title TEXT NOT NULL,
+    excerpt TEXT,
+    content TEXT,
+    image_url TEXT,
+    author TEXT,
+    views BIGINT DEFAULT 0,
+    likes BIGINT DEFAULT 0,
+    status TEXT DEFAULT 'published' CHECK (status IN ('draft', 'published', 'archived')),
+    created_at TIMESTAMPTZ DEFAULT now(),
+    updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+ALTER TABLE news ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "news_select_all" ON news FOR SELECT USING (true);
+CREATE POLICY "news_insert_admin" ON news FOR INSERT WITH CHECK (
+    auth.uid() IN (SELECT user_id FROM profiles WHERE role IN ('executive', 'admin'))
+);
+CREATE POLICY "news_update_admin" ON news FOR UPDATE USING (
+    auth.uid() IN (SELECT user_id FROM profiles WHERE role IN ('executive', 'admin'))
+);
+CREATE POLICY "news_delete_admin" ON news FOR DELETE USING (
+    auth.uid() IN (SELECT user_id FROM profiles WHERE role IN ('executive', 'admin'))
+);
+
+-- 6. جدول الفعاليات
+CREATE TABLE IF NOT EXISTS events (
+    id BIGSERIAL PRIMARY KEY,
+    title TEXT NOT NULL,
+    description TEXT,
+    day TEXT,
+    month TEXT,
+    full_date TEXT,
+    location TEXT,
+    image_url TEXT,
+    status TEXT DEFAULT 'upcoming' CHECK (status IN ('upcoming', 'ongoing', 'completed', 'cancelled')),
+    created_at TIMESTAMPTZ DEFAULT now(),
+    updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+ALTER TABLE events ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "events_select_all" ON events FOR SELECT USING (true);
+CREATE POLICY "events_insert_admin" ON events FOR INSERT WITH CHECK (
+    auth.uid() IN (SELECT user_id FROM profiles WHERE role IN ('executive', 'admin'))
+);
+CREATE POLICY "events_update_admin" ON events FOR UPDATE USING (
+    auth.uid() IN (SELECT user_id FROM profiles WHERE role IN ('executive', 'admin'))
+);
+CREATE POLICY "events_delete_admin" ON events FOR DELETE USING (
+    auth.uid() IN (SELECT user_id FROM profiles WHERE role IN ('executive', 'admin'))
+);
+
+-- 7. تحديد صلاحية admin لأول مستخدم يسجل (يدوياً)
 -- بعد تسجيل أول مستخدم، شغّل هذا الاستعلام:
 -- UPDATE profiles SET role = 'admin' WHERE email = 'admin@example.com';
