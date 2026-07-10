@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>طلب إنتساب - نقابة المهن التمثيلية</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <style>
+        .intisab-page {
+            max-width: 520px;
+            margin: 0 auto;
+            padding: 24px 16px 40px;
+            min-height: 100vh;
+        }
+        .intisab-page .intisab-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .intisab-page .intisab-header .intisab-logo {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            border: 3px solid var(--accent);
+            margin-bottom: 12px;
+        }
+        .intisab-page .intisab-header h1 {
+            font-size: 20px;
+            font-weight: 900;
+            color: var(--accent);
+        }
+        .intisab-page .intisab-header p {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+        .intisab-page .intisab-form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .intisab-page .intisab-section-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .intisab-page .intisab-field {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .intisab-page .intisab-field label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+        .intisab-page .intisab-field label .required {
+            color: var(--danger);
+        }
+        .intisab-page .intisab-field input,
+        .intisab-page .intisab-field textarea {
+            padding: 12px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text);
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        .intisab-page .intisab-field input:focus,
+        .intisab-page .intisab-field textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        .intisab-page .intisab-field .intisab-hint {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+        .intisab-page .intisab-file-upload {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            border: 1px dashed var(--border);
+            background: var(--bg-card);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .intisab-page .intisab-file-upload:hover {
+            border-color: var(--accent);
+            background: var(--accent-glow);
+        }
+        .intisab-page .intisab-file-upload i {
+            font-size: 20px;
+            color: var(--accent);
+        }
+        .intisab-page .intisab-file-upload span {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        .intisab-page .intisab-field-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .intisab-page .intisab-submit {
+            padding: 16px;
+            border-radius: 12px;
+            border: none;
+            background: var(--accent-gradient);
+            color: #0a0a14;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 20px rgba(245,200,66,0.25);
+            margin-top: 8px;
+        }
+        .intisab-page .intisab-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(245,200,66,0.35);
+        }
+        .intisab-page .intisab-submit:disabled {
+            opacity: 0.6;
+            transform: none;
+        }
+        .intisab-page .intisab-footer {
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 32px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="intisab-page">
+
+        <div class="intisab-header">
+            <img src="images/logoNikabo.png" alt="الشعار" class="intisab-logo" />
+            <h1>طلب إنتساب إلى النقابة</h1>
+            <p>املأ البيانات التالية لتقديم طلب انتساب إلى نقابة المهن التمثيلية</p>
+        </div>
+
+        <form class="intisab-form" id="intisabForm">
+
+            <!-- المعلومات الشخصية -->
+            <div class="intisab-section-title"><i class="fas fa-user"></i> المعلومات الشخصية</div>
+
+            <div class="intisab-field">
+                <label>الإسم الكامل <span class="required">*</span></label>
+                <input type="text" id="intisabName" name="name" placeholder="أدخل اسمك الكامل" required />
+            </div>
+
+            <div class="intisab-field-row">
+                <div class="intisab-field">
+                    <label>رقم بطاقة التعريف الوطنية</label>
+                    <input type="text" id="intisabNationalId" name="national_id" placeholder="رقم البطاقة" />
+                </div>
+                <div class="intisab-field">
+                    <label>الإيميل</label>
+                    <input type="email" id="intisabEmail" name="email" placeholder="بريدك الإلكتروني" />
+                </div>
+            </div>
+
+            <!-- الاتصال -->
+            <div class="intisab-section-title"><i class="fas fa-phone"></i> معلومات الاتصال</div>
+
+            <div class="intisab-field-row">
+                <div class="intisab-field">
+                    <label>رقم الهاتف <span class="required">*</span></label>
+                    <input type="tel" id="intisabPhone" name="phone" placeholder="8 أرقام" maxlength="8" required />
+                    <div class="intisab-hint">8 أرقام بدون فواصل</div>
+                </div>
+                <div class="intisab-field">
+                    <label>رقم الواتساب <span class="required">*</span></label>
+                    <input type="tel" id="intisabWhatsapp" name="whatsapp" placeholder="رقم الواتساب" required />
+                    <div class="intisab-hint">مع مفتاح الدولة إن أمكن</div>
+                </div>
+            </div>
+
+            <!-- المستندات -->
+            <div class="intisab-section-title"><i class="fas fa-file-image"></i> المستندات المطلوبة</div>
+
+            <div class="intisab-field">
+                <label>صورة شخصية حديثة <span class="required">*</span></label>
+                <label class="intisab-file-upload" id="uploadPhotoLabel">
+                    <i class="fas fa-camera"></i>
+                    <span id="uploadPhotoText">اختر صورة شخصية</span>
+                    <input type="file" id="intisabPhoto" name="personal_photo" accept="image/*" hidden required />
+                </label>
+            </div>
+
+            <div class="intisab-field">
+                <label>صورة بطاقة التعريف الوطنية <span class="required">*</span></label>
+                <label class="intisab-file-upload" id="uploadIdLabel">
+                    <i class="fas fa-id-card"></i>
+                    <span id="uploadIdText">اختر صورة البطاقة</span>
+                    <input type="file" id="intisabIdCard" name="id_card_image" accept="image/*" hidden required />
+                </label>
+            </div>
+
+            <div class="intisab-field">
+                <label>صورة وصل دفع رسوم الإشتراك <span class="required">*</span></label>
+                <label class="intisab-file-upload" id="uploadReceiptLabel">
+                    <i class="fas fa-receipt"></i>
+                    <span id="uploadReceiptText">اختر صورة الإيصال</span>
+                    <input type="file" id="intisabReceipt" name="payment_receipt_image" accept="image/*" hidden required />
+                </label>
+                <div class="intisab-hint">رقم استلام الرسوم: <strong dir="ltr">26067036</strong></div>
+            </div>
+
+            <!-- الدفع -->
+            <div class="intisab-section-title"><i class="fas fa-credit-card"></i> معلومات الدفع</div>
+
+            <div class="intisab-field-row">
+                <div class="intisab-field">
+                    <label>الرقم الذي تم منه الدفع <span class="required">*</span></label>
+                    <input type="tel" id="intisabPaymentNumber" name="payment_number" placeholder="8 أرقام" maxlength="8" required />
+                    <div class="intisab-hint">رقم الهاتف الذي أرسلت منه رسوم الإشتراك</div>
+                </div>
+                <div class="intisab-field">
+                    <label>تاريخ عملية الدفع</label>
+                    <input type="date" id="intisabPaymentDate" name="payment_date" />
+                </div>
+            </div>
+
+            <button type="submit" class="intisab-submit" id="intisabSubmitBtn">
+                <i class="fas fa-paper-plane"></i> إرسال طلب الإنتساب
+            </button>
+
+        </form>
+
+        <div class="intisab-footer">
+            جميع الحقوق محفوظة &copy; 2026 نقابة المهن التمثيلية
+        </div>
+
+    </div>
+
+    <script>
+    (function() {
+        var form = document.getElementById('intisabForm');
+
+        // file upload preview
+        document.querySelectorAll('input[type="file"]').forEach(function(input) {
+            input.addEventListener('change', function() {
+                var label = this.closest('.intisab-file-upload');
+                var span = label.querySelector('span');
+                if (this.files.length > 0) {
+                    span.textContent = this.files[0].name;
+                }
+            });
+        });
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            var btn = document.getElementById('intisabSubmitBtn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
+            btn.disabled = true;
+
+            var formData = new FormData(form);
+            fetch('/api/affiliation/apply', { method: 'POST', body: formData })
+                .then(function(r) {
+                    if (!r.ok) return r.json().then(function(d) { throw new Error(d.error || d.title || 'فشل تقديم الطلب'); });
+                    return r.json();
+                })
+                .then(function(data) {
+                    btn.innerHTML = '<i class="fas fa-check-circle"></i> تم الإرسال بنجاح';
+                    window.location.href = 'intisab-done.html?id=' + (data.id || '');
+                })
+                .catch(function(err) {
+                    btn.innerHTML = '<i class="fas fa-paper-plane"></i> إرسال طلب الإنتساب';
+                    btn.disabled = false;
+                    alert('خطأ: ' + err.message);
+                });
+        });
+    })();
+    </script>
+
+</body>
+</html>
