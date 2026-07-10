@@ -26,10 +26,10 @@
         },
 
         // ===== تسجيل خروج =====
-        signOut: function() {
+        signOut: function(redirect) {
             localStorage.removeItem(this.TOKEN_KEY);
             localStorage.removeItem(this.USER_KEY);
-            window.location.href = 'login.html';
+            window.location.href = redirect || 'login.html';
         },
 
         // ===== حفظ الجلسة =====
