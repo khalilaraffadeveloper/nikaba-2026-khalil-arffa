@@ -592,7 +592,9 @@
         });
     });
 
-    (function() {
+    (async function() {
+        var role = await SupabaseAuth.requireRole();
+        if (!role) return;
         var list = document.getElementById('intisabList');
         var currentFilter = 'all';
         var allData = [];

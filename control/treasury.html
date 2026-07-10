@@ -37,6 +37,7 @@
             </div>
         </main>
     </div>
-    <script>if (!SupabaseAuth.checkAuth(true)) return;</script>
+    <script>(async function(){var r=await SupabaseAuth.requireRole();if(!r)return;})();</script>
 </body>
 </html>
+

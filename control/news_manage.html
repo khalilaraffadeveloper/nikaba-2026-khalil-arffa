@@ -67,7 +67,8 @@
     </div>
     <script>
     (function() {
-        if (!SupabaseAuth.checkAuth(true)) return;
+        var role = await SupabaseAuth.requireRole();
+        if (!role) return;
         var allNews = [];
         var editingId = null;
         var api = 'https://bfdixkdwhccriliwtnch.supabase.co';

@@ -60,6 +60,32 @@
             return true;
         },
 
+        // ===== التحقق من صلاحية الوصول للوحة التحكم =====
+        requireRole: async function(redirect) {
+            if (!this.checkAuth(redirect)) return false;
+            var token = this.getToken();
+            if (!token) { if (redirect) window.location.href = redirect || 'login.html'; return false; }
+            try {
+                var user = this.getUser();
+                if (!user || !user.id) return false;
+                var res = await fetch('https://bfdixkdwhccriliwtnch.supabase.co/rest/v1/profiles?user_id=eq.' + user.id + '&select=role', {
+                    headers: { 'apikey': 'sb_publishable_Y3FsxqV_4RA96t7MassN4w_NcOJ31--', 'Authorization': 'Bearer ' + token }
+                });
+                if (!res.ok) return false;
+                var profiles = await res.json();
+                if (!profiles || !profiles.length) return false;
+                var role = profiles[0].role;
+                if (role !== 'admin' && role !== 'executive') {
+                    if (redirect) window.location.href = redirect;
+                    return false;
+                }
+                return role;
+            } catch(e) {
+                if (redirect) window.location.href = redirect;
+                return false;
+            }
+        },
+
         // ===== استدعاء API محمي =====
         fetch: async function(url, options) {
             options = options || {};

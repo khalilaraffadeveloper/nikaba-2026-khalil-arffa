@@ -400,7 +400,8 @@
     });
 
     (async function() {
-        if (!SupabaseAuth.checkAuth(true)) return;
+        var role = await SupabaseAuth.requireRole();
+        if (!role) return;
         var user = SupabaseAuth.getUser();
         if (user) {
             document.querySelector('#mektebAdminName').textContent = user.email ? user.email.split('@')[0] : 'النقيب';

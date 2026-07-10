@@ -53,7 +53,8 @@
     </div>
     <script>
     (function() {
-        if (!SupabaseAuth.checkAuth(true)) return;
+        var role = await SupabaseAuth.requireRole();
+        if (!role) return;
         var allMessages = [];
         var currentFilter = 'all';
         function render(filter) {
