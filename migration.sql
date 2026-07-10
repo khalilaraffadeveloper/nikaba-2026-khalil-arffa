@@ -235,6 +235,26 @@ CREATE POLICY "edu_delete_admin" ON educational_videos FOR DELETE USING (
     auth.uid() IN (SELECT user_id FROM profiles WHERE role IN ('executive', 'admin'))
 );
 
--- 10. تحديد صلاحية admin لأول مستخدم يسجل (يدوياً)
+-- 10. إنشاء Storage Bucket لرفع ملفات الإنتساب
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('affiliation-files', 'affiliation-files', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- سياسات التخزين: السماح للجميع بقراءة الملفات
+CREATE POLICY "affiliation_files_public_read"
+ON storage.objects FOR SELECT USING (bucket_id = 'affiliation-files');
+
+-- السماح للزوار برفع الملفات (للنماذج العامة)
+CREATE POLICY "affiliation_files_anon_insert"
+ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'affiliation-files');
+
+-- السماح للإدارة بحذف الملفات
+CREATE POLICY "affiliation_files_admin_delete"
+ON storage.objects FOR DELETE USING (
+    bucket_id = 'affiliation-files' AND
+    auth.uid() IN (SELECT user_id FROM profiles WHERE role IN ('executive', 'admin'))
+);
+
+-- 11. تحديد صلاحية admin لأول مستخدم يسجل (يدوياً)
 -- بعد تسجيل أول مستخدم، شغّل هذا الاستعلام:
 -- UPDATE profiles SET role = 'admin' WHERE email = 'admin@example.com';

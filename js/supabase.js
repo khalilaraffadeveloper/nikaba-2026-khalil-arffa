@@ -86,10 +86,12 @@
                 url += '&status=eq.' + status;
             }
 
+            var token = window.SupabaseAuth ? SupabaseAuth.getToken() : null;
+
             var res = await fetch(url, {
                 headers: {
                     'apikey': SUPABASE_ANON_KEY,
-                    'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
+                    'Authorization': 'Bearer ' + (token || SUPABASE_ANON_KEY)
                 }
             });
 
