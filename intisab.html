@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr" dir="rtl">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -130,6 +130,24 @@
             opacity: 0.6;
             transform: none;
         }
+        .intisab-page .intisab-date-row {
+            display: flex;
+            gap: 8px;
+        }
+        .intisab-page .intisab-date-select {
+            flex: 1;
+            padding: 12px 10px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text);
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .intisab-page .intisab-date-select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
         .intisab-page .intisab-footer {
             text-align: center;
             font-size: 12px;
@@ -227,7 +245,20 @@
                 </div>
                 <div class="intisab-field">
                     <label>تاريخ عملية الدفع</label>
-                    <input type="date" id="intisabPaymentDate" name="payment_date" lang="fr" />
+                    <div class="intisab-date-row" id="intisabDateRow">
+                        <select id="intisabPaymentDay" class="intisab-date-select intisab-date-day">
+                            <option value="">Jour</option>
+                            <option value="01">1</option><option value="02">2</option><option value="03">3</option><option value="04">4</option><option value="05">5</option><option value="06">6</option><option value="07">7</option><option value="08">8</option><option value="09">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option><option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option><option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option><option value="29">29</option><option value="30">30</option><option value="31">31</option>
+                        </select>
+                        <select id="intisabPaymentMonth" class="intisab-date-select intisab-date-month">
+                            <option value="">Mois</option>
+                            <option value="01">Janvier</option><option value="02">Février</option><option value="03">Mars</option><option value="04">Avril</option><option value="05">Mai</option><option value="06">Juin</option><option value="07">Juillet</option><option value="08">Août</option><option value="09">Septembre</option><option value="10">Octobre</option><option value="11">Novembre</option><option value="12">Décembre</option>
+                        </select>
+                        <select id="intisabPaymentYear" class="intisab-date-select intisab-date-year">
+                            <option value="">Année</option>
+                        </select>
+                    </div>
+                    <input type="hidden" id="intisabPaymentDate" name="payment_date" />
                 </div>
             </div>
 
@@ -247,6 +278,30 @@
     (function() {
         var form = document.getElementById('intisabForm');
 
+        // populate years
+        var yearSelect = document.getElementById('intisabPaymentYear');
+        var currentYear = new Date().getFullYear();
+        for (var y = currentYear; y >= currentYear - 10; y--) {
+            var opt = document.createElement('option');
+            opt.value = y;
+            opt.textContent = y;
+            yearSelect.appendChild(opt);
+        }
+
+        // combine date on submit
+        function getCombinedDate() {
+            var d = document.getElementById('intisabPaymentDay').value;
+            var m = document.getElementById('intisabPaymentMonth').value;
+            var y = document.getElementById('intisabPaymentYear').value;
+            if (d && m && y) return y + '-' + m + '-' + d;
+            return '';
+        }
+        document.querySelectorAll('.intisab-date-select').forEach(function(sel) {
+            sel.addEventListener('change', function() {
+                document.getElementById('intisabPaymentDate').value = getCombinedDate();
+            });
+        });
+
         // file upload preview
         document.querySelectorAll('input[type="file"]').forEach(function(input) {
             input.addEventListener('change', function() {
@@ -260,6 +315,7 @@
 
         form.addEventListener('submit', function(e) {
             e.preventDefault();
+            document.getElementById('intisabPaymentDate').value = getCombinedDate();
             var btn = document.getElementById('intisabSubmitBtn');
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
             btn.disabled = true;
