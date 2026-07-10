@@ -237,12 +237,12 @@ CREATE POLICY "edu_delete_admin" ON educational_videos FOR DELETE USING (
 
 -- 9.5 دالة لتجاوز RLS عند إدراج طلبات الإنتساب (للنماذج العامة)
 CREATE OR REPLACE FUNCTION insert_affiliation(
-    p_name TEXT,
+    p_name TEXT DEFAULT '',
     p_national_id TEXT DEFAULT NULL,
     p_email TEXT DEFAULT NULL,
-    p_phone TEXT,
-    p_whatsapp TEXT,
-    p_payment_number TEXT,
+    p_phone TEXT DEFAULT '',
+    p_whatsapp TEXT DEFAULT '',
+    p_payment_number TEXT DEFAULT '',
     p_payment_date TEXT DEFAULT NULL,
     p_personal_photo_url TEXT DEFAULT NULL,
     p_id_card_image_url TEXT DEFAULT NULL,

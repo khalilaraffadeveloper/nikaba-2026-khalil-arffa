@@ -125,6 +125,32 @@
             return await res.json();
         },
 
+        // ===== إنشاء خبر ترحيبي =====
+        createWelcomeNews: async function(memberName, memberPhone, paymentDate) {
+            var token = window.SupabaseAuth ? SupabaseAuth.getToken() : null;
+            if (!token) throw new Error('يجب تسجيل الدخول أولاً');
+            var today = new Date().toLocaleDateString('ar-EG', { year:'numeric', month:'long', day:'numeric' });
+            var newsItem = {
+                title: '🎉 ترحيب بالعضو الجديد: ' + memberName,
+                excerpt: 'نرحب بحرارة بالعضو الجديد ' + memberName + ' المنضم إلى نقابة المهن التمثيلية',
+                content: '<p style="font-size:16px;line-height:1.8;">يسر المكتب التنفيذي لنقابة المهن التمثيلية أن يعلن عن قبول عضو جديد في النقابة.</p><p style="font-size:16px;line-height:1.8;">نرحب بالزميل/ة <strong>' + memberName + '</strong> في أسرة النقابة، متمنين له/ا مسيرة مهنية ناجحة ومثمرة في عالم الفن والتمثيل.</p><p style="font-size:16px;line-height:1.8;">تاريخ الإنتساب: ' + today + '</p><p style="font-size:16px;line-height:1.8;">نهنئ العضو الجديد ونتمنى له/ا التوفيق في مشواره/ا الفني.<br/>المكتب التنفيذي<br/>نقابة المهن التمثيلية - موريتانيا</p>',
+                author: 'المكتب التنفيذي',
+                status: 'published'
+            };
+            var res = await fetch(SUPABASE_URL + '/rest/v1/news', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Authorization': 'Bearer ' + token,
+                    'Prefer': 'return=representation'
+                },
+                body: JSON.stringify(newsItem)
+            });
+            if (!res.ok) { var e = await res.text(); throw new Error(e || 'فشل إنشاء الخبر'); }
+            return await res.json();
+        },
+
         // ===== إحصائيات سريعة للوحة التحكم =====
         getStats: async function() {
             var all = await this.getAffiliations();

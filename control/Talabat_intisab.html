@@ -736,12 +736,22 @@
             // ربط أزرار القبول/الرفض
             document.getElementById('btnApprove').onclick = async function() {
                 if (!confirm('تأكيد قبول طلب الإنتساب من ' + item.name + '?')) return;
+                var btn = document.getElementById('btnApprove');
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري...';
                 try {
                     await NikabaAPI.updateAffiliationStatus(id, 'approved');
+                    try {
+                        await NikabaAPI.createWelcomeNews(item.name, item.phone, item.payment_date);
+                    } catch(newsErr) {
+                        console.warn('فشل إنشاء الخبر الترحيبي', newsErr);
+                    }
                     item.status = 'approved';
                     loadData();
                     document.getElementById('intisabModal').classList.remove('show');
                 } catch(e) { alert('خطأ: ' + e.message); }
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-check"></i> قبول';
             };
             document.getElementById('btnReject').onclick = async function() {
                 if (!confirm('تأكيد رفض طلب الإنتساب من ' + item.name + '?')) return;
