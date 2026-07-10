@@ -119,85 +119,149 @@
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: 16px;
-            max-width: 600px;
-            width: 90%;
-            max-height: 85vh;
+            max-width: 640px;
+            width: 92%;
+            max-height: 88vh;
             overflow-y: auto;
-            padding: 24px;
+            padding: 0;
         }
-        .intisab-modal-box h3 {
-            margin-bottom: 16px;
-        }
-        .intisab-modal-box .intisab-detail-row {
+        .intisab-modal-box .intisab-modal-head {
+            position: sticky;
+            top: 0;
+            background: var(--bg-card);
+            z-index: 2;
+            padding: 20px 24px 16px;
+            border-bottom: 1px solid var(--border-light);
             display: flex;
-            padding: 6px 0;
-            border-bottom: 1px solid rgba(255,255,255,.05);
+            justify-content: space-between;
+            align-items: center;
+        }
+        .intisab-modal-box .intisab-modal-head h3 {
+            font-size: 18px;
+            font-weight: 800;
+            margin: 0;
+        }
+        .intisab-modal-box .intisab-modal-body {
+            padding: 20px 24px;
+        }
+        .intisab-modal-box .intisab-section {
+            margin-bottom: 20px;
+        }
+        .intisab-modal-box .intisab-section:last-child {
+            margin-bottom: 0;
+        }
+        .intisab-modal-box .intisab-section-title {
             font-size: 13px;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
-        .intisab-modal-box .intisab-detail-row .intisab-label {
-            width: 140px;
-            color: var(--text-muted);
-            flex-shrink: 0;
+        .intisab-modal-box .intisab-section-title i {
+            font-size: 14px;
         }
-        .intisab-modal-box .intisab-detail-row .intisab-value {
-            flex: 1;
+        .intisab-modal-box .intisab-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
         }
-        .intisab-modal-box img {
-            max-width: 100%;
-            max-height: 200px;
-            border-radius: 8px;
-            margin: 4px 0;
-        }
-        .intisab-modal-box .intisab-form-group {
-            margin-bottom: 12px;
-        }
-        .intisab-modal-box .intisab-form-group label {
-            display: block;
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-bottom: 4px;
-        }
-        .intisab-modal-box .intisab-form-group select,
-        .intisab-modal-box .intisab-form-group textarea {
-            width: 100%;
-            padding: 8px 12px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
+        .intisab-modal-box .intisab-field {
             background: var(--bg);
-            color: var(--text-primary);
-            font-size: 13px;
+            border-radius: 10px;
+            padding: 10px 14px;
+            border: 1px solid var(--border-light);
+        }
+        .intisab-modal-box .intisab-field.full {
+            grid-column: 1 / -1;
+        }
+        .intisab-modal-box .intisab-field-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 2px;
+        }
+        .intisab-modal-box .intisab-field-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            direction: ltr;
+            text-align: right;
+        }
+        .intisab-modal-box .intisab-field-value.rtl {
+            direction: rtl;
+        }
+        .intisab-modal-box .intisab-images {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+        }
+        .intisab-modal-box .intisab-image-card {
+            background: var(--bg);
+            border-radius: 10px;
+            border: 1px solid var(--border-light);
+            overflow: hidden;
+            text-align: center;
+        }
+        .intisab-modal-box .intisab-image-card img {
+            width: 100%;
+            height: 130px;
+            object-fit: cover;
+            display: block;
+        }
+        .intisab-modal-box .intisab-image-card .intisab-image-label {
+            padding: 6px 8px;
+            font-size: 11px;
+            color: var(--text-muted);
         }
         .intisab-modal-actions {
             display: flex;
             gap: 10px;
-            margin-top: 16px;
+            padding: 16px 24px 20px;
+            border-top: 1px solid var(--border-light);
         }
         .intisab-btn-approve {
             background: #4caf50;
             color: #fff;
             border: none;
-            padding: 8px 20px;
-            border-radius: 8px;
+            padding: 10px 24px;
+            border-radius: 10px;
             cursor: pointer;
             font-size: 13px;
+            font-weight: 700;
+            transition: all 0.2s;
+        }
+        .intisab-btn-approve:hover {
+            background: #43a047;
         }
         .intisab-btn-reject {
             background: #e74c3c;
             color: #fff;
             border: none;
-            padding: 8px 20px;
-            border-radius: 8px;
+            padding: 10px 24px;
+            border-radius: 10px;
             cursor: pointer;
             font-size: 13px;
+            font-weight: 700;
+            transition: all 0.2s;
+        }
+        .intisab-btn-reject:hover {
+            background: #d32f2f;
         }
         .intisab-btn-close {
             background: var(--bg);
             color: var(--text-secondary);
             border: 1px solid var(--border);
-            padding: 8px 20px;
-            border-radius: 8px;
+            padding: 10px 24px;
+            border-radius: 10px;
             cursor: pointer;
             font-size: 13px;
+            transition: all 0.2s;
+            margin-right: auto;
+        }
+        .intisab-btn-close:hover {
+            border-color: var(--accent);
+            color: var(--accent);
         }
         .intisab-empty-state {
             text-align: center;
@@ -505,12 +569,15 @@
     <!-- ===== شكلية طلبات الإنتساب المستقبلة ===== -->
     <div class="intisab-modal-overlay" id="intisabModal">
         <div class="intisab-modal-box">
-            <h3 id="modalTitle">تفاصيل الطلب</h3>
-            <div id="modalBody"></div>
+            <div class="intisab-modal-head">
+                <h3 id="modalTitle">شكلية الإنتساب</h3>
+                <span class="intisab-badge-pending" id="modalStatusBadge">قيد المراجعة</span>
+            </div>
+            <div class="intisab-modal-body" id="modalBody"></div>
             <div class="intisab-modal-actions">
-                <button class="intisab-btn-approve" id="btnApprove"><i class="fas fa-check"></i> قبول</button>
-                <button class="intisab-btn-reject" id="btnReject"><i class="fas fa-times"></i> رفض</button>
                 <button class="intisab-btn-close" id="btnCloseModal">إغلاق</button>
+                <button class="intisab-btn-reject" id="btnReject"><i class="fas fa-times"></i> رفض</button>
+                <button class="intisab-btn-approve" id="btnApprove"><i class="fas fa-check"></i> قبول</button>
             </div>
         </div>
     </div>
@@ -541,7 +608,7 @@
                 personal_photo: 'https://via.placeholder.com/300x300/1a1a2e/f5c842?text=صورة+شخصية',
                 id_card_image: 'https://via.placeholder.com/400x250/14141f/f5c842?text=بطاقة+التعريف+الوطنية',
                 payment_receipt_image: 'https://via.placeholder.com/400x300/14141f/f5c842?text=وصل+دفع+رسوم+الإشتراك',
-                payment_number: 'PAY-2026-001',
+                payment_number: '26067036',
                 payment_date: '2026-07-01',
                 date: '2026-07-01',
                 status: 'pending',
@@ -554,11 +621,11 @@
                 email: 'fatima@example.com',
                 national_id: '2345678901',
                 phone: '23456789',
-                whatsapp: '23456789',
+                whatsapp: '98765432',
                 personal_photo: 'https://via.placeholder.com/300x300/1a1a2e/f5c842?text=صورة+شخصية',
                 id_card_image: 'https://via.placeholder.com/400x250/14141f/f5c842?text=بطاقة+التعريف+الوطنية',
                 payment_receipt_image: 'https://via.placeholder.com/400x300/14141f/f5c842?text=وصل+دفع+رسوم+الإشتراك',
-                payment_number: 'PAY-2026-002',
+                payment_number: '26445577',
                 payment_date: '2026-06-28',
                 date: '2026-06-28',
                 status: 'approved',
@@ -571,11 +638,11 @@
                 email: 'ali@example.com',
                 national_id: '3456789012',
                 phone: '34567890',
-                whatsapp: '34567890',
+                whatsapp: '11223344',
                 personal_photo: 'https://via.placeholder.com/300x300/1a1a2e/f5c842?text=صورة+شخصية',
                 id_card_image: 'https://via.placeholder.com/400x250/14141f/f5c842?text=بطاقة+التعريف+الوطنية',
                 payment_receipt_image: 'https://via.placeholder.com/400x300/14141f/f5c842?text=وصل+دفع+رسوم+الإشتراك',
-                payment_number: 'PAY-2026-003',
+                payment_number: '25001122',
                 payment_date: '2026-06-25',
                 date: '2026-06-25',
                 status: 'rejected',
@@ -643,24 +710,51 @@
             var id = parseInt(target.getAttribute('data-id'));
             var item = mockData.find(function(d) { return d.id === id; });
             if (!item) return;
+            var badge = document.getElementById('modalStatusBadge');
+            var badgeClass = 'intisab-badge-pending';
+            var statusText = 'قيد المراجعة';
+            if (item.status === 'approved') { badgeClass = 'intisab-badge-approved'; statusText = 'مقبول'; }
+            else if (item.status === 'rejected') { badgeClass = 'intisab-badge-rejected'; statusText = 'مرفوض'; }
+            badge.className = badgeClass;
+            badge.textContent = statusText;
+
             document.getElementById('modalTitle').textContent = 'شكلية طلبات الإنتساب المستقبلة - ' + item.name;
             var body = '';
-            body += '<div class="intisab-detail-row"><span class="intisab-label">الإسم</span><span class="intisab-value">' + item.name + '</span></div>';
-            body += '<div class="intisab-detail-row"><span class="intisab-label">رقم بطاقة التعريف</span><span class="intisab-value">' + item.national_id + '</span></div>';
-            body += '<div class="intisab-detail-row"><span class="intisab-label">رقم الهاتف</span><span class="intisab-value">' + item.phone + '</span></div>';
-            body += '<div class="intisab-detail-row"><span class="intisab-label">رقم الواتساب</span><span class="intisab-value">' + item.whatsapp + '</span></div>';
-            body += '<div class="intisab-detail-row"><span class="intisab-label">الإيميل</span><span class="intisab-value">' + (item.email || '—') + '</span></div>';
-            body += '<div class="intisab-detail-row"><span class="intisab-label">الرقم الذي تم منه الدفع</span><span class="intisab-value">' + item.payment_number + '</span></div>';
-            body += '<div class="intisab-detail-row"><span class="intisab-label">تاريخ عملية الدفع</span><span class="intisab-value">' + item.payment_date + '</span></div>';
-            if (item.personal_photo) {
-                body += '<div class="intisab-detail-row"><span class="intisab-label">صورة شخصية</span><span class="intisab-value"><img src="' + item.personal_photo + '" alt="صورة شخصية" /></span></div>';
-            }
-            if (item.id_card_image) {
-                body += '<div class="intisab-detail-row"><span class="intisab-label">صورة بطاقة التعريف</span><span class="intisab-value"><img src="' + item.id_card_image + '" alt="بطاقة تعريف" /></span></div>';
-            }
-            if (item.payment_receipt_image) {
-                body += '<div class="intisab-detail-row"><span class="intisab-label">صورة دفع الرسوم</span><span class="intisab-value"><img src="' + item.payment_receipt_image + '" alt="إيصال دفع" /></span></div>';
-            }
+
+            // قسم المعلومات الشخصية
+            body += '<div class="intisab-section">';
+            body += '<div class="intisab-section-title"><i class="fas fa-user"></i> المعلومات الشخصية</div>';
+            body += '<div class="intisab-grid">';
+            body += '<div class="intisab-field full"><div class="intisab-field-label">الإسم</div><div class="intisab-field-value rtl">' + item.name + '</div></div>';
+            body += '<div class="intisab-field"><div class="intisab-field-label">رقم بطاقة التعريف</div><div class="intisab-field-value">' + item.national_id + '</div></div>';
+            body += '<div class="intisab-field"><div class="intisab-field-label">الإيميل</div><div class="intisab-field-value rtl">' + (item.email || '—') + '</div></div>';
+            body += '</div></div>';
+
+            // قسم معلومات الاتصال
+            body += '<div class="intisab-section">';
+            body += '<div class="intisab-section-title"><i class="fas fa-phone"></i> معلومات الاتصال</div>';
+            body += '<div class="intisab-grid">';
+            body += '<div class="intisab-field"><div class="intisab-field-label">رقم الهاتف</div><div class="intisab-field-value">' + item.phone + '</div></div>';
+            body += '<div class="intisab-field"><div class="intisab-field-label">رقم الواتساب</div><div class="intisab-field-value">' + item.whatsapp + '</div></div>';
+            body += '</div></div>';
+
+            // قسم معلومات الدفع
+            body += '<div class="intisab-section">';
+            body += '<div class="intisab-section-title"><i class="fas fa-credit-card"></i> معلومات الدفع</div>';
+            body += '<div class="intisab-grid">';
+            body += '<div class="intisab-field"><div class="intisab-field-label">الرقم الذي تم منه الدفع</div><div class="intisab-field-value">' + item.payment_number + '</div></div>';
+            body += '<div class="intisab-field"><div class="intisab-field-label">تاريخ عملية الدفع</div><div class="intisab-field-value">' + item.payment_date + '</div></div>';
+            body += '</div></div>';
+
+            // قسم المستندات
+            body += '<div class="intisab-section">';
+            body += '<div class="intisab-section-title"><i class="fas fa-file-image"></i> المستندات المرفوعة</div>';
+            body += '<div class="intisab-images">';
+            body += '<div class="intisab-image-card"><img src="' + (item.personal_photo || 'https://via.placeholder.com/300x300/14141f/666?text=لا+توجد') + '" alt="صورة شخصية" /><div class="intisab-image-label"><i class="fas fa-user"></i> صورة شخصية</div></div>';
+            body += '<div class="intisab-image-card"><img src="' + (item.id_card_image || 'https://via.placeholder.com/300x300/14141f/666?text=لا+توجد') + '" alt="بطاقة تعريف" /><div class="intisab-image-label"><i class="fas fa-id-card"></i> بطاقة التعريف</div></div>';
+            body += '<div class="intisab-image-card"><img src="' + (item.payment_receipt_image || 'https://via.placeholder.com/300x300/14141f/666?text=لا+توجد') + '" alt="وصل دفع" /><div class="intisab-image-label"><i class="fas fa-receipt"></i> وصل دفع الرسوم</div></div>';
+            body += '</div></div>';
+
             document.getElementById('modalBody').innerHTML = body;
             document.getElementById('intisabModal').classList.add('show');
         });
