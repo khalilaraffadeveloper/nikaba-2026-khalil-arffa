@@ -32,6 +32,22 @@
 
     <!-- ===== قسم الاشتراك وطرق الدفع ===== -->
     <div class="landing-section">
+        <!-- ===== إحصائيات حية ===== -->
+        <div class="ls-stats" id="liveStats" style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-bottom:24px;">
+            <div class="ls-stat-card" style="background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:16px 24px;text-align:center;min-width:120px;">
+                <div style="font-size:28px;font-weight:900;color:var(--accent);" id="statMembersCount">0</div>
+                <div style="font-size:12px;color:var(--text-muted);">أعضاء</div>
+            </div>
+            <div class="ls-stat-card" style="background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:16px 24px;text-align:center;min-width:120px;">
+                <div style="font-size:28px;font-weight:900;color:var(--primary);" id="statNewsCount">0</div>
+                <div style="font-size:12px;color:var(--text-muted);">خبر</div>
+            </div>
+            <div class="ls-stat-card" style="background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:16px 24px;text-align:center;min-width:120px;">
+                <div style="font-size:28px;font-weight:900;color:var(--purple);" id="statEventsCount">0</div>
+                <div style="font-size:12px;color:var(--text-muted);">فعالية</div>
+            </div>
+        </div>
+
         <div class="ls-badge"><i class="fas fa-credit-card"></i> الاشتراك والدفع</div>
         <h2 class="ls-title">كيف تصبح عضواً في النقابة؟</h2>
 
@@ -102,5 +118,24 @@
     </div>
 
 <script src="js/landing-particles.js"></script>
+<script>
+(async function() {
+    var api = 'https://bfdixkdwhccriliwtnch.supabase.co';
+    var key = 'sb_publishable_Y3FsxqV_4RA96t7MassN4w_NcOJ31--';
+    var h = { 'apikey': key };
+    try {
+        var m = await fetch(api + '/rest/v1/profiles?select=count', { headers: h });
+        if (m.ok) { var md = await m.json(); document.getElementById('statMembersCount').textContent = Array.isArray(md) ? md.length : (md.count || 0); }
+    } catch(e) {}
+    try {
+        var n = await fetch(api + '/rest/v1/news?select=count', { headers: h });
+        if (n.ok) { var nd = await n.json(); document.getElementById('statNewsCount').textContent = Array.isArray(nd) ? nd.length : (nd.count || 0); }
+    } catch(e) {}
+    try {
+        var e = await fetch(api + '/rest/v1/events?select=count', { headers: h });
+        if (e.ok) { var ed = await e.json(); document.getElementById('statEventsCount').textContent = Array.isArray(ed) ? ed.length : (ed.count || 0); }
+    } catch(e) {}
+})();
+</script>
 </body>
 </html>

@@ -325,7 +325,7 @@
                 var formData = new FormData(form);
                 var result = await NikabaAPI.submitAffiliation(formData);
                 btn.innerHTML = '<i class="fas fa-check-circle"></i> تم الإرسال بنجاح';
-                window.location.href = 'intisab-done.html?id=' + (result[0]?.id || '');
+                document.getElementById('intisabForm').innerHTML = '<div style="text-align:center;padding:40px 16px;"><i class="fas fa-check-circle" style="font-size:48px;color:#22c55e;margin-bottom:12px;"></i><h2 style="color:var(--text);margin-bottom:6px;">تم استلام طلبك بنجاح ✅</h2><p style="color:var(--text-muted);font-size:14px;">سيتم مراجعة طلبك من قبل المكتب التنفيذي والتواصل معك قريباً</p><p style="margin-top:16px;font-size:12px;color:var(--text-muted);">رقم الطلب: ' + (result[0]?.id || '—') + '</p><a href="login.html" class="intisab-btn" style="display:inline-block;margin-top:16px;text-decoration:none;">العودة للرئيسية</a></div>';
             } catch(err) {
                 btn.innerHTML = '<i class="fas fa-paper-plane"></i> إرسال طلب الإنتساب';
                 btn.disabled = false;

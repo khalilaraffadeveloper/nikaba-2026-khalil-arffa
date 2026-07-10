@@ -193,6 +193,48 @@ CREATE POLICY "elections_delete_admin" ON elections FOR DELETE USING (
     auth.uid() IN (SELECT user_id FROM profiles WHERE role IN ('executive', 'admin'))
 );
 
--- 8. تحديد صلاحية admin لأول مستخدم يسجل (يدوياً)
+-- 8. جدول رسائل الشات العام
+CREATE TABLE IF NOT EXISTS chat_messages (
+    id BIGSERIAL PRIMARY KEY,
+    sender_name TEXT NOT NULL,
+    sender_email TEXT,
+    message TEXT NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT now()
+);
+
+ALTER TABLE chat_messages ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "chat_select_all" ON chat_messages FOR SELECT USING (true);
+CREATE POLICY "chat_insert_auth" ON chat_messages FOR INSERT WITH CHECK (
+    auth.role() = 'authenticated'
+);
+
+-- 9. جدول البرامج التعليمية
+CREATE TABLE IF NOT EXISTS educational_videos (
+    id BIGSERIAL PRIMARY KEY,
+    title TEXT NOT NULL,
+    description TEXT,
+    video_url TEXT,
+    thumbnail_url TEXT,
+    category TEXT,
+    sort_order INT DEFAULT 0,
+    status TEXT DEFAULT 'published' CHECK (status IN ('published', 'draft')),
+    created_at TIMESTAMPTZ DEFAULT now()
+);
+
+ALTER TABLE educational_videos ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "edu_select_all" ON educational_videos FOR SELECT USING (true);
+CREATE POLICY "edu_insert_admin" ON educational_videos FOR INSERT WITH CHECK (
+    auth.uid() IN (SELECT user_id FROM profiles WHERE role IN ('executive', 'admin'))
+);
+CREATE POLICY "edu_update_admin" ON educational_videos FOR UPDATE USING (
+    auth.uid() IN (SELECT user_id FROM profiles WHERE role IN ('executive', 'admin'))
+);
+CREATE POLICY "edu_delete_admin" ON educational_videos FOR DELETE USING (
+    auth.uid() IN (SELECT user_id FROM profiles WHERE role IN ('executive', 'admin'))
+);
+
+-- 10. تحديد صلاحية admin لأول مستخدم يسجل (يدوياً)
 -- بعد تسجيل أول مستخدم، شغّل هذا الاستعلام:
 -- UPDATE profiles SET role = 'admin' WHERE email = 'admin@example.com';

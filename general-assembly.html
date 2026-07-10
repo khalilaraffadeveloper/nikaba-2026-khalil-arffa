@@ -159,7 +159,7 @@
             <div class="ga-ticker-track" id="gaTickerTrack">
                 <span><i class="fas fa-user-check"></i> إجمالي الأعضاء: <strong id="tickerMembers">0</strong></span>
                 <span><i class="fas fa-clock"></i> طلبات إنتساب معلقة: <strong id="tickerPending">0</strong></span>
-                <span><i class="fas fa-newspaper"></i> آخر الأخبار: <strong>جاري التحديث...</strong></span>
+                <span><i class="fas fa-newspaper"></i> آخر الأخبار: <strong id="tickerNews">جاري التحديث...</strong></span>
                 <span><i class="fas fa-vote-yea"></i> الانتخابات: <strong id="tickerElections">—</strong></span>
             </div>
         </div>
@@ -374,13 +374,18 @@
             } catch(e) {}
         })();
 
-        // ===== تحميل الإحصائيات =====
+        // ===== تحميل الإحصائيات الحية =====
         (async function loadStats() {
             try {
+                var token = SupabaseAuth.getToken();
+                if (!token) return;
+                var h = { 'apikey': 'sb_publishable_Y3FsxqV_4RA96t7MassN4w_NcOJ31--', 'Authorization': 'Bearer ' + token };
+                var membersRes = await fetch(api + '/rest/v1/profiles?select=count', { headers: h });
+                if (membersRes.ok) { var m = await membersRes.json(); document.getElementById('tickerMembers').textContent = Array.isArray(m) ? m.length : (m.count || 0); }
+                var newsRes = await fetch(api + '/rest/v1/news?select=count', { headers: h });
+                if (newsRes.ok) { var n = await newsRes.json(); document.getElementById('tickerNews').textContent = Array.isArray(n) ? n.length : (n.count || 0); }
                 if (window.NikabaAPI) {
                     var stats = await NikabaAPI.getStats();
-                    var allAffiliations = await NikabaAPI.getAffiliations();
-                    document.getElementById('tickerMembers').textContent = stats.approved || 0;
                     document.getElementById('tickerPending').textContent = stats.pending || 0;
                 }
             } catch(e) {}
@@ -511,7 +516,7 @@
                     openModal('modalNewsDetail');
                 });
             });
-            if (items.length > 0) document.getElementById('tickerElections').textContent = items[0].title;
+            if (items.length > 0) document.getElementById('tickerNews').textContent = items[0].title;
         })();
 
         // ===== فعاليات من Supabase مع fallback =====
@@ -563,74 +568,87 @@
             } catch(e) {}
         })();
 
-        // ===== الشات مع localStorage =====
+        // ===== الشات مع Supabase =====
         var chatMessages = document.getElementById('gaChatMessages');
         var chatInput = document.getElementById('gaChatInput');
-        var chatKey = 'nikaba_chat_' + userEmail;
 
-        function loadChat() {
+        async function loadChat() {
             try {
-                var saved = JSON.parse(localStorage.getItem(chatKey)) || [];
+                var res = await fetch(api + '/rest/v1/chat_messages?order=created_at.asc&limit=100', { headers: h() });
+                var msgs = res.ok ? (await res.json() || []) : [];
                 chatMessages.innerHTML = '';
-                if (saved.length === 0) {
+                if (!msgs.length) {
                     chatMessages.innerHTML = '<div class="ga-empty"><i class="fas fa-comments"></i><p>لا توجد رسائل بعد — كن أول من يرسل!</p></div>';
                     return;
                 }
-                saved.forEach(function(msg) {
-                    chatMessages.innerHTML += '<div class="ga-chat-msg"><div class="ga-chat-avatar">' + msg.sender.charAt(0).toUpperCase() + '</div><div class="ga-chat-bubble"><div class="ga-chat-sender">' + msg.sender + '</div><div class="ga-chat-text">' + msg.text.replace(/</g,'&lt;') + '</div></div></div>';
+                msgs.forEach(function(msg) {
+                    var senderName = msg.sender_name || 'عضو';
+                    chatMessages.innerHTML += '<div class="ga-chat-msg"><div class="ga-chat-avatar">' + senderName.charAt(0).toUpperCase() + '</div><div class="ga-chat-bubble"><div class="ga-chat-sender">' + senderName + '</div><div class="ga-chat-text">' + (msg.message || '').replace(/</g,'&lt;') + '</div></div></div>';
                 });
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             } catch(e) { chatMessages.innerHTML = '<div class="ga-empty"><i class="fas fa-comments"></i><p>لا توجد رسائل بعد — كن أول من يرسل!</p></div>'; }
         }
         loadChat();
 
-        document.getElementById('gaChatSend').addEventListener('click', function() {
+        document.getElementById('gaChatSend').addEventListener('click', async function() {
             var text = chatInput.value.trim();
             if (!text) return;
-            var saved = [];
-            try { saved = JSON.parse(localStorage.getItem(chatKey)) || []; } catch(e) {}
-            saved.push({ sender: userName, text: text, time: new Date().toISOString() });
-            if (saved.length > 100) saved = saved.slice(-100);
-            try { localStorage.setItem(chatKey, JSON.stringify(saved)); } catch(e) {}
             chatInput.value = '';
+            try {
+                await fetch(api + '/rest/v1/chat_messages', {
+                    method: 'POST',
+                    headers: Object.assign(h(), { 'Content-Type': 'application/json', 'Prefer': 'return=minimal' }),
+                    body: JSON.stringify({ sender_name: userName, sender_email: userEmail, message: text })
+                });
+            } catch(e) {}
             loadChat();
-            setTimeout(function() { chatMessages.scrollTop = chatMessages.scrollHeight; }, 50);
+            setTimeout(function() { chatMessages.scrollTop = chatMessages.scrollHeight; }, 100);
         });
         chatInput.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') document.getElementById('gaChatSend').click();
         });
 
-        // ===== فيديوهات تعليمية =====
+        // ===== فيديوهات تعليمية من Supabase مع fallback =====
         var eduVideos = [
             { title: 'أساسيات التمثيل المسرحي', desc: 'تعلم أساسيات التمثيل المسرحي من الوقوف على الخشبة إلى الإلقاء.' },
             { title: 'فن الإلقاء والصوت', desc: 'تقنيات التحكم بالصوت والإلقاء المسرحي والتلفزيوني.' },
             { title: 'تقنيات الأداء التلفزيوني', desc: 'التمثيل أمام الكاميرا وأساسيات الأداء التلفزيوني.' },
             { title: 'كتابة السيناريو والحوار', desc: 'أساسيات كتابة السيناريو الدرامي والحوار المسرحي.' }
         ];
-        document.querySelectorAll('.ga-edu-card').forEach(function(card) {
-            card.addEventListener('click', function() {
-                var i = parseInt(this.getAttribute('data-video'));
-                var v = eduVideos[i] || eduVideos[0];
-                document.getElementById('modalVideoBody').innerHTML = '<div class="video-placeholder"><i class="fas fa-video"></i><p style="font-weight:700;color:var(--text);margin-bottom:4px;">' + v.title + '</p><p>' + v.desc + '</p><p style="margin-top:12px;font-size:11px;">📺 الفيديو قيد التحميل — قريباً</p></div>';
-                openModal('modalVideo');
+        (async function loadVideos() {
+            try {
+                var res = await fetch(api + '/rest/v1/educational_videos?order=sort_order.asc&limit=20', { headers: h() });
+                if (res.ok) {
+                    var dbVids = await res.json();
+                    if (dbVids && dbVids.length) eduVideos = dbVids.map(function(v) { return { title: v.title, desc: v.description || '' }; });
+                }
+            } catch(e) {}
+            document.querySelectorAll('.ga-edu-card').forEach(function(card) {
+                card.addEventListener('click', function() {
+                    var i = parseInt(this.getAttribute('data-video'));
+                    var v = eduVideos[i] || eduVideos[0];
+                    document.getElementById('modalVideoBody').innerHTML = '<div class="video-placeholder"><i class="fas fa-video"></i><p style="font-weight:700;color:var(--text);margin-bottom:4px;">' + v.title + '</p><p>' + v.desc + '</p><p style="margin-top:12px;font-size:11px;">📺 الفيديو قيد التحميل — قريباً</p></div>';
+                    openModal('modalVideo');
+                });
             });
-        });
+        })();
 
         // ===== إشعارات =====
-        (function checkNotifs() {
+        (async function checkNotifs() {
             try {
-                var saved = JSON.parse(localStorage.getItem(chatKey)) || [];
-                if (saved.length > 0) { notifDot.style.display = 'block'; }
+                var res = await fetch(api + '/rest/v1/chat_messages?order=created_at.desc&limit=5', { headers: h() });
+                if (!res.ok) return;
+                var recent = await res.json();
                 var notifBody = document.getElementById('modalNotifBody');
-                if (saved.length === 0) {
+                if (!recent || !recent.length) {
                     notifBody.innerHTML = '<div class="ga-empty"><i class="fas fa-bell-slash"></i><p>لا توجد إشعارات جديدة</p></div>';
-                } else {
-                    notifBody.innerHTML = '';
-                    var recent = saved.slice(-5).reverse();
-                    recent.forEach(function(msg) {
-                        notifBody.innerHTML += '<div style="padding:8px 0;border-bottom:1px solid var(--border-light);"><div style="font-size:11px;color:var(--text-muted);">' + msg.sender + '</div><div style="font-size:13px;color:var(--text);">' + msg.text.replace(/</g,'&lt;') + '</div></div>';
-                    });
+                    return;
                 }
+                document.getElementById('mektebNotifBadge').textContent = recent.length;
+                notifBody.innerHTML = '';
+                recent.forEach(function(msg) {
+                    notifBody.innerHTML += '<div style="padding:8px 0;border-bottom:1px solid var(--border-light);"><div style="font-size:11px;color:var(--text-muted);">' + (msg.sender_name || 'عضو') + '</div><div style="font-size:13px;color:var(--text);">' + (msg.message || '').replace(/</g,'&lt;') + '</div></div>';
+                });
             } catch(e) {}
         })();
 

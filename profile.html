@@ -169,7 +169,7 @@
         (async function() {
             try {
                 var token = SupabaseAuth.getToken();
-                var res = await fetch('https://bfdixkdwhccriliwtnch.supabase.co/rest/v1/profiles?user_id=eq.' + userId + '&select=*', {
+                var res = await fetch('https://bfdixkdwhccriliwtnch.supabase.co/rest/v1/profiles?email=eq.' + encodeURIComponent(userEmail) + '&select=*', {
                     headers: { 'apikey': 'sb_publishable_Y3FsxqV_4RA96t7MassN4w_NcOJ31--', 'Authorization': 'Bearer ' + token }
                 });
                 if (!res.ok) { console.warn('Profile fetch failed', res.status); return; }
@@ -193,7 +193,30 @@
         })();
 
         document.getElementById('prEditBtn').addEventListener('click', function() {
-            alert('✏️ قريباً — سيتم تفعيل خاصية تعديل البيانات.');
+            var newName = prompt('الاسم:', document.getElementById('prFieldName').textContent);
+            if (newName === null) return;
+            var newPhone = prompt('رقم الهاتف:', document.getElementById('prFieldPhone').textContent !== '—' ? document.getElementById('prFieldPhone').textContent : '');
+            if (newPhone === null) return;
+            var newId = prompt('بطاقة التعريف:', document.getElementById('prFieldId').textContent !== '—' ? document.getElementById('prFieldId').textContent : '');
+            if (newId === null) return;
+            var newWhatsapp = prompt('الواتساب:', document.getElementById('prFieldWhatsapp').textContent !== '—' ? document.getElementById('prFieldWhatsapp').textContent : '');
+            if (newWhatsapp === null) return;
+            (async function() {
+                var token = SupabaseAuth.getToken();
+                var body = {};
+                if (newName.trim()) body.name = newName.trim();
+                if (newPhone.trim()) body.phone = newPhone.trim();
+                if (newId.trim()) body.national_id = newId.trim();
+                if (newWhatsapp.trim()) body.whatsapp = newWhatsapp.trim();
+                if (!Object.keys(body).length) return;
+                var res = await fetch('https://bfdixkdwhccriliwtnch.supabase.co/rest/v1/profiles?user_id=eq.' + userId, {
+                    method: 'PATCH',
+                    headers: { 'apikey': 'sb_publishable_Y3FsxqV_4RA96t7MassN4w_NcOJ31--', 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                if (res.ok) { alert('✅ تم تحديث البيانات'); window.location.reload(); }
+                else { alert('❌ فشل التحديث'); }
+            })();
         });
         document.getElementById('prLogoutBtn').addEventListener('click', function() {
             if (confirm('تأكيد تسجيل الخروج؟')) SupabaseAuth.signOut();
