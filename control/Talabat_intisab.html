@@ -502,7 +502,7 @@
 
     </div>
 
-    <!-- ===== مودال التفاصيل ===== -->
+    <!-- ===== شكلية طلبات الإنتساب المستقبلة ===== -->
     <div class="intisab-modal-overlay" id="intisabModal">
         <div class="intisab-modal-box">
             <h3 id="modalTitle">تفاصيل الطلب</h3>
@@ -535,7 +535,14 @@
                 id: 1,
                 name: 'محمد أحمد',
                 email: 'mohamed@example.com',
+                national_id: '1234567890',
                 phone: '12345678',
+                whatsapp: '12345678',
+                personal_photo: '',
+                id_card_image: '',
+                payment_receipt_image: '',
+                payment_number: 'PAY-2026-001',
+                payment_date: '2026-07-01',
                 date: '2026-07-01',
                 status: 'pending',
                 specialty: 'تمثيل',
@@ -545,7 +552,14 @@
                 id: 2,
                 name: 'فاطمة محمد',
                 email: 'fatima@example.com',
+                national_id: '2345678901',
                 phone: '23456789',
+                whatsapp: '23456789',
+                personal_photo: '',
+                id_card_image: '',
+                payment_receipt_image: '',
+                payment_number: 'PAY-2026-002',
+                payment_date: '2026-06-28',
                 date: '2026-06-28',
                 status: 'approved',
                 specialty: 'إخراج',
@@ -555,7 +569,14 @@
                 id: 3,
                 name: 'علي حسن',
                 email: 'ali@example.com',
+                national_id: '3456789012',
                 phone: '34567890',
+                whatsapp: '34567890',
+                personal_photo: '',
+                id_card_image: '',
+                payment_receipt_image: '',
+                payment_number: 'PAY-2026-003',
+                payment_date: '2026-06-25',
                 date: '2026-06-25',
                 status: 'rejected',
                 specialty: 'سيناريو',
@@ -588,16 +609,16 @@
                 html += '<div class="intisab-card" data-id="' + d.id + '">';
                 html += '<div class="intisab-header">';
                 html += '<div><div class="intisab-name">' + d.name + '</div>';
-                html += '<div class="intisab-email">' + d.email + '</div></div>';
+                html += '<div class="intisab-email">بطاقة: ' + d.national_id + '</div></div>';
                 html += '<span class="' + badgeClass + '">' + statusText + '</span>';
                 html += '</div>';
                 html += '<div class="intisab-meta">';
                 html += '<span><i class="fas fa-phone"></i> ' + d.phone + '</span>';
+                html += '<span><i class="fab fa-whatsapp"></i> ' + d.whatsapp + '</span>';
                 html += '<span><i class="fas fa-calendar"></i> ' + d.date + '</span>';
-                html += '<span><i class="fas fa-star"></i> ' + d.specialty + '</span>';
                 html += '</div>';
                 html += '<div class="intisab-actions">';
-                html += '<button class="intisab-btn-close view-details" data-id="' + d.id + '"><i class="fas fa-eye"></i> عرض التفاصيل</button>';
+                html += '<button class="intisab-btn-close view-details" data-id="' + d.id + '"><i class="fas fa-eye"></i> عرض شكلية الإنتساب</button>';
                 html += '</div>';
                 html += '</div>';
             });
@@ -622,13 +643,24 @@
             var id = parseInt(target.getAttribute('data-id'));
             var item = mockData.find(function(d) { return d.id === id; });
             if (!item) return;
-            document.getElementById('modalTitle').textContent = 'تفاصيل طلب الإنتساب - ' + item.name;
+            document.getElementById('modalTitle').textContent = 'شكلية طلبات الإنتساب المستقبلة - ' + item.name;
             var body = '';
-            body += '<div class="intisab-detail-row"><span class="intisab-label">الاسم</span><span class="intisab-value">' + item.name + '</span></div>';
-            body += '<div class="intisab-detail-row"><span class="intisab-label">البريد</span><span class="intisab-value">' + item.email + '</span></div>';
-            body += '<div class="intisab-detail-row"><span class="intisab-label">الهاتف</span><span class="intisab-value">' + item.phone + '</span></div>';
-            body += '<div class="intisab-detail-row"><span class="intisab-label">التاريخ</span><span class="intisab-value">' + item.date + '</span></div>';
-            body += '<div class="intisab-detail-row"><span class="intisab-label">التخصص</span><span class="intisab-value">' + item.specialty + '</span></div>';
+            body += '<div class="intisab-detail-row"><span class="intisab-label">الإسم</span><span class="intisab-value">' + item.name + '</span></div>';
+            body += '<div class="intisab-detail-row"><span class="intisab-label">رقم بطاقة التعريف</span><span class="intisab-value">' + item.national_id + '</span></div>';
+            body += '<div class="intisab-detail-row"><span class="intisab-label">رقم الهاتف</span><span class="intisab-value">' + item.phone + '</span></div>';
+            body += '<div class="intisab-detail-row"><span class="intisab-label">رقم الواتساب</span><span class="intisab-value">' + item.whatsapp + '</span></div>';
+            body += '<div class="intisab-detail-row"><span class="intisab-label">الإيميل</span><span class="intisab-value">' + (item.email || '—') + '</span></div>';
+            body += '<div class="intisab-detail-row"><span class="intisab-label">الرقم الذي تم منه الدفع</span><span class="intisab-value">' + item.payment_number + '</span></div>';
+            body += '<div class="intisab-detail-row"><span class="intisab-label">تاريخ عملية الدفع</span><span class="intisab-value">' + item.payment_date + '</span></div>';
+            if (item.personal_photo) {
+                body += '<div class="intisab-detail-row"><span class="intisab-label">صورة شخصية</span><span class="intisab-value"><img src="' + item.personal_photo + '" alt="صورة شخصية" /></span></div>';
+            }
+            if (item.id_card_image) {
+                body += '<div class="intisab-detail-row"><span class="intisab-label">صورة بطاقة التعريف</span><span class="intisab-value"><img src="' + item.id_card_image + '" alt="بطاقة تعريف" /></span></div>';
+            }
+            if (item.payment_receipt_image) {
+                body += '<div class="intisab-detail-row"><span class="intisab-label">صورة دفع الرسوم</span><span class="intisab-value"><img src="' + item.payment_receipt_image + '" alt="إيصال دفع" /></span></div>';
+            }
             document.getElementById('modalBody').innerHTML = body;
             document.getElementById('intisabModal').classList.add('show');
         });
