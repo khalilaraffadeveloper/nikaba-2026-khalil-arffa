@@ -32,7 +32,6 @@ body.control-page {
     flex-direction: column;
     border-left: 1px solid var(--border);
     z-index: 100;
-    overflow: hidden;
 }
 .mekteb-sidebar:hover {
     width: 260px;
@@ -69,18 +68,20 @@ body.control-page {
     list-style: none;
     position: relative;
     flex: 1;
+}
+.mekteb-sidebar:hover .mekteb-nav-list {
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-width: thin;
     scrollbar-color: var(--border) transparent;
 }
-.mekteb-nav-list::-webkit-scrollbar {
+.mekteb-sidebar:hover .mekteb-nav-list::-webkit-scrollbar {
     width: 3px;
 }
-.mekteb-nav-list::-webkit-scrollbar-track {
+.mekteb-sidebar:hover .mekteb-nav-list::-webkit-scrollbar-track {
     background: transparent;
 }
-.mekteb-nav-list::-webkit-scrollbar-thumb {
+.mekteb-sidebar:hover .mekteb-nav-list::-webkit-scrollbar-thumb {
     background: var(--border);
     border-radius: 999px;
 }
@@ -94,7 +95,7 @@ body.control-page {
     color: var(--text-secondary);
     transition: all 0.2s;
     white-space: nowrap;
-    gap: 20px;
+    gap: 30px;
 }
 .mekteb-nav-list li a i {
     font-size: 22px;
