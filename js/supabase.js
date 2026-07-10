@@ -37,14 +37,24 @@
                 }
             }
 
-            var res = await fetch(SUPABASE_URL + '/rest/v1/affiliations', {
+            var res = await fetch(SUPABASE_URL + '/rest/v1/rpc/insert_affiliation', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'apikey': SUPABASE_ANON_KEY,
-                    'Prefer': 'return=representation'
+                    'apikey': SUPABASE_ANON_KEY
                 },
-                body: JSON.stringify(data)
+                body: JSON.stringify({
+                    p_name: data.name,
+                    p_national_id: data.national_id,
+                    p_email: data.email,
+                    p_phone: data.phone,
+                    p_whatsapp: data.whatsapp,
+                    p_payment_number: data.payment_number,
+                    p_payment_date: data.payment_date,
+                    p_personal_photo_url: data.personal_photo_url,
+                    p_id_card_image_url: data.id_card_image_url,
+                    p_payment_receipt_url: data.payment_receipt_url
+                })
             });
 
             if (!res.ok) {

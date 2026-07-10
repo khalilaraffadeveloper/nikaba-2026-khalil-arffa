@@ -235,6 +235,31 @@ CREATE POLICY "edu_delete_admin" ON educational_videos FOR DELETE USING (
     auth.uid() IN (SELECT user_id FROM profiles WHERE role IN ('executive', 'admin'))
 );
 
+-- 9.5 دالة لتجاوز RLS عند إدراج طلبات الإنتساب (للنماذج العامة)
+CREATE OR REPLACE FUNCTION insert_affiliation(
+    p_name TEXT,
+    p_national_id TEXT DEFAULT NULL,
+    p_email TEXT DEFAULT NULL,
+    p_phone TEXT,
+    p_whatsapp TEXT,
+    p_payment_number TEXT,
+    p_payment_date TEXT DEFAULT NULL,
+    p_personal_photo_url TEXT DEFAULT NULL,
+    p_id_card_image_url TEXT DEFAULT NULL,
+    p_payment_receipt_url TEXT DEFAULT NULL
+) RETURNS json
+LANGUAGE plpgsql SECURITY DEFINER
+AS $$
+DECLARE
+    result json;
+BEGIN
+    INSERT INTO affiliations (name, national_id, email, phone, whatsapp, payment_number, payment_date, personal_photo_url, id_card_image_url, payment_receipt_url)
+    VALUES (p_name, p_national_id, p_email, p_phone, p_whatsapp, p_payment_number, p_payment_date, p_personal_photo_url, p_id_card_image_url, p_payment_receipt_url)
+    RETURNING row_to_json(affiliations) INTO result;
+    RETURN result;
+END;
+$$;
+
 -- 10. إنشاء Storage Bucket لرفع ملفات الإنتساب
 INSERT INTO storage.buckets (id, name, public)
 VALUES ('affiliation-files', 'affiliation-files', true)
