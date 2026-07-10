@@ -7,334 +7,787 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <link rel="stylesheet" href="css/style.css" />
     <script src="js/supabase-auth.js"></script>
+    <script src="js/supabase.js"></script>
     <style>
+        /* ===== إعادة تعيين الجسم ===== */
         .ga-page {
             min-height: 100vh;
             background: var(--bg);
+            padding-bottom: 80px;
         }
-        /* شريط التنقل العلوي */
-        .ga-nav {
+
+        /* ===== الشريط العلوي القابل للطي ===== */
+        .ga-topbar {
+            position: sticky;
+            top: 0;
+            z-index: 200;
             background: var(--bg-card);
             border-bottom: 1px solid var(--border-light);
-            padding: 12px 20px;
+        }
+        .ga-topbar-main {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            padding: 10px 16px;
         }
-        .ga-nav-right {
+        .ga-topbar-right {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
-        .ga-nav-right img {
-            width: 36px;
-            height: 36px;
+        .ga-topbar-right img {
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             border: 2px solid var(--accent);
         }
-        .ga-nav-right .ga-nav-title {
-            font-size: 16px;
-            font-weight: 800;
+        .ga-topbar-title {
+            font-size: 15px;
+            font-weight: 900;
             color: var(--accent);
         }
-        .ga-nav-left {
+        .ga-topbar-left {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 6px;
         }
-        .ga-nav-left .ga-user-name {
-            font-size: 13px;
+        .ga-topbar-btn {
+            background: none;
+            border: none;
             color: var(--text-secondary);
+            font-size: 18px;
+            padding: 6px 8px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
         }
-        .ga-nav-left .ga-user-name strong {
+        .ga-topbar-btn:hover {
+            background: var(--bg-elevated);
             color: var(--text);
         }
-        .ga-nav-left .ga-avatar {
-            width: 34px;
-            height: 34px;
+        .ga-topbar-btn .badge-dot {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--danger);
+            border: 2px solid var(--bg-card);
+        }
+
+        /* ===== القائمة المنسدلة (Drawer) ===== */
+        .ga-drawer-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 300;
+        }
+        .ga-drawer-overlay.show { display: block; }
+        .ga-drawer {
+            position: fixed;
+            top: 0; right: -280px;
+            width: 260px;
+            height: 100vh;
+            background: var(--bg-card);
+            border-left: 1px solid var(--border);
+            z-index: 400;
+            transition: right 0.3s ease;
+            padding: 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .ga-drawer.open { right: 0; }
+        .ga-drawer-close {
+            align-self: flex-end;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 20px;
+            padding: 4px 8px;
+            cursor: pointer;
+        }
+        .ga-drawer-user {
+            text-align: center;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border-light);
+            margin-bottom: 12px;
+        }
+        .ga-drawer-avatar {
+            width: 56px;
+            height: 56px;
             border-radius: 50%;
             background: var(--bg-elevated);
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 22px;
+            font-weight: 800;
             color: var(--accent);
-            font-weight: 700;
-            font-size: 14px;
-            border: 2px solid var(--border);
+            border: 3px solid var(--accent);
+            margin: 0 auto 8px;
         }
-        .ga-nav-left .ga-logout-btn {
-            background: none;
-            border: none;
-            color: var(--danger);
-            font-size: 18px;
-            cursor: pointer;
-            padding: 6px;
-            border-radius: 8px;
-            transition: all 0.2s;
-        }
-        .ga-nav-left .ga-logout-btn:hover {
-            background: rgba(239,68,68,0.1);
-        }
-
-        /* الترحيب */
-        .ga-hero {
-            padding: 40px 20px 30px;
-            text-align: center;
-            position: relative;
-        }
-        .ga-hero::before {
-            content: '';
-            position: absolute;
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(245,200,66,0.04) 0%, transparent 70%);
-            top: -50px;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-        .ga-hero h1 {
-            font-size: 26px;
-            font-weight: 900;
-            color: var(--accent);
-            margin-bottom: 8px;
-            position: relative;
-        }
-        .ga-hero p {
-            font-size: 14px;
-            color: var(--text-muted);
-            max-width: 400px;
-            margin: 0 auto;
-        }
-        .ga-hero .ga-member-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 4px 14px;
-            border-radius: 999px;
-            background: var(--accent-glow);
-            border: 1px solid rgba(245,200,66,0.2);
-            font-size: 12px;
-            color: var(--accent);
-            margin-top: 12px;
-        }
-
-        /* شبكة الخدمات */
-        .ga-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            padding: 0 16px 20px;
-            max-width: 480px;
-            margin: 0 auto;
-        }
-        .ga-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 20px 16px;
-            text-align: center;
-            transition: all 0.2s;
-            cursor: pointer;
-            text-decoration: none;
-        }
-        .ga-card:hover {
-            border-color: var(--accent);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-        }
-        .ga-card .ga-card-icon {
-            font-size: 28px;
-            margin-bottom: 8px;
-        }
-        .ga-card .ga-card-title {
-            font-size: 13px;
+        .ga-drawer-name {
+            font-size: 15px;
             font-weight: 700;
             color: var(--text);
         }
-        .ga-card .ga-card-desc {
+        .ga-drawer-email {
             font-size: 11px;
             color: var(--text-muted);
-            margin-top: 2px;
         }
-
-        /* الألوان */
-        .ga-card:nth-child(1) .ga-card-icon { color: var(--accent); }
-        .ga-card:nth-child(2) .ga-card-icon { color: var(--primary); }
-        .ga-card:nth-child(3) .ga-card-icon { color: var(--success); }
-        .ga-card:nth-child(4) .ga-card-icon { color: var(--purple); }
-        .ga-card:nth-child(5) .ga-card-icon { color: var(--pink); }
-        .ga-card:nth-child(6) .ga-card-icon { color: var(--teal); }
-        .ga-card:nth-child(7) .ga-card-icon { color: var(--orange); }
-        .ga-card:nth-child(8) .ga-card-icon { color: var(--danger); }
-
-        /* الإشعارات */
-        .ga-notif-bar {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            margin: 0 16px 16px;
-            padding: 14px 16px;
+        .ga-drawer-role {
+            display: inline-block;
+            font-size: 10px;
+            padding: 2px 10px;
+            border-radius: 999px;
+            background: var(--accent-glow);
+            color: var(--accent);
+            margin-top: 6px;
+        }
+        .ga-drawer-role.admin { background: rgba(59,130,246,0.15); color: var(--primary); }
+        .ga-drawer-role.executive { background: rgba(139,92,246,0.15); color: var(--purple); }
+        .ga-drawer-nav {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            flex: 1;
+        }
+        .ga-drawer-nav li { margin-bottom: 2px; }
+        .ga-drawer-nav a {
             display: flex;
             align-items: center;
             gap: 10px;
-            max-width: 480px;
-            margin-left: auto;
-            margin-right: auto;
+            padding: 10px 12px;
+            border-radius: 10px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 13px;
+            transition: all 0.2s;
         }
-        .ga-notif-bar .ga-notif-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
+        .ga-drawer-nav a:hover {
+            background: var(--bg-elevated);
+            color: var(--text);
+        }
+        .ga-drawer-nav a i { width: 20px; text-align: center; font-size: 15px; }
+        .ga-drawer-nav .drawer-divider {
+            height: 1px;
+            background: var(--border-light);
+            margin: 8px 0;
+        }
+        .ga-drawer-nav .drawer-danger a { color: var(--danger); }
+        .ga-drawer-nav .drawer-danger a:hover { background: rgba(239,68,68,0.1); }
+
+        /* ===== زر secret للمكتب التنفيذي ===== */
+        .ga-secret-btn {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: linear-gradient(135deg, var(--accent), #d4a830);
+            color: #0a0a14;
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 800;
+            text-decoration: none;
+            margin: 12px 0 8px;
+            transition: all 0.2s;
+        }
+        .ga-secret-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 20px rgba(245,200,66,0.3);
+        }
+        .ga-secret-btn.show { display: flex; }
+
+        /* ===== شريط الإحصائيات المتحرك ===== */
+        .ga-ticker {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border-light);
+            padding: 8px 16px;
+            overflow: hidden;
+            white-space: nowrap;
+            position: relative;
+        }
+        .ga-ticker-track {
+            display: inline-block;
+            animation: ticker-scroll 20s linear infinite;
+        }
+        .ga-ticker-track span {
+            display: inline-block;
+            margin-left: 40px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .ga-ticker-track span i { color: var(--accent); margin-left: 4px; }
+        .ga-ticker-track span strong { color: var(--text); }
+        @keyframes ticker-scroll {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* ===== علامات التبويب الرئيسية ===== */
+        .ga-tabs {
+            display: flex;
+            overflow-x: auto;
+            gap: 0;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border-light);
+            position: sticky;
+            top: 52px;
+            z-index: 150;
+            scrollbar-width: none;
+        }
+        .ga-tabs::-webkit-scrollbar { display: none; }
+        .ga-tab {
+            flex-shrink: 0;
+            padding: 10px 18px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .ga-tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+        .ga-tab i { margin-left: 6px; }
+
+        /* ===== محتوى كل تبويب ===== */
+        .ga-panel {
+            display: none;
+            padding: 16px;
+        }
+        .ga-panel.active { display: block; }
+
+        /* ===== بطاقة الأخبار ===== */
+        .ga-news-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 10px;
+            transition: all 0.2s;
+        }
+        .ga-news-card:last-child { margin-bottom: 0; }
+        .ga-news-card .ga-news-date {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+        .ga-news-card .ga-news-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text);
+            margin: 4px 0;
+        }
+        .ga-news-card .ga-news-excerpt {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* ===== الفعاليات ===== */
+        .ga-event-item {
+            display: flex;
+            gap: 12px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        .ga-event-date-box {
+            text-align: center;
+            min-width: 48px;
+            padding: 6px 8px;
             background: var(--accent-glow);
+            border-radius: 10px;
+        }
+        .ga-event-date-box .eday { font-size: 18px; font-weight: 900; color: var(--accent); display: block; }
+        .ga-event-date-box .emonth { font-size: 9px; color: var(--text-muted); }
+        .ga-event-info { flex: 1; }
+        .ga-event-info .ga-event-title { font-size: 14px; font-weight: 700; }
+        .ga-event-info .ga-event-desc { font-size: 11px; color: var(--text-muted); }
+
+        /* ===== الإنتخابات ===== */
+        .ga-election-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(139,92,246,0.2);
+            border-radius: 14px;
+            padding: 16px;
+            text-align: center;
+        }
+        .ga-election-card .ga-elec-icon {
+            font-size: 32px;
+            color: var(--purple);
+            margin-bottom: 8px;
+        }
+        .ga-election-card .ga-elec-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text);
+        }
+        .ga-election-card .ga-elec-status {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+        .ga-election-card .ga-elec-progress {
+            height: 6px;
+            background: var(--bg-elevated);
+            border-radius: 999px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+        .ga-election-card .ga-elec-progress .ga-elec-fill {
+            height: 100%;
+            background: var(--purple);
+            border-radius: 999px;
+            width: 0%;
+        }
+        .ga-election-card .ga-elec-votes {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* ===== الشات العام ===== */
+        .ga-chat-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+        }
+        .ga-chat-messages {
+            padding: 12px;
+            max-height: 280px;
+            overflow-y: auto;
+        }
+        .ga-chat-msg {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .ga-chat-msg .ga-chat-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--bg-elevated);
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
             color: var(--accent);
             flex-shrink: 0;
         }
-        .ga-notif-bar .ga-notif-text {
-            font-size: 13px;
-            color: var(--text-secondary);
-            flex: 1;
+        .ga-chat-msg .ga-chat-bubble {
+            background: var(--bg-elevated);
+            border-radius: 12px;
+            padding: 8px 12px;
+            max-width: 80%;
         }
-        .ga-notif-bar .ga-notif-count {
-            background: var(--danger);
-            color: #fff;
-            font-size: 11px;
+        .ga-chat-msg .ga-chat-bubble .ga-chat-sender {
+            font-size: 10px;
             font-weight: 700;
-            padding: 2px 10px;
-            border-radius: 999px;
+            color: var(--accent);
         }
-
-        /* الفوتر */
-        .ga-footer {
-            text-align: center;
-            padding: 20px;
-            font-size: 12px;
-            color: var(--text-muted);
+        .ga-chat-msg .ga-chat-bubble .ga-chat-text {
+            font-size: 13px;
+            color: var(--text);
+        }
+        .ga-chat-input-wrap {
+            display: flex;
+            gap: 8px;
+            padding: 10px 12px;
             border-top: 1px solid var(--border-light);
         }
+        .ga-chat-input-wrap input {
+            flex: 1;
+            padding: 10px 14px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text);
+            font-size: 13px;
+        }
+        .ga-chat-input-wrap input:focus { outline: none; border-color: var(--accent); }
+        .ga-chat-input-wrap button {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: var(--accent);
+            color: #0a0a14;
+            cursor: pointer;
+        }
+
+        /* ===== البرامج التعليمية ===== */
+        .ga-edu-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .ga-edu-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .ga-edu-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+        .ga-edu-card .ga-edu-thumb {
+            height: 90px;
+            background: var(--bg-elevated);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: var(--accent);
+            position: relative;
+        }
+        .ga-edu-card .ga-edu-thumb .play-overlay {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%,-50%);
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            background: rgba(245,200,66,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: var(--accent);
+            border: 2px solid var(--accent);
+        }
+        .ga-edu-card .ga-edu-title {
+            padding: 8px 10px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        /* ===== حالة عدم وجود محتوى ===== */
+        .ga-empty {
+            text-align: center;
+            padding: 30px 20px;
+            color: var(--text-muted);
+        }
+        .ga-empty i { font-size: 32px; margin-bottom: 8px; }
+
+        /* ===== الفوتر ===== */
+        .ga-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-card);
+            border-top: 1px solid var(--border-light);
+            padding: 8px 16px;
+            display: flex;
+            justify-content: space-around;
+            z-index: 200;
+        }
+        .ga-footer a {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            font-size: 10px;
+            color: var(--text-muted);
+            text-decoration: none;
+            padding: 4px 8px;
+            transition: all 0.2s;
+        }
+        .ga-footer a i { font-size: 18px; }
+        .ga-footer a.active { color: var(--accent); }
+        .ga-footer a:hover { color: var(--text); }
 
         @media (min-width: 500px) {
-            .ga-grid {
-                grid-template-columns: repeat(3, 1fr);
-                max-width: 600px;
-            }
+            .ga-edu-grid { grid-template-columns: repeat(3, 1fr); }
         }
     </style>
 </head>
 <body>
 
-    <div class="ga-page">
+    <div class="ga-page" id="gaPage">
 
-        <!-- شريط التنقل -->
-        <nav class="ga-nav">
-            <div class="ga-nav-right">
-                <img src="images/logoNikabo.png" alt="الشعار" />
-                <span class="ga-nav-title">الجمعية العامة</span>
+        <!-- ===== الشريط العلوي ===== -->
+        <div class="ga-topbar">
+            <div class="ga-topbar-main">
+                <div class="ga-topbar-right">
+                    <img src="images/logoNikabo.png" alt="الشعار" />
+                    <span class="ga-topbar-title">الجمعية العامة</span>
+                </div>
+                <div class="ga-topbar-left">
+                    <button class="ga-topbar-btn" id="gaBtnNotif" title="الإشعارات"><i class="fas fa-bell"></i><span class="badge-dot" id="gaNotifDot"></span></button>
+                    <button class="ga-topbar-btn" id="gaBtnDrawer" title="القائمة"><i class="fas fa-bars"></i></button>
+                </div>
             </div>
-            <div class="ga-nav-left">
-                <span class="ga-user-name">مرحباً، <strong id="gaUserName">عضو</strong></span>
-                <div class="ga-avatar" id="gaUserAvatar">ع</div>
-                <button class="ga-logout-btn" id="gaLogoutBtn" title="تسجيل خروج"><i class="fas fa-sign-out-alt"></i></button>
+        </div>
+
+        <!-- ===== شريط الإحصائيات المتحرك ===== -->
+        <div class="ga-ticker">
+            <div class="ga-ticker-track" id="gaTickerTrack">
+                <span><i class="fas fa-user-check"></i> إجمالي الأعضاء: <strong id="tickerMembers">0</strong></span>
+                <span><i class="fas fa-clock"></i> طلبات إنتساب معلقة: <strong id="tickerPending">0</strong></span>
+                <span><i class="fas fa-newspaper"></i> آخر الأخبار: <strong>جاري التحديث...</strong></span>
+                <span><i class="fas fa-vote-yea"></i> الانتخابات: <strong id="tickerElections">—</strong></span>
             </div>
-        </nav>
-
-        <!-- الترحيب -->
-        <div class="ga-hero">
-            <h1>الجمعية العامة</h1>
-            <p>General Assembly — نقابة المهن التمثيلية في موريتانيا</p>
-            <div class="ga-member-badge"><i class="fas fa-user-check"></i> عضو في النقابة</div>
         </div>
 
-        <!-- شريط الإشعارات -->
-        <div class="ga-notif-bar">
-            <div class="ga-notif-icon"><i class="fas fa-bell"></i></div>
-            <span class="ga-notif-text">لا توجد إشعارات جديدة</span>
-            <span class="ga-notif-count" id="gaNotifCount" style="display:none;">0</span>
+        <!-- ===== علامات التبويب ===== -->
+        <div class="ga-tabs" id="gaTabs">
+            <div class="ga-tab active" data-tab="news"><i class="fas fa-newspaper"></i> الأخبار</div>
+            <div class="ga-tab" data-tab="events"><i class="fas fa-calendar-alt"></i> الفعاليات</div>
+            <div class="ga-tab" data-tab="elections"><i class="fas fa-vote-yea"></i> الانتخابات</div>
+            <div class="ga-tab" data-tab="chat"><i class="fas fa-comments"></i> الشات العام</div>
+            <div class="ga-tab" data-tab="edu"><i class="fas fa-graduation-cap"></i> البرامج التعليمية</div>
         </div>
 
-        <!-- شبكة الخدمات -->
-        <div class="ga-grid">
-
-            <a href="control/EL_Mekteb1.html" class="ga-card">
-                <div class="ga-card-icon"><i class="fas fa-tachometer-alt"></i></div>
-                <div class="ga-card-title">المكتب التنفيذي</div>
-                <div class="ga-card-desc">Bureau Exécutif</div>
-            </a>
-
-            <a href="news.html" class="ga-card">
-                <div class="ga-card-icon"><i class="fas fa-newspaper"></i></div>
-                <div class="ga-card-title">الأخبار</div>
-                <div class="ga-card-desc">Actualités</div>
-            </a>
-
-            <a href="events.html" class="ga-card">
-                <div class="ga-card-icon"><i class="fas fa-calendar-alt"></i></div>
-                <div class="ga-card-title">الفعاليات</div>
-                <div class="ga-card-desc">Événements</div>
-            </a>
-
-            <a href="members.html" class="ga-card">
-                <div class="ga-card-icon"><i class="fas fa-users"></i></div>
-                <div class="ga-card-title">الأعضاء</div>
-                <div class="ga-card-desc">Membres</div>
-            </a>
-
-            <a href="gallery.html" class="ga-card">
-                <div class="ga-card-icon"><i class="fas fa-images"></i></div>
-                <div class="ga-card-title">المعرض</div>
-                <div class="ga-card-desc">Galerie</div>
-            </a>
-
-            <a href="contact.html" class="ga-card">
-                <div class="ga-card-icon"><i class="fas fa-headset"></i></div>
-                <div class="ga-card-title">اتصل بنا</div>
-                <div class="ga-card-desc">Contact</div>
-            </a>
-
-            <a href="intisab.html" class="ga-card">
-                <div class="ga-card-icon"><i class="fas fa-handshake"></i></div>
-                <div class="ga-card-title">طلب إنتساب</div>
-                <div class="ga-card-desc">Demande d'Adhésion</div>
-            </a>
-
-            <a href="settings.html" class="ga-card">
-                <div class="ga-card-icon"><i class="fas fa-cog"></i></div>
-                <div class="ga-card-title">الإعدادات</div>
-                <div class="ga-card-desc">Paramètres</div>
-            </a>
-
+        <!-- ===== لوحة الأخبار ===== -->
+        <div class="ga-panel active" id="panelNews">
+            <div id="gaNewsList"><div class="ga-empty"><i class="fas fa-newspaper"></i><p>لا توجد أخبار بعد</p></div></div>
         </div>
 
-        <div class="ga-footer">
-            جميع الحقوق محفوظة &copy; 2026 — نقابة المهن التمثيلية في موريتانيا
+        <!-- ===== لوحة الفعاليات ===== -->
+        <div class="ga-panel" id="panelEvents">
+            <div id="gaEventsList"><div class="ga-empty"><i class="fas fa-calendar-alt"></i><p>لا توجد فعاليات حالياً</p></div></div>
+        </div>
+
+        <!-- ===== لوحة الانتخابات ===== -->
+        <div class="ga-panel" id="panelElections">
+            <div class="ga-election-card" id="gaElectionCard">
+                <div class="ga-elec-icon"><i class="fas fa-vote-yea"></i></div>
+                <div class="ga-elec-title" id="gaElecTitle">لا توجد انتخابات نشطة</div>
+                <div class="ga-elec-status" id="gaElecStatus">سيتم الإعلان عن مواعيد الانتخابات القادمة قريباً</div>
+                <div class="ga-elec-progress"><div class="ga-elec-fill" id="gaElecFill" style="width:0%"></div></div>
+                <div class="ga-elec-votes" id="gaElecVotes">0 مشارك</div>
+            </div>
+        </div>
+
+        <!-- ===== لوحة الشات العام ===== -->
+        <div class="ga-panel" id="panelChat">
+            <div class="ga-chat-box">
+                <div class="ga-chat-messages" id="gaChatMessages">
+                    <div class="ga-empty"><i class="fas fa-comments"></i><p>لا توجد رسائل بعد — كن أول من يرسل!</p></div>
+                </div>
+                <div class="ga-chat-input-wrap">
+                    <input type="text" id="gaChatInput" placeholder="اكتب رسالة..." maxlength="500" />
+                    <button id="gaChatSend"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== لوحة البرامج التعليمية ===== -->
+        <div class="ga-panel" id="panelEdu">
+            <div class="ga-edu-grid" id="gaEduGrid">
+                <div class="ga-edu-card">
+                    <div class="ga-edu-thumb"><i class="fas fa-video"></i><div class="play-overlay"><i class="fas fa-play"></i></div></div>
+                    <div class="ga-edu-title">أساسيات التمثيل المسرحي</div>
+                </div>
+                <div class="ga-edu-card">
+                    <div class="ga-edu-thumb"><i class="fas fa-microphone-alt"></i><div class="play-overlay"><i class="fas fa-play"></i></div></div>
+                    <div class="ga-edu-title">فن الإلقاء والصوت</div>
+                </div>
+                <div class="ga-edu-card">
+                    <div class="ga-edu-thumb"><i class="fas fa-theater-masks"></i><div class="play-overlay"><i class="fas fa-play"></i></div></div>
+                    <div class="ga-edu-title">تقنيات الأداء التلفزيوني</div>
+                </div>
+                <div class="ga-edu-card">
+                    <div class="ga-edu-thumb"><i class="fas fa-pen-fancy"></i><div class="play-overlay"><i class="fas fa-play"></i></div></div>
+                    <div class="ga-edu-title">كتابة السيناريو والحوار</div>
+                </div>
+            </div>
         </div>
 
     </div>
 
+    <!-- ===== القائمة الجانبية (Drawer) ===== -->
+    <div class="ga-drawer-overlay" id="gaDrawerOverlay"></div>
+    <div class="ga-drawer" id="gaDrawer">
+        <button class="ga-drawer-close" id="gaDrawerClose"><i class="fas fa-times"></i></button>
+
+        <div class="ga-drawer-user">
+            <div class="ga-drawer-avatar" id="gaDrawerAvatar">ع</div>
+            <div class="ga-drawer-name" id="gaDrawerName">عضو</div>
+            <div class="ga-drawer-email" id="gaDrawerEmail">member@nikaba.mr</div>
+            <div class="ga-drawer-role" id="gaDrawerRole">عضو</div>
+            <!-- الزر السري للمكتب التنفيذي (يظهر فقط للـ admin/executive) -->
+            <a href="control/EL_Mekteb1.html" class="ga-secret-btn" id="gaSecretBtn"><i class="fas fa-tachometer-alt"></i> 🛠️ لوحة المكتب التنفيذي</a>
+        </div>
+
+        <ul class="ga-drawer-nav">
+            <li><a href="#" id="drawerProfile"><i class="fas fa-user-circle"></i> الملف الشخصي</a></li>
+            <li><a href="#" id="drawerContact"><i class="fas fa-envelope"></i> مراسلة المكتب التنفيذي</a></li>
+            <li><a href="#" id="drawerSettings"><i class="fas fa-cog"></i> الإعدادات</a></li>
+            <li><a href="#" id="drawerHelp"><i class="fas fa-question-circle"></i> مساعدة</a></li>
+            <li class="drawer-divider"></li>
+            <li><a href="#" id="drawerFaq"><i class="fas fa-file-alt"></i> الأسئلة الشائعة</a></li>
+            <li><a href="#" id="drawerAbout"><i class="fas fa-info-circle"></i> عن النقابة</a></li>
+            <li class="drawer-divider"></li>
+            <li class="drawer-danger"><a href="javascript:void(0)" id="gaDrawerLogout"><i class="fas fa-sign-out-alt"></i> تسجيل خروج</a></li>
+        </ul>
+    </div>
+
+    <!-- ===== الفوتر ===== -->
+    <div class="ga-footer">
+        <a href="#" class="active" data-tab="news"><i class="fas fa-newspaper"></i> الأخبار</a>
+        <a href="#" data-tab="events"><i class="fas fa-calendar-alt"></i> الفعاليات</a>
+        <a href="#" data-tab="elections"><i class="fas fa-vote-yea"></i> الانتخابات</a>
+        <a href="#" data-tab="chat"><i class="fas fa-comments"></i> الشات</a>
+        <a href="#" data-tab="edu"><i class="fas fa-graduation-cap"></i> التعليمي</a>
+    </div>
+
     <script>
     (function() {
-        // التحقق من تسجيل الدخول
         if (!SupabaseAuth.checkAuth(true)) return;
 
         var user = SupabaseAuth.getUser();
-        if (user) {
-            var name = user.email ? user.email.split('@')[0] : 'عضو';
-            document.getElementById('gaUserName').textContent = name;
-            document.getElementById('gaUserAvatar').textContent = name.charAt(0).toUpperCase();
+        var userEmail = user ? user.email : 'عضو';
+        var userName = userEmail.split('@')[0];
+        var userRole = 'member';
+        var allAffiliations = [];
+
+        // ===== تهيئة واجهة المستخدم =====
+        document.getElementById('gaDrawerName').textContent = userName;
+        document.getElementById('gaDrawerEmail').textContent = userEmail;
+        document.getElementById('gaDrawerAvatar').textContent = userName.charAt(0).toUpperCase();
+
+        // ===== جلب صلاحيات المستخدم من Supabase =====
+        (async function loadProfile() {
+            try {
+                var token = SupabaseAuth.getToken();
+                if (!token) return;
+                var res = await fetch('https://bfdixkdwhccriliwtnch.supabase.co/rest/v1/profiles?email=eq.' + encodeURIComponent(userEmail) + '&select=role', {
+                    headers: { 'apikey': 'sb_publishable_Y3FsxqV_4RA96t7MassN4w_NcOJ31--', 'Authorization': 'Bearer ' + token }
+                });
+                if (!res.ok) return;
+                var profiles = await res.json();
+                if (profiles && profiles.length > 0 && profiles[0].role) {
+                    userRole = profiles[0].role;
+                    var roleEl = document.getElementById('gaDrawerRole');
+                    if (userRole === 'admin') { roleEl.textContent = '🛡️ آدمن'; roleEl.className = 'ga-drawer-role admin'; }
+                    else if (userRole === 'executive') { roleEl.textContent = '⚡ مكتب تنفيذي'; roleEl.className = 'ga-drawer-role executive'; }
+                    else { roleEl.textContent = '✔️ عضو'; roleEl.className = 'ga-drawer-role'; }
+                    if (userRole === 'admin' || userRole === 'executive') {
+                        document.getElementById('gaSecretBtn').classList.add('show');
+                    }
+                }
+            } catch(e) {}
+        })();
+
+        // ===== جلب الإحصائيات =====
+        (async function loadStats() {
+            try {
+                if (window.NikabaAPI) {
+                    var stats = await NikabaAPI.getStats();
+                    allAffiliations = await NikabaAPI.getAffiliations();
+                    document.getElementById('tickerMembers').textContent = stats.approved || 0;
+                    document.getElementById('tickerPending').textContent = stats.pending || 0;
+                }
+            } catch(e) {}
+        })();
+
+        // ===== التنقل بين التبويبات =====
+        function switchTab(tabId) {
+            document.querySelectorAll('.ga-tab').forEach(function(el) { el.classList.remove('active'); });
+            document.querySelectorAll('.ga-footer a').forEach(function(el) { el.classList.remove('active'); });
+            document.querySelectorAll('.ga-panel').forEach(function(el) { el.classList.remove('active'); });
+            var tab = document.querySelector('.ga-tab[data-tab="' + tabId + '"]');
+            var footer = document.querySelector('.ga-footer a[data-tab="' + tabId + '"]');
+            var panel = document.getElementById('panel' + tabId.charAt(0).toUpperCase() + tabId.slice(1));
+            if (tab) tab.classList.add('active');
+            if (footer) footer.classList.add('active');
+            if (panel) panel.classList.add('active');
         }
 
-        // تسجيل خروج
-        document.getElementById('gaLogoutBtn').addEventListener('click', function() {
-            if (confirm('تأكيد تسجيل الخروج؟')) {
-                SupabaseAuth.signOut();
-            }
+        document.querySelectorAll('.ga-tab').forEach(function(el) {
+            el.addEventListener('click', function() { switchTab(this.getAttribute('data-tab')); });
         });
+        document.querySelectorAll('.ga-footer a').forEach(function(el) {
+            el.addEventListener('click', function(e) { e.preventDefault(); switchTab(this.getAttribute('data-tab')); });
+        });
+
+        // ===== القائمة الجانبية =====
+        var drawer = document.getElementById('gaDrawer');
+        var overlay = document.getElementById('gaDrawerOverlay');
+        document.getElementById('gaBtnDrawer').addEventListener('click', function() {
+            drawer.classList.add('open');
+            overlay.classList.add('show');
+        });
+        function closeDrawer() {
+            drawer.classList.remove('open');
+            overlay.classList.remove('show');
+        }
+        document.getElementById('gaDrawerClose').addEventListener('click', closeDrawer);
+        overlay.addEventListener('click', closeDrawer);
+
+        // ===== تسجيل خروج =====
+        document.getElementById('gaDrawerLogout').addEventListener('click', function() {
+            if (confirm('تأكيد تسجيل الخروج؟')) SupabaseAuth.signOut();
+        });
+
+        // ===== مراسلة المكتب التنفيذي =====
+        document.getElementById('drawerContact').addEventListener('click', function(e) {
+            e.preventDefault();
+            var subject = encodeURIComponent('رسالة من عضو - ' + userName);
+            var body = encodeURIComponent('المرسل: ' + userEmail + '\n\n');
+            window.location.href = 'mailto:bureau@nikaba.mr?subject=' + subject + '&body=' + body;
+        });
+
+        // ===== إشعار جديد (محاكاة) =====
+        var notifDot = document.getElementById('gaNotifDot');
+        notifDot.style.display = 'none';
+
+        // ===== أخبار وهمية =====
+        var sampleNews = [
+            { date: '2026-07-10', title: 'افتتاح باب الترشح لانتخابات النقابة', excerpt: 'أعلنت اللجنة المشرفة على الانتخابات فتح باب الترشح للمناصب النقابية ابتداءً من 15 يوليو.' },
+            { date: '2026-07-08', title: 'ورشة عمل حول حقوق الفنانين', excerpt: 'ينظم المكتب التنفيذي ورشة عمل يوم 20 يوليو بالتعاون مع منظمة اليونسكو.' },
+            { date: '2026-07-05', title: 'استقبال طلبات الإنتساب', excerpt: 'لا يزال باب الإنتساب مفتوحاً لجميع الفنانين والممثلين في موريتانيا.' },
+            { date: '2026-07-01', title: 'اجتماع الجمعية العامة السنوي', excerpt: 'دعوة لجميع الأعضاء لحضور اجتماع الجمعية العامة السنوي المقرر عقده في أغسطس.' }
+        ];
+        var newsHtml = '';
+        sampleNews.forEach(function(n) {
+            newsHtml += '<div class="ga-news-card"><div class="ga-news-date">' + n.date + '</div><div class="ga-news-title">' + n.title + '</div><div class="ga-news-excerpt">' + n.excerpt + '</div></div>';
+        });
+        document.getElementById('gaNewsList').innerHTML = newsHtml;
+
+        // ===== فعاليات وهمية =====
+        var sampleEvents = [
+            { day: '20', month: 'يوليو', title: 'ورشة حقوق الفنانين', desc: 'بالتعاون مع اليونسكو' },
+            { day: '15', month: 'يوليو', title: 'افتتاح باب الترشح', desc: 'الانتخابات النقابية' },
+            { day: '05', month: 'أغسطس', title: 'الجمعية العامة السنوي', desc: 'قاعة الاجتماعات الكبرى' }
+        ];
+        var eventsHtml = '';
+        sampleEvents.forEach(function(e) {
+            eventsHtml += '<div class="ga-event-item"><div class="ga-event-date-box"><span class="eday">' + e.day + '</span><span class="emonth">' + e.month + '</span></div><div class="ga-event-info"><div class="ga-event-title">' + e.title + '</div><div class="ga-event-desc">' + e.desc + '</div></div></div>';
+        });
+        document.getElementById('gaEventsList').innerHTML = eventsHtml;
+
+        // ===== الشات العام (محلي) =====
+        var chatMessages = document.getElementById('gaChatMessages');
+        var chatInput = document.getElementById('gaChatInput');
+        document.getElementById('gaChatSend').addEventListener('click', function() {
+            var text = chatInput.value.trim();
+            if (!text) return;
+            if (chatMessages.querySelector('.ga-empty')) chatMessages.innerHTML = '';
+            chatMessages.innerHTML += '<div class="ga-chat-msg"><div class="ga-chat-avatar">' + userName.charAt(0).toUpperCase() + '</div><div class="ga-chat-bubble"><div class="ga-chat-sender">' + userName + '</div><div class="ga-chat-text">' + text.replace(/</g,'&lt;') + '</div></div></div>';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            chatInput.value = '';
+        });
+        chatInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') document.getElementById('gaChatSend').click();
+        });
+
     })();
     </script>
 
