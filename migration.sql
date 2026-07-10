@@ -52,7 +52,11 @@ CREATE TABLE IF NOT EXISTS affiliations (
     personal_photo_url TEXT,
     id_card_image_url TEXT,
     payment_receipt_url TEXT,
+    generated_email TEXT,
+    generated_password TEXT,
+    account_created BOOLEAN DEFAULT false,
     status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
+    credentials TEXT,
     created_at TIMESTAMPTZ DEFAULT now(),
     updated_at TIMESTAMPTZ DEFAULT now()
 );

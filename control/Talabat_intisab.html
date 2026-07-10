@@ -574,15 +574,36 @@
                 <span class="intisab-badge-pending" id="modalStatusBadge">قيد المراجعة</span>
             </div>
             <div class="intisab-modal-body" id="modalBody"></div>
-            <div class="intisab-modal-actions">
+            <div class="intisab-modal-actions" id="modalActions">
                 <button class="intisab-btn-close" id="btnCloseModal">إغلاق</button>
                 <button class="intisab-btn-reject" id="btnReject"><i class="fas fa-times"></i> رفض</button>
                 <button class="intisab-btn-approve" id="btnApprove"><i class="fas fa-check"></i> قبول</button>
+            </div>
+            <div id="modalCredentials" style="display:none;margin-top:12px;padding:14px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:10px;">
+                <h4 style="font-size:13px;color:#22c55e;margin-bottom:8px;"><i class="fas fa-check-circle"></i> بيانات الدخول للعضو الجديد</h4>
+                <div style="font-size:13px;color:var(--text);margin-bottom:4px;"><span style="color:var(--text-muted);">البريد:</span> <strong dir="ltr" id="credEmail" style="user-select:all;"></strong></div>
+                <div style="font-size:13px;color:var(--text);margin-bottom:8px;"><span style="color:var(--text-muted);">كلمة السر:</span> <strong dir="ltr" id="credPassword" style="user-select:all;background:var(--bg);padding:2px 8px;border-radius:4px;font-family:monospace;"></strong></div>
+                <button onclick="copyCredentials()" style="padding:6px 14px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text-secondary);cursor:pointer;font-size:12px;"><i class="fas fa-copy"></i> نسخ البيانات</button>
             </div>
         </div>
     </div>
 
     <script>
+    function copyCredentials() {
+        var email = document.getElementById('credEmail').textContent;
+        var pass = document.getElementById('credPassword').textContent;
+        var text = 'البريد: ' + email + '\nكلمة السر: ' + pass;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(function() {
+                alert('✅ تم نسخ بيانات الدخول');
+            }).catch(function() {
+                prompt('انسخ البيانات يدوياً:', text);
+            });
+        } else {
+            prompt('انسخ البيانات يدوياً:', text);
+        }
+    }
+
     // toggle submenu
     document.querySelectorAll('.mekteb-submenu-toggle').forEach(function(el) {
         el.addEventListener('click', function(e) {
@@ -724,6 +745,28 @@
             document.getElementById('modalBody').innerHTML = body;
             document.getElementById('intisabModal').classList.add('show');
 
+            // إظهار/إخفاء الأزرار والبيانات حسب الحالة
+            var actionsDiv = document.getElementById('modalActions');
+            var credDiv = document.getElementById('modalCredentials');
+            var creds = null;
+            if (item.credentials) {
+                if (typeof item.credentials === 'string') { try { creds = JSON.parse(item.credentials); } catch(e) {} }
+                else { creds = item.credentials; }
+            }
+            if (item.status === 'pending') {
+                actionsDiv.style.display = 'flex';
+                credDiv.style.display = 'none';
+            } else {
+                actionsDiv.style.display = 'none';
+                if (item.status === 'approved' && creds) {
+                    credDiv.style.display = 'block';
+                    document.getElementById('credEmail').textContent = creds.email || item.email || '';
+                    document.getElementById('credPassword').textContent = creds.password || '';
+                } else {
+                    credDiv.style.display = 'none';
+                }
+            }
+
             // ربط أزرار القبول/الرفض
             document.getElementById('btnApprove').onclick = async function() {
                 if (!confirm('تأكيد قبول طلب الإنتساب من ' + item.name + '?')) return;
@@ -752,10 +795,16 @@
                         console.warn('فشل إنشاء الخبر الترحيبي', newsErr);
                     }
                     item.status = 'approved';
+                    if (createdAccount) {
+                        item.credentials = { email: createdAccount.email, password: createdAccount.password };
+                        try {
+                            await NikabaAPI.saveCredentials(id, createdAccount.email, createdAccount.password);
+                        } catch(e) { console.warn('فشل حفظ بيانات الدخول', e); }
+                    }
                     loadData();
                     document.getElementById('intisabModal').classList.remove('show');
                     if (createdAccount) {
-                        alert('✅ تم قبول العضو وإنشاء حسابه بنجاح\n\nالبريد: ' + createdAccount.email + '\nكلمة السر: ' + createdAccount.password + '\n\nيرجى تسليم كلمة السر للعضو الجديد');
+                        alert('✅ تم قبول العضو وإنشاء حسابه بنجاح\n\nالبريد: ' + createdAccount.email + '\nكلمة السر: ' + createdAccount.password + '\n\nيمكنك الاطلاع على بيانات الدخول لاحقاً من تفاصيل الطلب');
                     } else if (item.email) {
                         alert('✅ تم قبول الطلب بنجاح');
                     } else {

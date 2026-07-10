@@ -155,7 +155,7 @@
         createMemberFromAffiliation: async function(data) {
             var token = window.SupabaseAuth ? SupabaseAuth.getToken() : null;
             if (!token) throw new Error('يجب تسجيل الدخول أولاً');
-            var password = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-2).toUpperCase() + '1!';
+            var password = data.phone || '12345678';
             var signRes = await fetch(SUPABASE_URL + '/auth/v1/signup', {
                 method: 'POST',
                 headers: { 'apikey': SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
@@ -187,6 +187,22 @@
                 }
             }
             return { userId: newUserId, email: data.email, password: password };
+        },
+
+        // ===== حفظ بيانات الدخول للعضو المقبول =====
+        saveCredentials: async function(affiliationId, email, password) {
+            var token = window.SupabaseAuth ? SupabaseAuth.getToken() : null;
+            if (!token) throw new Error('يجب تسجيل الدخول أولاً');
+            var res = await fetch(SUPABASE_URL + '/rest/v1/affiliations?id=eq.' + affiliationId, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify({ credentials: JSON.stringify({ email: email, password: password }) })
+            });
+            if (!res.ok) { var e = await res.text(); throw new Error(e || 'فشل حفظ البيانات'); }
         },
 
         // ===== إحصائيات سريعة للوحة التحكم =====
