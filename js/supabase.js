@@ -42,7 +42,6 @@
                 headers: {
                     'Content-Type': 'application/json',
                     'apikey': SUPABASE_ANON_KEY,
-                    'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
                     'Prefer': 'return=representation'
                 },
                 body: JSON.stringify(data)
@@ -63,7 +62,6 @@
                 method: 'POST',
                 headers: {
                     'apikey': SUPABASE_ANON_KEY,
-                    'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
                     'x-upsert': 'true'
                 },
                 body: file
